@@ -1662,7 +1662,7 @@ $("shopModal").onclick = e => { if(e.target.id==="shopModal") $("shopModal").cla
 
 /* ---------- 업적 ---------- */
 const ACH=[
-  {id:"x1",icon:"🧑‍🚀",name:"꿈의 직업",desc:"우주비행사 되기",goal:1,val:()=>JOBS[S.car.job]&&JOBS[S.car.job].n==="우주비행사"?1:0,reward:5e6},
+  {id:"x1",icon:"🧑‍🚀",name:"꿈의 직업",desc:"우주비행사 되기 (꿈의 직업이지만 월급은 공무원 수준이에요!)",goal:1,val:()=>JOBS[S.car.job]&&JOBS[S.car.job].n==="우주비행사"?1:0,reward:5e6},
   {id:"x2",icon:"🎓",name:"자격증 부자",desc:"자격증·학위 10개 따기",goal:10,val:()=>Object.keys(S.car.edu||{}).length,reward:50000},
   {id:"lf1",icon:"🏢",name:"독립 만세!",desc:"부모님 집에서 나와 원룸 이상으로 이사",goal:2,val:()=>S.life?S.life.home:0,reward:3000},
   {id:"lf2",icon:"🏙️",name:"내 집 같은 아파트",desc:"신축 아파트 이상에서 살기",goal:4,val:()=>S.life?S.life.home:0,reward:200000},
@@ -1815,13 +1815,13 @@ const EDU=[
   {id:"med",ic:"🏥",n:"의대·의사 면허",c:4e7,t:600,req:["uni"]},
   {id:"cfa",ic:"📈",n:"국제 금융 자격증",c:8e7,t:480,req:["uni"]},
   {id:"mba",ic:"🎩",n:"해외 MBA",c:3e8,t:600,req:["uni"]},
-  {id:"cook",ic:"🍳",n:"한식·양식 조리사",c:80000,t:90,req:["hs"]},
-  {id:"draw",ic:"✏️",n:"웹툰 아카데미",c:150000,t:120,req:["hs"]},
-  {id:"elec",ic:"🔌",n:"전기기사 자격증",c:250000,t:120,req:["hs"]},
-  {id:"teach",ic:"🧑‍🏫",n:"교원 임용고시",c:2e6,t:300,req:["uni"]},
+  {id:"cook",ic:"🍳",n:"한식·양식 조리사",c:20000,t:60,req:["hs"]},
+  {id:"draw",ic:"✏️",n:"웹툰 아카데미",c:60000,t:120,req:["hs"]},
+  {id:"elec",ic:"🔌",n:"전기기사 자격증",c:40000,t:90,req:["hs"]},
+  {id:"teach",ic:"🧑‍🏫",n:"교원 임용고시",c:1e6,t:300,req:["uni"]},
   {id:"cpa",ic:"🧮",n:"공인회계사(CPA)",c:5e6,t:360,req:["uni"]},
   {id:"pilot",ic:"🛩️",n:"비행 훈련·조종사 면허",c:2e7,t:420,req:["uni"]},
-  {id:"phd",ic:"🔬",n:"이공계 박사 학위",c:1.5e8,t:600,req:["uni"]},
+  {id:"phd",ic:"🔬",n:"이공계 박사 학위",c:3e7,t:900,req:["uni"]},
 ];
 const JOBS=[
   {ic:"🏪",n:"편의점 알바",sal:3,req:[]},
@@ -1837,11 +1837,11 @@ const JOBS=[
   {ic:"🍳",n:"호텔 셰프",sal:55,req:["cook"]},
   {ic:"✏️",n:"웹툰 작가",sal:80,req:["draw","comp"]},
   {ic:"🔌",n:"전기 기술자",sal:100,req:["elec"]},
-  {ic:"🧑‍🏫",n:"중학교 선생님",sal:260,req:["teach"]},
+  {ic:"🧑‍🏫",n:"중학교 선생님",sal:150,req:["teach"]},
   {ic:"🧮",n:"공인회계사",sal:600,req:["cpa"]},
   {ic:"✈️",n:"항공기 조종사",sal:1300,req:["pilot"]},
   {ic:"🧠",n:"AI 연구원",sal:5000,req:["phd","code"]},
-  {ic:"🧑‍🚀",n:"우주비행사",sal:8000,req:["phd","pilot"],texp:1200},
+  {ic:"🧑‍🚀",n:"우주비행사",sal:1600,req:["phd","pilot"],texp:1200},
 ];
 const GIGS=[
   {id:"g1",ic:"🛵",n:"주말 배달",t:45,req:["drv"],pay:()=>2000+clickPay()*25,d:"고정 수입"},
@@ -1874,13 +1874,13 @@ function autoPay(){ return 0; }
 var LIFE_READY=false;
 const HOMES=[
   {ic:"🏠",n:"부모님 집 (캥거루족)",c:0,dep:0,hp:34,d:"공짜! 하지만 엄마 잔소리가 따라와요"},
-  {ic:"🛏️",n:"고시원",c:300,dep:0,hp:30,d:"창문도 없는 1평 방 · 보증금 없음"},
-  {ic:"🏢",n:"원룸 (월세)",c:2000,dep:2e4,hp:48,d:"드디어 나만의 공간!"},
-  {ic:"🏘️",n:"투룸 빌라",c:12000,dep:1.5e5,hp:58,d:"방이 두 개! 친구도 부를 수 있어요"},
-  {ic:"🏙️",n:"신축 아파트",c:80000,dep:1.5e6,hp:70,d:"헬스장·놀이터가 있는 단지"},
-  {ic:"🌇",n:"고급 주상복합",c:6e5,dep:1.5e7,hp:80,d:"컨시어지가 택배를 받아 줘요"},
-  {ic:"🏰",n:"한강뷰 펜트하우스",c:5e6,dep:2e8,hp:90,d:"창밖으로 불꽃놀이가 보여요"},
-  {ic:"🏝️",n:"해외 대저택 + 집사",c:5e7,dep:3e9,hp:100,d:"수영장·전용 셰프·집사까지"},
+  {ic:"🛏️",n:"고시원",c:80,dep:0,hp:30,d:"창문도 없는 1평 방 · 보증금 없음 · 알바 월급의 15%쯤"},
+  {ic:"🏢",n:"원룸 (월세)",c:1200,dep:2e4,hp:48,d:"드디어 나만의 공간! · 사무직 월급의 20%쯤"},
+  {ic:"🏘️",n:"투룸 빌라",c:6000,dep:1e5,hp:58,d:"방이 두 개! · 프로그래머 월급의 25%쯤"},
+  {ic:"🏙️",n:"신축 아파트",c:40000,dep:1e6,hp:70,d:"헬스장·놀이터가 있는 단지 · 변호사 월급의 25%쯤"},
+  {ic:"🌇",n:"고급 주상복합",c:1.5e5,dep:5e6,hp:80,d:"컨시어지가 택배를 받아 줘요 · 투자은행가 월급의 23%쯤"},
+  {ic:"🏰",n:"한강뷰 펜트하우스",c:8e5,dep:4e7,hp:90,d:"창밖으로 불꽃놀이가 보여요 · CEO(부장) 월급의 15%쯤"},
+  {ic:"🏝️",n:"해외 대저택 + 집사",c:1e7,dep:5e8,hp:100,d:"수영장·전용 셰프·집사까지 · 월급보다 자산 소득이 많아야 해요"},
 ];
 const FOODS=[
   {ic:"🍜",n:"라면·편의점",k:.4,h:-3,hp:-3,d:"싸지만 건강이 나빠져요"},
@@ -1889,14 +1889,14 @@ const FOODS=[
   {ic:"🥗",n:"건강식 + 헬스 PT",k:3.5,h:3,hp:2,d:"비싸지만 건강 쑥쑥"},
 ];
 const INSL=[
-  {id:"med",ic:"🏥",n:"실손 의료보험",d:"병원비·수술비의 90%를 보험사가 내줘요"},
+  {id:"med",ic:"🏥",n:"실손 의료보험",d:"병원비·수술비의 80%를 보험사가 내줘요 (자기부담 20%)"},
   {id:"car",ic:"🚗",n:"자동차 보험",d:"교통사고 수리비의 90%를 보험사가 내줘요"},
   {id:"fire",ic:"🔥",n:"화재·주택 보험",d:"집에 불이 나거나 물이 새면 90% 보상 (집에 살 때만)"},
 ];
-const INS_COV=.9, INS_MARGIN=1.15;
+const INS_COV=.9, INS_MARGIN=1.15, COV={med:.8,car:.9,fire:.9};   // 실손보험은 자기부담금 20%
 const TAXB=[[2000,.06],[10000,.15],[40000,.24],[150000,.35],[5e5,.38],[2e6,.40],[6e6,.42],[Infinity,.45]];
-const DEP_TERMS=[{m:3,bo:.3},{m:6,bo:.6},{m:12,bo:1.0}], INT_TAX=.154;
-const LOTTO_P=1000, LOTTO_MAX=100, LOTTO_PRIZE=[0,2e9,5e7,1.5e6,5e4,5e3];
+const DEP_TERMS=[{m:3,bo:-.2},{m:6,bo:.1},{m:12,bo:.4}], INT_TAX=.154;
+const LOTTO_P=2, LOTTO_MAX=100, LOTTO_PRIZE=[0,4e6,1e5,3000,100,10];   // 1장 2코인 ≈ 1,000원 (사무직 월급 6,300코인 ≈ 300만원 기준)
 function initLife(){ if(!S.life) S.life={}; const L=S.life;
   const D=W_DAY(gTick());
   if(L.lastD==null) L.lastD=D; if(L.cpi==null) L.cpi=100; if(!Array.isArray(L.cpiH)||!L.cpiH.length) L.cpiH=[L.cpi];
@@ -1907,26 +1907,29 @@ function initLife(){ if(!S.life) S.life={}; const L=S.life;
   LIFE_READY=true; }
 const lifeCpi=()=>S.life&&S.life.cpi?S.life.cpi:100;
 const lifeK=()=>lifeCpi()/100;
-function lifeMul(){ if(!LIFE_READY||!S.life) return 1; const L=S.life; return (0.8+L.happy*.006)*(L.health<30?.8:1)*(1+.03*L.grad); }
-function incomeTax(g){ const k=lifeK(); let t=0, prev=0; for(const [lim,r] of TAXB){ const top=lim*k; if(g>prev) t+=(Math.min(g,top)-prev)*r; if(g<=top) break; prev=top; } return Math.floor(t); }
+function lifeMul(){ if(!LIFE_READY||!S.life) return 1; const L=S.life; return (0.9+L.happy*.003)*(L.health<30?.85:1)*(1+.03*L.grad)*Math.pow(L.cpi/100,.9); }
+function incomeTax(g){ const k=lifeK(); g=Math.max(0,g-(500*k+g*.1)); let t=0, prev=0; for(const [lim,r] of TAXB){ const top=lim*k; if(g>prev) t+=(Math.min(g,top)-prev)*r; if(g<=top) break; prev=top; } return Math.floor(t*1.1); }   // 근로소득공제(500+10%) 후 누진세율, 지방소득세 10% 포함
+const npsPart=g=>Math.floor(Math.min(g,20000*lifeK())*.045);   // 국민연금 4.5% (소득 상한 있음)
+const socIns=g=>npsPart(g)+Math.floor(g*.049);                  // + 건강·장기요양 4.0% + 고용 0.9%
 const homeCost=(i=S.life.home)=>HOMES[i].c*lifeK();
 const homeDep=i=>HOMES[i].dep*lifeK();
-const foodCost=(f=S.life.food)=>FOODS[f].k*(150+HOMES[S.life.home].c*.25)*lifeK();
+const foodCost=(f=S.life.food)=>FOODS[f].k*(60+HOMES[S.life.home].c*.15)*lifeK();
 const monthPay=()=>clickPay()*DAYTICKS*TICKMS/1000;           // 한 달(장 1일) 동안 버는 세전 급여
-const lifeBase=()=>(300+HOMES[S.life.home].c*.8+clickPay()*25)*lifeK();
+const lifeBase=()=>100*lifeK()+HOMES[S.life.home].c*.3*lifeK()+clickPay()*8;   // ≈ 한 달 월급의 5%
 function hFac(){ const h=S.life.health; return h<30?2:h<60?1.3:h<85?1:.7; }
 function insRisk(id){ const b=lifeBase(), hf=hFac();
-  if(id==="med") return [{p:.10*hf,c:b*.6,t:"🤒 독감으로 병원에 다녀왔어요"},{p:.012*hf,c:b*20,t:"🚑 맹장이 터져서 응급 수술!"}];
-  if(id==="car") return [{p:.03,c:b*8,t:"🚗 출근길 접촉사고! 수리비"}];
+  if(id==="med") return [{p:.10*hf,c:b*.6,t:"🤒 독감으로 병원에 다녀왔어요"},{p:.006*hf,c:b*40,t:"🚑 맹장이 터져서 응급 수술!"}];
+  if(id==="car") return [{p:.016,c:b*15,t:"🚗 출근길 접촉사고! 수리비"}];
   if(id==="fire") return S.life.home>=1?[{p:.01,c:b*6+homeCost()*6,t:"🔥 누전으로 집에 불이 났어요!"},{p:.02,c:b*1.5+homeCost()*.5,t:"💧 윗집에서 물이 새서 도배를 새로 해요"}]:[];
   return []; }
-function insPrem(id){ if(id==="fire"&&S.life.home<1) return 0; return Math.ceil(insRisk(id).reduce((a,r)=>a+r.p*r.c,0)*INS_COV*INS_MARGIN); }
+function insPrem(id){ if(id==="fire"&&S.life.home<1) return 0; return Math.ceil(insRisk(id).reduce((a,r)=>a+r.p*r.c,0)*COV[id]*INS_MARGIN); }
 const insTotal=()=>INSL.reduce((a,x)=>a+(S.life.ins[x.id]?insPrem(x.id):0),0);
 const fixedCost=()=>homeCost()+foodCost()+insTotal();
 const depValue=()=>S.life?S.life.dep.reduce((a,d)=>a+d.a,0):0;
 const lifeAssets=()=>S.life?depValue()+S.life.pen.b+S.life.hdep:0;
-const penLimit=()=>Math.max(10000,Math.floor(monthPay()*1.5));
-const penOpen=()=>S.life.pen.start>=0&&S.life.mon-S.life.pen.start>=120;
+const penLimit=()=>Math.floor(Math.min(Math.max(2000*lifeK(),monthPay()*1.5),60000*lifeK()));   // 실제: 연 600만원 한도
+const penRate=()=>S.life.yr.gross<=720000*lifeK()?.165:.132;                                         // 총급여 5,500만 이하 16.5%, 넘으면 13.2%
+const penOpen=()=>S.life.pen.start>=0&&S.life.mon-S.life.pen.start>=60&&S.life.age>=55;   // 실제: 55살 이상 + 가입 5년
 function lifeLog(t,v){ const L=S.life; L.log.unshift({a:L.age,t,v:v||0}); if(L.log.length>15) L.log.length=15; }
 function lifePay(n,why){ n=Math.floor(n); if(n<1) return 0; const p=Math.min(n,Math.max(0,Math.floor(bal()))); if(p>0) spend(p); return p; }
 
@@ -1938,21 +1941,30 @@ function monthTick(){ const L=S.life, M=S.mkt;
   L.mon++;
   // 2) 고정 지출: 월세·식비·보험료
   const rent=homeCost(), food=foodCost(), prem=insTotal(), need=Math.floor(rent+food+prem);
-  if(need>0){ const paid=lifePay(need); L.yr.insP+=Math.min(prem,Math.max(0,paid-rent-food));
-    if(paid<need){ L.late++; L.happy=Math.max(0,L.happy-10); S.loan.credit=Math.max(300,S.loan.credit-10);
-      for(const k in L.ins) L.ins[k]=false;
-      if(L.late>=2&&L.home>0){ const from=HOMES[L.home]; L.home=Math.max(0,L.home-2); const ref=L.hdep; L.hdep=0; gain(ref); L.late=0;
-        banner("📦 강제 이사…<small>월세를 2달 밀려서 "+from.n+"에서 쫓겨났어요"+(ref?" (보증금 +"+fmt(ref)+" 돌려받음)":"")+"</small>","big",3200); lifeLog("📦 월세 연체로 "+HOMES[L.home].n+"(으)로 이사",-1); }
-      else { toast("⚠️ 생활비가 모자라요! "+fmt(need-paid)+" 연체 · 신용점수 −10 · 보험 해지됨"); lifeLog("⚠️ 생활비 연체 −"+fmt(need-paid)+" (보험 자동 해지)",-1); }
-    } else { L.late=0; if(curView==="life") toast("🧾 이번 달 생활비 −"+fmt(need)+" (월세 "+fmt(rent)+" · 식비 "+fmt(food)+(prem?" · 보험 "+fmt(prem):"")+")"); }
+  if(L.arr==null) L.arr=0;
+  if(need>0||L.arr>0){
+    // ① 식비 → 못 내면 굶어서 건강 ↓
+    const fp=lifePay(food); if(fp<Math.floor(food)){ L.health=Math.max(0,L.health-6); lifeLog("🍙 식비가 모자라 끼니를 걸렀어요 (건강 −6)",-1); }
+    // ② 보험료 → 못 내면 보험 실효
+    if(prem>0){ if(bal()>=prem){ lifePay(prem); L.yr.insP+=prem; } else { for(const k in L.ins) L.ins[k]=false; toast("⚠️ 보험료를 못 내서 보험이 실효됐어요!"); lifeLog("⚠️ 보험료 미납 → 보험 실효",-1); } }
+    // ③ 월세(+밀린 월세) → 못 내면 연체
+    const owe=Math.floor(rent+L.arr), rp=lifePay(owe); L.arr=owe-rp;
+    if(L.arr>0){ L.late++; L.happy=Math.max(0,L.happy-8); S.loan.credit=Math.max(300,S.loan.credit-10);
+      if(L.late>=2&&L.home>0){ // 주택임대차보호법: 월세 2번 밀리면 집주인이 계약을 끝낼 수 있어요
+        const from=HOMES[L.home], ref=Math.max(0,Math.floor(L.hdep-L.arr)); L.arr=0; L.late=0; L.hdep=0;
+        let to=0; for(let i=L.home-1;i>=0;i--){ if(homeDep(i)<=ref&&homeCost(i)<=Math.max(1,monthPay())*.3){ to=i; break; } }
+        const nd=Math.floor(homeDep(to)); L.home=to; L.hdep=nd; gain(ref-nd);
+        banner("📦 계약 해지…<small>월세 2번 연체로 "+from.n+"에서 나가야 해요 · 밀린 월세를 뺀 보증금 "+fmt(ref)+" 돌려받음</small>","big",3500); lifeLog("📦 월세 연체로 계약 해지 → "+HOMES[to].n+"(으)로 이사",-1); }
+      else { toast("⚠️ 월세 "+fmt(L.arr)+" 연체! 신용점수 −10 · 한 번 더 밀리면 계약 해지"); lifeLog("⚠️ 월세 연체 "+fmt(L.arr),-1); }
+    } else { L.late=0; if(curView==="life"&&need>0) toast("🧾 이번 달 생활비 −"+fmt(need)+" (월세 "+fmt(rent)+" · 식비 "+fmt(food)+(prem?" · 보험 "+fmt(prem):"")+")"); }
   }
   // 3) 건강·행복
   const F=FOODS[L.food]; L.health=Math.max(0,Math.min(100,L.health+F.h-(L.age>=40?.3:0)-(L.age>=60?.5:0)));
   const tgt=HOMES[L.home].hp+F.hp+(L.health-60)/4+(L.late?-15:0)+Math.min(10,fameScore()*.1);
   L.happy=Math.max(0,Math.min(100,L.happy+(tgt-L.happy)*.3));
   // 4) 보험 사고
-  INSL.forEach(x=>insRisk(x.id).forEach(r=>{ if(Math.random()<r.p){ const cost=Math.floor(r.c); if(L.ins[x.id]){ const me=Math.floor(cost*(1-INS_COV)); lifePay(me); lifeLog(r.t+" → 🛡️ "+x.n+" 덕분에 "+fmt(cost)+" 중 "+fmt(me)+"만 냈어요",0); toast(r.t+" — 보험으로 "+fmt(cost-me)+" 보상!"); S.stat.insSave=(S.stat.insSave||0)+cost-me; }
-    else { const p=lifePay(cost); lifeLog(r.t+" −"+fmt(p)+" (보험이 없었어요 😢)",-1); toast(r.t+" −"+fmt(p)+" (보험 없음)"); if(cost>lifeBase()*5){ banner(r.t.slice(0,2)+" 큰 지출!<small>−"+fmt(p)+" · 보험이 있었다면 "+fmt(cost*INS_COV)+" 보상받았을 거예요</small>","big",2800); shake("shake",300); } } } }));
+  INSL.forEach(x=>insRisk(x.id).forEach(r=>{ if(Math.random()<r.p){ const cost=Math.floor(r.c); if(L.ins[x.id]){ const me=Math.floor(cost*(1-COV[x.id])); lifePay(me); lifeLog(r.t+" → 🛡️ "+x.n+" 덕분에 "+fmt(cost)+" 중 "+fmt(me)+"만 냈어요",0); toast(r.t+" — 보험으로 "+fmt(cost-me)+" 보상!"); S.stat.insSave=(S.stat.insSave||0)+cost-me; }
+    else { const p=lifePay(cost); lifeLog(r.t+" −"+fmt(p)+" (보험이 없었어요 😢)",-1); toast(r.t+" −"+fmt(p)+" (보험 없음)"); if(cost>lifeBase()*5){ banner(r.t.slice(0,2)+" 큰 지출!<small>−"+fmt(p)+" · 보험이 있었다면 "+fmt(cost*COV[x.id])+" 보상받았을 거예요</small>","big",2800); shake("shake",300); } } } }));
   // 5) 작은 인생 이벤트
   lifeMisc();
   // 6) 정기예금 만기
@@ -1970,7 +1982,7 @@ function monthTick(){ const L=S.life, M=S.mkt;
 function lifeMisc(){ const L=S.life, b=lifeBase(), r=Math.random();
   const ev=[
     [.05,()=>{ const c=lifePay(b*.5); return ["💒 친구 결혼식 축의금 −"+fmt(c),-1]; }],
-    [.04,()=>{ const c=lifePay(b*.8); return ["📱 휴대폰 액정이 깨졌어요 −"+fmt(c),-1]; }],
+    [.04,()=>{ const c=lifePay(b*2); return ["📱 휴대폰 액정이 깨졌어요 −"+fmt(c),-1]; }],
     [.03,()=>{ const c=lifePay(b*.6); return ["🎂 가족 생일 선물 −"+fmt(c),-1]; }],
     [.02,()=>{ const g=Math.floor(b*3); gain(g); return ["🧧 할머니가 용돈을 주셨어요 +"+fmt(g),1]; }],
     [.02,()=>{ const g=Math.floor(b*1.2); gain(g); return ["🎁 마트 경품 추첨 당첨! +"+fmt(g),1]; }],
@@ -1982,7 +1994,7 @@ function lifeMisc(){ const L=S.life, b=lifeBase(), r=Math.random();
   let acc=0; for(const [p,f] of ev){ acc+=p; if(r<acc){ const [t,v]=f(); lifeLog(t,v); if(curView==="life") toast(t); return; } } }
 const M_reg=()=>S.mkt?S.mkt.reg:0;
 function yearEnd(){ const L=S.life, Y=L.yr;
-  const penC=Math.floor(L.pen.yr*.165), insC=Math.floor(Math.min(Y.insP,lifeBase()*20)*.12), basic=Math.floor(Y.tax*.05);
+  const penC=Math.floor(L.pen.yr*penRate()), insC=Math.floor(Math.min(Y.insP,lifeBase()*20)*.12), basic=Math.floor(Y.tax*.05);
   const refund=Math.min(Y.tax,penC+insC+basic);
   if(refund>0){ gain(refund); S.stat.yearRefund=(S.stat.yearRefund||0)+refund; }
   S.stat.lifeYears=(S.stat.lifeYears||0)+1;
@@ -1997,10 +2009,10 @@ const LCH=[
   {t:"📞 \"서울중앙지검입니다\"",d:"\"고객님 계좌가 범죄에 쓰였어요. 안전 계좌로 돈을 옮겨야 보호됩니다.\" 라는 전화가 왔어요.",a:["시키는 대로 송금한다",()=>{ const c=lifePay(Math.min(bal()*.3,lifeBase()*30)); lifeLog("☠️ 보이스피싱 피해 −"+fmt(c),-1); return "☠️ 보이스피싱이었어요!! −"+fmt(c)+"\n검찰·경찰·은행은 절대 전화로 송금하라고 하지 않아요."; }],b:["끊고 112에 신고한다",()=>{ S.loan.credit=Math.min(1000,S.loan.credit+5); S.stat.phish=(S.stat.phish||0)+1; lifeLog("🛡️ 보이스피싱을 막았어요",1); return "👮 잘했어요! 보이스피싱이었어요. 신용점수 +5"; }]},
   {t:"🪙 \"원금 보장! 매달 30% 수익\"",d:"SNS에서 만난 사람이 '절대 안 잃는' 투자 상품을 추천해요. 지금 넣으면 특별히 수익을 더 준대요.",a:["투자한다",()=>{ const c=lifePay(Math.min(bal()*.25,lifeBase()*15)); lifeLog("💀 폰지 사기 피해 −"+fmt(c),-1); return "💀 폰지 사기였어요… −"+fmt(c)+"\n'원금 보장 + 높은 수익'은 100% 사기예요!"; }],b:["거절한다",()=>{ S.stat.phish=(S.stat.phish||0)+1; lifeLog("🛡️ 투자 사기를 피했어요",1); return "✅ 현명해요! 며칠 뒤 그 사람이 사기로 잡혔다는 뉴스가 나왔어요."; }]},
   {t:"💸 친구가 돈을 빌려달래요",d:"오래된 친구가 급하다며 돈을 빌려달라고 해요. 꼭 갚겠대요.",a:["빌려준다",()=>{ const c=lifePay(lifeBase()*5); if(Math.random()<.6){ setTimeout(()=>{ const g=Math.floor(c*1.1); gain(g); toast("💌 친구가 고맙다며 "+fmt(g)+"을(를) 갚았어요!"); lifeLog("💌 친구가 빌린 돈 +"+fmt(g)+" 갚음",1); },40000); return "🤝 "+fmt(c)+" 빌려줬어요. 곧 갚는대요!"; } lifeLog("👻 친구에게 빌려준 "+fmt(c)+" 못 받음",-1); return "👻 친구가 연락이 안 돼요… −"+fmt(c)+"\n'돌려받지 못해도 괜찮은 만큼만' 빌려주세요."; }],b:["정중하게 거절한다",()=>{ S.life.happy=Math.max(0,S.life.happy-3); return "😅 거절했어요. 조금 서먹해졌어요 (행복 −3)"; }]},
-  {t:"🏋️ 퇴근 후 뭐 할까요?",d:"오늘 회식이 있어요. 하지만 헬스장 등록도 고민 중이에요.",a:["헬스장 등록",()=>{ const c=lifePay(lifeBase()*.4); S.life.health=Math.min(100,S.life.health+8); return "💪 헬스 시작! 건강 +8 (−"+fmt(c)+")"; }],b:["회식 간다",()=>{ S.life.happy=Math.min(100,S.life.happy+5); S.life.health=Math.max(0,S.life.health-4); return "🍻 재밌었어요! 행복 +5, 건강 −4"; }]},
-  {t:"🎓 야간 대학원 모집",d:"퇴근 후에 공부하면 몸은 힘들지만 몸값(급여)이 오를 수 있어요.",a:["등록한다",()=>{ if(S.life.grad>=5) return "🎓 이미 공부를 충분히 했어요!"; const c=Math.floor(lifeBase()*4); if(bal()<c) return "💸 등록금 "+fmt(c)+"이(가) 부족해요"; spend(c); S.life.grad++; S.life.health=Math.max(0,S.life.health-3); lifeLog("🎓 대학원 수료! 급여 +3%",1); return "🎓 수료했어요! 급여 영구 +3% (지금 +"+(S.life.grad*3)+"%) · 건강 −3"; }],b:["다음에…",()=>"📺 오늘은 쉬기로 했어요"]},
+  {t:"🏋️ 퇴근 후 뭐 할까요?",d:"오늘 회식이 있어요. 하지만 헬스장 등록도 고민 중이에요.",a:["헬스장 등록",()=>{ const c=lifePay(lifeBase()*.6); S.life.health=Math.min(100,S.life.health+8); return "💪 헬스 시작! 건강 +8 (−"+fmt(c)+")"; }],b:["회식 간다",()=>{ S.life.happy=Math.min(100,S.life.happy+5); S.life.health=Math.max(0,S.life.health-4); return "🍻 재밌었어요! 행복 +5, 건강 −4"; }]},
+  {t:"🎓 야간 대학원 모집",d:"퇴근 후에 공부하면 몸은 힘들지만 몸값(급여)이 오를 수 있어요.",a:["등록한다",()=>{ if(S.life.grad>=5) return "🎓 이미 공부를 충분히 했어요!"; const c=Math.floor(lifeBase()*25); if(bal()<c) return "💸 등록금 "+fmt(c)+"이(가) 부족해요"; spend(c); S.life.grad++; S.life.health=Math.max(0,S.life.health-3); lifeLog("🎓 대학원 수료! 급여 +3%",1); return "🎓 수료했어요! 급여 영구 +3% (지금 +"+(S.life.grad*3)+"%) · 건강 −3"; }],b:["다음에…",()=>"📺 오늘은 쉬기로 했어요"]},
   {t:"🛍️ 블랙프라이데이 90% 세일!",d:"평소 갖고 싶던 물건이 엄청 싸요. 그런데 꼭 필요한 건 아니에요.",a:["질러버린다!",()=>{ const c=lifePay(lifeBase()*2); S.life.happy=Math.min(100,S.life.happy+6); return "🛍️ 샀다! 행복 +6 (−"+fmt(c)+")"; }],b:["참고 저축한다",()=>{ S.life.happy=Math.max(0,S.life.happy-1); return "🐷 참았어요! 이 돈을 정기예금에 넣으면 이자가 붙어요."; }]},
-  {t:"🚕 택시 vs 지하철",d:"늦잠을 자서 지각할 것 같아요!",a:["택시 탄다",()=>{ const c=lifePay(lifeBase()*.15); return "🚕 지각은 면했어요 (−"+fmt(c)+")"; }],b:["지하철 + 뛴다",()=>{ if(Math.random()<.5){ S.car.exp=Math.max(0,S.car.exp-20); return "😵 지각했어요… 경력 −20초"; } S.life.health=Math.min(100,S.life.health+1); return "🏃 아슬아슬 세이프! 운동도 됐어요 (건강 +1)"; }]},
+  {t:"🚕 택시 vs 지하철",d:"늦잠을 자서 지각할 것 같아요!",a:["택시 탄다",()=>{ const c=lifePay(lifeBase()*.3); return "🚕 지각은 면했어요 (−"+fmt(c)+")"; }],b:["지하철 + 뛴다",()=>{ if(Math.random()<.5){ S.car.exp=Math.max(0,S.car.exp-20); return "😵 지각했어요… 경력 −20초"; } S.life.health=Math.min(100,S.life.health+1); return "🏃 아슬아슬 세이프! 운동도 됐어요 (건강 +1)"; }]},
 ];
 let lifeOpen=false;
 function lifeChoice(){ if(!S.life||lifeOpen||ceoOpen||document.querySelector(".overlay.show")||(typeof cineOn!=="undefined"&&cineOn)||busy) return; const e=LCH[rnd(LCH.length)]; lifeOpen=true;
@@ -2011,19 +2023,19 @@ function lifeChoice(){ if(!S.life||lifeOpen||ceoOpen||document.querySelector(".o
   openModal("lifeModal"); ping(1000,.15,.3); }
 
 /* ---- 행동 ---- */
-function moveHome(i){ const L=S.life; if(i===L.home) return; const nd=Math.floor(homeDep(i)), fee=Math.floor(homeCost(i)*.5+lifeBase()*.3), ref=L.hdep, need=nd+fee-ref;
-  if(need>0&&bal()<need){ toast("💸 보증금 "+fmt(nd)+" + 이사비 "+fmt(fee)+"이(가) 필요해요 (지금 보증금 "+fmt(ref)+" 돌려받는 것 포함)"); return; }
-  if(need>0) spend(need); else gain(-need); L.hdep=nd; const up=i>L.home; L.home=i; L.late=0;
+function moveHome(i){ const L=S.life; if(i===L.home) return; const nd=Math.floor(homeDep(i)), fee=Math.floor((homeDep(i)+homeCost(i)*100)*.005+lifeBase()*3), ref=Math.max(0,L.hdep-(L.arr||0)), need=nd+fee-ref;
+  if(need>0&&bal()<need){ toast("💸 보증금 "+fmt(nd)+" + 중개수수료·이사비 "+fmt(fee)+"이(가) 필요해요 (지금 보증금 "+fmt(ref)+" 돌려받는 것 포함)"); return; }
+  if(need>0) spend(need); else gain(-need); L.hdep=nd; L.arr=0; const up=i>L.home; L.home=i; L.late=0;
   if(up){ L.happy=Math.min(100,L.happy+6); banner(HOMES[i].ic+" 이사 완료!<small>"+HOMES[i].n+" · 매달 "+fmt(homeCost(i))+"</small>","big",2300); confetti(70,innerWidth/2,innerHeight*.4); melody([523,659,784,1047],80,"square",.1,.18); }
   else toast(HOMES[i].ic+" "+HOMES[i].n+"(으)로 이사했어요 · 아낀 돈으로 투자해 봐요!");
   lifeLog(HOMES[i].ic+" "+HOMES[i].n+"(으)로 이사 (보증금 "+fmt(nd)+")",up?1:0); save(); renderLife(); }
 let depTerm=1;
 function openDep(frac){ const L=S.life; if(L.dep.length>=5){ toast("🏦 정기예금은 5개까지만 만들 수 있어요"); return; } const a=Math.floor(bal()*frac); if(a<100){ toast("💸 최소 100코인부터 넣을 수 있어요"); return; }
-  const T=DEP_TERMS[depTerm], r=(S.mkt.br+T.bo)/100*.3; spend(a); L.dep.push({a,r,m:T.m,s:L.mon,e:L.mon+T.m});
+  const T=DEP_TERMS[depTerm], r=Math.max(.1,S.mkt.br+T.bo)/100/12; spend(a); L.dep.push({a,r,m:T.m,s:L.mon,e:L.mon+T.m});
   toast("🏦 "+T.m+"개월 정기예금 "+fmt(a)+" 가입! 만기 이자 "+fmt(a*r*T.m*(1-INT_TAX))+" (세후)"); ping(1300,.12,.2); save(); renderLife(); }
 function breakDep(i){ const L=S.life, d=L.dep[i]; if(!d) return; const it=Math.floor(d.a*d.r*(L.mon-d.s)*.1); gain(d.a+it); L.dep.splice(i,1); toast("💔 중도해지… 원금 "+fmt(d.a)+" + 쥐꼬리 이자 "+fmt(it)+" (약속을 깨면 이자를 거의 못 받아요)"); save(); renderLife(); }
 function penPut(frac){ const L=S.life, room=Math.max(0,penLimit()-L.pen.yr), a=Math.floor(Math.min(room*frac,bal())); if(a<1){ toast(room<1?"📅 올해 연금저축 한도를 다 채웠어요!":"💸 코인이 부족해요"); return; }
-  spend(a); L.pen.b+=a; L.pen.paid+=a; L.pen.yr+=a; if(L.pen.start<0) L.pen.start=L.mon; toast("👴 연금저축 +"+fmt(a)+" · 연말정산 때 16.5%("+fmt(a*.165)+") 돌려받아요"); save(); renderLife(); }
+  spend(a); L.pen.b+=a; L.pen.paid+=a; L.pen.yr+=a; if(L.pen.start<0) L.pen.start=L.mon; toast("👴 연금저축 +"+fmt(a)+" · 연말정산 때 "+(penRate()*100).toFixed(1)+"%("+fmt(a*penRate())+") 돌려받아요"); save(); renderLife(); }
 let penSure=false;
 function penOut(){ const L=S.life; if(L.pen.b<1) return; const open=penOpen();
   if(!open&&!penSure){ penSure=true; renderLife(); return; } penSure=false;
@@ -2034,7 +2046,7 @@ function penOut(){ const L=S.life; if(L.pen.b<1) return; const open=penOpen();
 /* ---- 🎟️ 로또 6/45 ---- */
 function lottoDraw(D){ const r=seeded("lotto645-"+D), pool=[...Array(45)].map((_,i)=>i+1), out=[]; for(let i=0;i<7;i++){ const k=Math.floor(r()*pool.length); out.push(pool.splice(k,1)[0]); } return {n:out.slice(0,6).sort((a,b)=>a-b),b:out[6]}; }
 function lottoRank(t,w){ const m=t.filter(x=>w.n.includes(x)).length; return m===6?1:m===5&&t.includes(w.b)?2:m===5?3:m===4?4:m===3?5:0; }
-function lottoTax(p){ if(p<=2e6*lifeK()) return 0; const big=3e8*lifeK(); return Math.floor(Math.min(p,big)*.22+Math.max(0,p-big)*.33); }
+function lottoTax(p){ if(p<=4000*lifeK()) return 0; const big=6e5*lifeK(); return Math.floor(Math.min(p,big)*.22+Math.max(0,p-big)*.33); }
 function lottoSettle(){ const L=S.life, D=W_DAY(gTick()); if(!L.lotto.t.length||L.lotto.D>=D) return; const w=lottoDraw(L.lotto.D), cnt=[0,0,0,0,0,0]; let gross=0;
   L.lotto.t.forEach(t=>{ const rk=lottoRank(t,w); cnt[rk]++; if(rk) gross+=Math.floor(LOTTO_PRIZE[rk]*(L.lotto.k||1)); });
   const tax=lottoTax(gross), net=gross-tax; if(net>0) gain(net); L.lst.won+=net; const best=cnt.findIndex((c,i)=>i>0&&c>0);
@@ -2057,34 +2069,34 @@ function renderLife(){ if(!S.life) return; const L=S.life, H=HOMES[L.home], F=FO
   $("lfCoins").textContent=fmt(bal());
   const yoy=L.cpiH.length>12?(L.cpi/L.cpiH[L.cpiH.length-13]-1)*100:(L.cpi/L.cpiH[0]-1)*100*12/Math.max(1,L.cpiH.length-1);
   const bar=(v,c)=>'<div class="morale"><i style="width:'+v+'%;background:'+c+'"></i></div>';
-  $("lifeHead").innerHTML='<div>🎂 <b>'+L.age+'살</b> '+(L.mon%12+1)+'월 · 다음 달까지 <b id="lfLeft">'+lifeLeft()+'</b></div><div>🛒 물가지수 <b>'+L.cpi.toFixed(1)+'</b> <small>(연 '+(yoy>=0?"+":"")+yoy.toFixed(1)+'%)</small></div><div>💼 생활 효과 급여 <b>×'+lifeMul().toFixed(2)+'</b></div>';
+  $("lifeHead").innerHTML='<div>🎂 <b>'+L.age+'살</b> '+(L.mon%12+1)+'월 · 다음 달까지 <b id="lfLeft">'+lifeLeft()+'</b></div><div>🛒 물가지수 <b>'+L.cpi.toFixed(1)+'</b> <small>(연 '+(yoy>=0?"+":"")+yoy.toFixed(1)+'%)</small></div><div>💼 행복·건강·물가 반영 급여 <b>×'+lifeMul().toFixed(2)+'</b></div>';
   const ratio=mp>0?rent/mp*100:0;
   let h='<div class="card2"><h4>📅 이번 달 가계부 <small style="opacity:.7;font-weight:600">(장 1일 = 1달 · 장 12일 = 1년)</small></h4>'+
     '<div class="kv"><div>😊 행복<b>'+Math.round(L.happy)+'</b>'+bar(L.happy,"#ffd23f")+'</div><div>❤️ 건강<b>'+Math.round(L.health)+'</b>'+bar(L.health,L.health<30?"#ff5b5b":"#4ade80")+'</div><div>💼 한 달 급여(세전)<b>'+fmt(mp)+'</b></div></div>'+
     '<div class="kv" style="margin-top:6px"><div>🏠 월세·관리비<b>'+fmt(rent)+'</b></div><div>🍽️ 식비<b>'+fmt(food)+'</b></div><div>🛡️ 보험료<b>'+fmt(prem)+'</b></div></div>'+
-    '<div style="margin-top:8px;font-size:.82rem;line-height:1.6">💸 매달 고정 지출 <b class="warn">'+fmt(fx)+'</b> · 월세는 월급의 <b class="'+(ratio>30?"warn":"")+'">'+ratio.toFixed(0)+'%</b> '+(ratio>30?"⚠️ (30%를 넘으면 위험해요!)":"👍 (30% 이하면 안전)")+(L.late?'<br><span class="warn">⚠️ 생활비 '+L.late+'달 연체 중! 2달 밀리면 쫓겨나요</span>':'')+
+    '<div style="margin-top:8px;font-size:.82rem;line-height:1.6">💸 매달 고정 지출 <b class="warn">'+fmt(fx)+'</b> · 월세는 월급의 <b class="'+(ratio>30?"warn":"")+'">'+ratio.toFixed(0)+'%</b> '+(ratio>30?"⚠️ (30%를 넘으면 위험해요!)":"👍 (30% 이하면 안전)")+(L.late?'<br><span class="warn">⚠️ 월세 '+fmt(L.arr||0)+' 연체 중! 한 번 더 밀리면 계약 해지 (보증금에서 빼고 돌려줘요)</span>':'')+
     '<br>🍞 물가 때문에 '+(L.cpiH.length>12?"1년 전":"처음")+' 100코인으로 사던 물건이 지금은 <b>'+(L.cpi/(L.cpiH.length>12?L.cpiH[L.cpiH.length-13]:L.cpiH[0])*100).toFixed(1)+'코인</b>이에요. 현금만 들고 있으면 가치가 줄어요!</div></div>';
   // 집
   h+='<div class="xTitle">🏠 어디에 살까요? <small>(좋은 집일수록 행복 ↑ → 급여 ↑ · 보증금은 이사 갈 때 돌려받아요)</small></div><div class="card2">'+HOMES.map((x,i)=>{ const c=homeCost(i), d=homeDep(i), cur=i===L.home;
-    return '<div class="lRow'+(cur?" cur":"")+'"><span class="li">'+x.ic+'</span><span class="lt"><b>'+x.n+'</b><small>'+x.d+'</small><small>월 '+fmt(c)+' · 보증금 '+fmt(d)+' · 행복 '+x.hp+'</small></span><button class="btn2'+(i<L.home?" blue":"")+'" data-home="'+i+'"'+(cur?" disabled":"")+'>'+(cur?"🏡 사는 중":i>L.home?"⬆ 이사":"⬇ 이사")+'</button></div>'; }).join("")+'</div>';
+    return '<div class="lRow'+(cur?" cur":"")+'"><span class="li">'+x.ic+'</span><span class="lt"><b>'+x.n+'</b><small>'+x.d+'</small><small>월 '+fmt(c)+' · 보증금 '+fmt(d)+' · 행복 '+x.hp+(mp>0&&!cur&&c>0?' · 월급의 <span class="'+(c/mp>.3?'warn':'')+'">'+Math.round(c/mp*100)+'%</span>':'')+'</small></span><button class="btn2'+(i<L.home?" blue":"")+'" data-home="'+i+'"'+(cur?" disabled":"")+'>'+(cur?"🏡 사는 중":i>L.home?"⬆ 이사":"⬇ 이사")+'</button></div>'; }).join("")+'</div>';
   // 식비
   h+='<div class="xTitle">🍽️ 무엇을 먹을까요?</div><div class="card2"><div class="lFood">'+FOODS.map((f,i)=>'<button class="'+(i===L.food?"on":"")+'" data-food="'+i+'"><span>'+f.ic+'</span><b>'+f.n+'</b><small>월 '+fmt(foodCost(i))+'</small><small>'+f.d+'</small></button>').join("")+'</div></div>';
   // 보험
-  h+='<div class="xTitle">🛡️ 보험 <small>(평소엔 돈이 나가지만 큰 사고가 나면 90%를 대신 내줘요)</small></div><div class="card2">'+INSL.map(x=>{ const p=insPrem(x.id), on=L.ins[x.id], na=x.id==="fire"&&L.home<1;
+  h+='<div class="xTitle">🛡️ 보험 <small>(평소엔 돈이 나가지만 큰 사고가 나면 80~90%를 대신 내줘요)</small></div><div class="card2">'+INSL.map(x=>{ const p=insPrem(x.id), on=L.ins[x.id], na=x.id==="fire"&&L.home<1;
     return '<div class="lRow'+(on?" cur":"")+'"><span class="li">'+x.ic+'</span><span class="lt"><b>'+x.n+'</b><small>'+x.d+'</small><small>'+(na?"부모님 집에선 필요 없어요":"월 보험료 "+fmt(p))+'</small></span><button class="btn2'+(on?" red":"")+'" data-ins="'+x.id+'"'+(na?" disabled":"")+'>'+(on?"해지":"가입")+'</button></div>'; }).join("")+
     '<div style="font-size:.75rem;opacity:.8;margin-top:6px">💡 보험사는 평균적으로 받은 보험료보다 조금 적게 돌려줘요(그래서 돈을 벌어요). 그래도 한 번에 큰돈이 나가는 걸 막아 주는 게 보험이에요. 건강이 나쁘면 병원 갈 일이 많아져서 의료보험료가 올라요. 지금까지 보험으로 아낀 돈 <b>'+fmt(S.stat.insSave||0)+'</b></div></div>';
   // 정기예금
-  const T=DEP_TERMS[depTerm], r=(S.mkt.br+T.bo)/100*.3;
-  h+='<div class="xTitle">🏦 정기예금 <small>(약속한 기간 동안 못 빼는 대신 이자가 높아요 · 이자소득세 15.4%)</small></div><div class="card2">'+
-    '<div class="lSeg">'+DEP_TERMS.map((t,i)=>'<button class="'+(i===depTerm?"on":"")+'" data-term="'+i+'">'+t.m+'개월<small>월 '+((S.mkt.br+t.bo)*.3).toFixed(2)+'%</small></button>').join("")+'</div>'+
-    '<div style="font-size:.8rem;margin:6px 0">기준금리 '+S.mkt.br.toFixed(2)+'% + 우대 '+T.bo+'%p → '+T.m+'개월 뒤 세후 <b class="up">+'+(r*T.m*(1-INT_TAX)*100).toFixed(1)+'%</b> · 같은 기간 물가는 약 +'+(Math.max(0,yoy)/12*T.m).toFixed(1)+'%</div>'+
+  const T=DEP_TERMS[depTerm], r=Math.max(.1,S.mkt.br+T.bo)/100/12;
+  h+='<div class="xTitle">🏦 정기예금 <small>(진짜 은행처럼 연 3~4%대 · 이자소득세 15.4% · 물가보다 조금 나은 정도예요)</small></div><div class="card2">'+
+    '<div class="lSeg">'+DEP_TERMS.map((t,i)=>'<button class="'+(i===depTerm?"on":"")+'" data-term="'+i+'">'+t.m+'개월<small>연 '+Math.max(.1,S.mkt.br+t.bo).toFixed(2)+'%</small></button>').join("")+'</div>'+
+    '<div style="font-size:.8rem;margin:6px 0">기준금리 '+S.mkt.br.toFixed(2)+'% '+(T.bo>=0?'+ 우대 '+T.bo:'− '+(-T.bo))+'%p → '+T.m+'개월 뒤 세후 <b class="up">+'+(r*T.m*(1-INT_TAX)*100).toFixed(1)+'%</b> · 같은 기간 물가는 약 +'+(Math.max(0,yoy)/12*T.m).toFixed(1)+'%</div>'+
     '<div class="row2"><button class="btn2 gold" data-dep=".1">현금 10%</button><button class="btn2 gold" data-dep=".25">25%</button><button class="btn2 gold" data-dep=".5">50%</button></div>'+
     (L.dep.length?L.dep.map((d,i)=>'<div class="lRow"><span class="li">🔒</span><span class="lt"><b>'+fmt(d.a)+'</b> · '+d.m+'개월<small>만기까지 '+(d.e-L.mon)+'달 · 세후 이자 +'+fmt(d.a*d.r*d.m*(1-INT_TAX))+'</small>'+bar((L.mon-d.s)/d.m*100,"#4ade80")+'</span><button class="btn2 red" data-brk="'+i+'">중도해지</button></div>').join(""):'<div style="opacity:.6;font-size:.8rem;margin-top:6px">가입한 정기예금이 없어요</div>')+'</div>';
   // 연금
-  const room=Math.max(0,penLimit()-L.pen.yr), open=penOpen(), left=L.pen.start<0?120:Math.max(0,120-(L.mon-L.pen.start));
+  const room=Math.max(0,penLimit()-L.pen.yr), open=penOpen(), left=Math.max(L.pen.start<0?60:Math.max(0,60-(L.mon-L.pen.start)),(55-L.age)*12-(L.mon%12));
   h+='<div class="xTitle">👴 연금저축 & 국민연금 <small>(노후 준비 + 세금 혜택)</small></div><div class="card2">'+
     '<div class="kv"><div>연금저축 잔액<b>'+fmt(L.pen.b)+'</b></div><div>낸 돈 합계<b>'+fmt(L.pen.paid)+'</b></div><div>수익률<b class="'+cls(L.pen.b-L.pen.paid)+'">'+(L.pen.paid?((L.pen.b/L.pen.paid-1)*100).toFixed(1):"0.0")+'%</b></div></div>'+
-    '<div style="font-size:.8rem;margin:6px 0;line-height:1.6">올해 한도 '+fmt(penLimit())+' 중 <b>'+fmt(L.pen.yr)+'</b> 넣음 → 연말정산 때 <b class="up">'+fmt(L.pen.yr*.165)+'</b> 돌려받아요 (16.5% 세액공제)<br>'+(open?"✅ 10년이 지나서 <b>연금으로 받을 수 있어요</b> (세금 5.5%만)":"⏳ 연금 받기까지 "+left+"달 ("+(left/12).toFixed(1)+"년) · 그 전에 빼면 16.5% 세금을 내요")+'</div>'+
+    '<div style="font-size:.8rem;margin:6px 0;line-height:1.6">올해 한도 '+fmt(penLimit())+' 중 <b>'+fmt(L.pen.yr)+'</b> 넣음 → 연말정산 때 <b class="up">'+fmt(L.pen.yr*penRate())+'</b> 돌려받아요 ('+(penRate()*100).toFixed(1)+'% 세액공제 · 월급이 많으면 13.2%)<br>'+(open?"✅ 55살 + 5년 조건을 채워서 <b>연금으로 받을 수 있어요</b> (세금 5.5%만)":"⏳ 연금은 55살 이상 + 가입 5년이 지나야 받아요 (약 "+(left/12).toFixed(1)+"년 남음) · 그 전에 빼면 16.5% 세금")+'</div>'+
     '<div class="row2"><button class="btn2" data-pen=".25">한도의 25% 넣기</button><button class="btn2" data-pen="1"'+(room<1?" disabled":"")+'>한도까지 넣기</button><button class="btn2 '+(open?"gold":"red")+'" id="penOut"'+(L.pen.b<1?" disabled":"")+'>'+(open?"👴 연금 받기":penSure?"⚠️ 정말 해지?":"중도해지")+'</button></div>'+
     '<div style="font-size:.8rem;margin-top:8px;line-height:1.6">🏛️ 국민연금 적립 <b>'+fmt(L.nps)+'</b> <small>(월급에서 4.5% + 회사가 4.5% 더 내줘요 · 65살부터 매달 받아요)</small><br>🧾 올해 낸 근로소득세 <b>'+fmt(L.yr.tax)+'</b> · 4대보험 <b>'+fmt(L.yr.soc)+'</b> · 실효세율 <b>'+(L.yr.gross?(L.yr.tax/L.yr.gross*100).toFixed(1):"0.0")+'%</b></div></div>';
   // 로또
@@ -2097,7 +2109,7 @@ function renderLife(){ if(!S.life) return; const L=S.life, H=HOMES[L.home], F=FO
     '<div class="row2"><button class="btn2" id="lotMine"'+(lPick.length===6?"":" disabled")+'>이 번호로 1장 사기</button><button class="btn2 blue" id="lotClr">지우기</button></div>'+
     (myN?'<div class="lTk">'+L.lotto.t.slice(-5).reverse().map(t=>'<div>'+t.map(n=>ball(n,1)).join("")+'</div>').join("")+(myN>5?'<small>… 외 '+(myN-5)+'장</small>':'')+'</div>':'')+
     (L.lres.length?'<div style="font-size:.8rem;margin-top:8px"><b>📜 내 당첨 기록</b>'+L.lres.map(x=>'<div class="lRes">'+(x.D+1)+'회 · '+x.tk+'장 · '+[1,2,3,4,5].filter(k=>x.cnt[k]).map(k=>k+'등×'+x.cnt[k]).join(" ")+(x.net?' <b class="up">+'+fmt(x.net)+'</b>':' 꽝')+'</div>').join("")+'</div>':'')+
-    '<div style="font-size:.75rem;opacity:.8;margin-top:6px;line-height:1.6">🎯 1등 확률 <b>8,145,060분의 1</b> (번개 맞을 확률보다 낮아요!) · 2등 1/1,357,510 · 3등 1/35,724 · 4등 1/733 · 5등 1/45<br>📉 평균적으로 산 돈의 <b>약 50%</b>만 돌려받아요 = 사면 살수록 손해. 지금까지 '+fmt(L.lst.tk*price)+' 써서 '+fmt(L.lst.won)+' 받았어요 · 200만 넘는 당첨금은 세금 22~33%</div></div>';
+    '<div style="font-size:.75rem;opacity:.8;margin-top:6px;line-height:1.6">🎯 1등 확률 <b>8,145,060분의 1</b> (번개 맞을 확률보다 낮아요!) · 2등 1/1,357,510 · 3등 1/35,724 · 4등 1/733 · 5등 1/45<br>📉 평균적으로 산 돈의 <b>약 50%</b>만 돌려받아요 = 사면 살수록 손해. 지금까지 '+fmt(L.lst.tk*price)+' 써서 '+fmt(L.lst.won)+' 받았어요 · 200만원(4,000코인) 넘는 당첨금은 세금 22~33%</div></div>';
   // 기록
   h+='<div class="xTitle">📜 인생 기록</div><div class="card2 lLog">'+(L.log.length?L.log.map(x=>'<div class="'+(x.v>0?"up":x.v<0?"dn":"")+'"><small>'+x.a+'살</small> '+escH(x.t)+'</div>').join(""):'<div style="opacity:.6">아직 특별한 일이 없었어요</div>')+'</div>';
   $("lifeBody").innerHTML=h; const B=$("lifeBody");
@@ -2133,8 +2145,8 @@ function finishGig(){ const C=S.car, g=GIGS.find(x=>x.id===C.gig.id); C.gig=null
   toast(g.ic+" "+g.n+" 완료! +"+fmt(pay)+" 코인"+txt); coinCascade(5,60); save(); }
 function payday(){ const C=S.car; let gross=Math.floor(C.acc); C.acc=0; if(gross<1) return; let tag="";
   if(Math.random()<.05+.02*S.clv){ gross*=3+S.critL; tag=" 🎉 성과급 ×"+(3+S.critL)+"!"; }
-  const tax=incomeTax(gross), ins=Math.floor(gross*.089), net=gross-tax-ins; gain(net); S.run+=net; dq().earn+=net; S.stat.paydays++;
-  if(S.life){ S.life.yr.tax+=tax; S.life.yr.soc+=ins; S.life.yr.gross+=gross; S.life.nps+=Math.floor(gross*.045)*2; }
+  const tax=incomeTax(gross), ins=socIns(gross), net=gross-tax-ins; gain(net); S.run+=net; dq().earn+=net; S.stat.paydays++;
+  if(S.life){ S.life.yr.tax+=tax; S.life.yr.soc+=ins; S.life.yr.gross+=gross; S.life.nps+=npsPart(gross)*2; }
   toast("💰 월급날!"+tag+" 세전 "+fmt(gross)+" − 소득세 "+fmt(tax)+"("+(tax/gross*100).toFixed(1)+"%) − 4대보험 "+fmt(ins)+" = 실수령 +"+fmt(net)); coinCascade(tag?12:6,50); if(tag) melody([659,784,1047,1319],80,"square",.1,.18);
   if(curView==="work"){ const r=$("wCoins").getBoundingClientRect(); floatText(r.left+r.width+30,r.top+8,"+"+fmt(net),"#9cf58a"); } save(); }
 const WEV=[
@@ -2156,7 +2168,7 @@ function renderWork(){ updAC();
   $("wCoins").textContent=fmt(bal()); $("wPerClick").textContent=fmt(sal); $("wPerSec").textContent=C.payIn;
   $("jobBig").innerHTML='<div class="jbI">'+J.ic+'</div><div class="jbT"><b>'+J.n+' · '+RANKS[C.rank]+'</b><span>급여 <b>'+fmt(sal)+'</b>/초 (기본급 '+fmt(J.sal)+' × 직급 ×'+RMUL[C.rank]+(C.study?' × 공부 중 70%':'')+(S.life?' × 생활 '+lifeMul().toFixed(2):'')+')</span>'+
     (nr!=null?'<span>다음 승진: '+RANKS[C.rank+1]+' (×'+RMUL[C.rank+1]+')까지 '+Math.max(0,nr-C.exp)+'초</span><div class="mbar"><i style="width:'+Math.min(100,(C.exp-REXP[C.rank])/(nr-REXP[C.rank])*100)+'%"></i></div>':'<span>🎖️ 최고 직급 부장!</span>')+'<small>총 경력 '+Math.floor(C.texp/60)+'분 '+(C.texp%60)+'초</small></div>';
-  $("payBox").innerHTML='<div>🧾 다음 월급날</div><b>'+C.payIn+'초</b><div>쌓인 급여(세전) '+fmt(C.acc)+'</div><small>소득세 누진 6~45% · 4대보험 8.9% 공제</small><small>이번 월급 예상 소득세 '+fmt(incomeTax(C.acc))+' ('+(C.acc>0?(incomeTax(C.acc)/C.acc*100).toFixed(1):'6.0')+'%)</small>';
+  $("payBox").innerHTML='<div>🧾 다음 월급날</div><b>'+C.payIn+'초</b><div>쌓인 급여(세전) '+fmt(C.acc)+'</div><small>소득세 누진 6~45%(+지방세 10%) · 4대보험 약 9.4% 공제</small><small>이번 월급 예상 소득세 '+fmt(incomeTax(C.acc))+' ('+(C.acc>0?(incomeTax(C.acc)/C.acc*100).toFixed(1):'6.0')+'%)</small>';
   $("jobList").innerHTML=JOBS.map((Jb,i)=>[Jb,i]).sort((a,b)=>a[0].sal-b[0].sal).map(([Jb,i])=>{ const ok=jobOk(i), cur=i===C.job; return '<div class="jRow'+(cur?" cur":"")+(ok?"":" lock")+'"><span class="ji">'+Jb.ic+'</span><span class="jt"><b>'+Jb.n+'</b><small>기본급 '+fmt(Jb.sal)+'/초 · '+(Jb.req.length?Jb.req.map(r=>(hasEdu(r)?"✅":"❌")+eduById(r).n).join(" "):"자격 필요 없음")+(Jb.texp?" · "+(C.texp>=Jb.texp?"✅":"❌")+"총 경력 30분":"")+'</small></span><button data-j="'+i+'"'+(ok&&!cur?"":" disabled")+'>'+(cur?"근무 중":ok?"이직":"🔒")+'</button></div>'; }).join("");
   $("jobList").querySelectorAll("button").forEach(b=>b.onclick=()=>switchJob(+b.dataset.j));
   if(C.study){ const e=eduById(C.study.id), left=Math.max(0,Math.ceil((C.study.end-Date.now())/1000)); $("studyNow").innerHTML='<div class="nowBox">📖 <b>'+e.n+'</b> 공부 중... '+left+'초 남음<div class="mbar"><i style="width:'+(100-left/C.study.t*100)+'%"></i></div></div>'; } else $("studyNow").innerHTML="";
@@ -2403,9 +2415,15 @@ $("setShake").onchange=e=>{ S.set.noshake=e.target.checked; save(); };
 $("saveExp").onclick=()=>{ try{ $("saveBox").value=btoa(unescape(encodeURIComponent(JSON.stringify({v:1,coins,best,S})))); toast("💾 저장 코드를 만들었어요!"); }catch(e){ toast("저장 코드를 만들지 못했어요"); } };
 $("saveCopy").onclick=async()=>{ const b=$("saveBox"); if(!b.value) $("saveExp").click(); b.select(); try{ await navigator.clipboard.writeText(b.value); toast("📋 복사했어요!"); }catch(e){ toast("직접 선택해서 복사(Ctrl+C) 해 주세요"); } };
 $("saveImp").onclick=()=>{
-  try{ const d=JSON.parse(decodeURIComponent(escape(atob($("saveBox").value.trim())))); if(!d||typeof d.coins!=="number"||!d.S) throw 0;
-    mergeS(d.S); coins=d.coins; best=Math.max(d.best||0,coins); shown=coins; pending=0; save(); applySkin(); applyFx(); setCoins(coins); renderStatus(); renderWork(); renderHist(); updPool(); updBadges(); toast("✅ 불러왔어요!"); closeModal("setModal"); }
-  catch(e){ toast("❌ 저장 코드가 올바르지 않아요"); }
+  // 옛 버전 코드도 받기: 공백·줄바꿈 제거 → 해독 → 그대로 저장소에 쓰고 새로고침해서
+  // 처음 켤 때와 똑같은 초기화(새 종목·새 아이템·생활 데이터 채우기)를 거치게 해요.
+  let d; try{ const raw=$("saveBox").value.replace(/\s+/g,""); d=JSON.parse(decodeURIComponent(escape(atob(raw)))); }catch(e){ d=null; }
+  if(!d||typeof d.coins!=="number"||!isFinite(d.coins)||!d.S||typeof d.S!=="object"){ toast("❌ 저장 코드가 올바르지 않아요 (전부 복사됐는지 확인해 주세요)"); return; }
+  const T=d.S, out={coins:d.coins,best:Math.max(+d.best||0,d.coins),S:T,ts:Date.now()};
+  ["charm","amp","potion","ins","free","jb","dbl","glove","batt","clv","cd","skins","skin","rb","soul","run","perk","lc","la","clicks","bonusAt"].forEach(k=>{ if(T[k]!==undefined) out[k]=T[k]; });
+  try{ localStorage.setItem("jp777",JSON.stringify(out)); }catch(e){ toast("❌ 저장 공간에 쓸 수 없어요"); return; }
+  wiped=true; // 새로고침 전에 지금 상태로 덮어쓰지 않게 막아요
+  toast("✅ 불러왔어요! 잠시 후 다시 시작해요…"); closeModal("setModal"); setTimeout(()=>location.reload(),700);
 };
 $("introClose").onclick=()=>{ S.seen=true; save(); closeModal("introModal"); };
 
@@ -3183,7 +3201,7 @@ function renderReDet(){ const r=RE.find(y=>y.id===reSel), R=S.re, o=R.own[r.id],
 }
 
 /* ---------- 📜 채권 ---------- */
-const BONDS=[{id:"b1",ic:"🇰🇷",n:"국채",days:3,rate:.03,risk:0,rk:0,rn:"안전"},{id:"b2",ic:"🏦",n:"은행채",days:4,rate:.06,risk:.01,rk:1,rn:"조금 위험"},{id:"b3",ic:"🏭",n:"회사채",days:5,rate:.13,risk:.05,rk:2,rn:"위험"},{id:"b4",ic:"🎲",n:"정크본드",days:4,rate:.32,risk:.18,rk:3,rn:"매우 위험"},{id:"b5",ic:"🇺🇸",n:"미국 국채",days:6,rate:.045,risk:0,rk:0,rn:"안전"},{id:"b6",ic:"🏙️",n:"지방채",days:5,rate:.05,risk:.005,rk:0,rn:"안전"},{id:"b7",ic:"🌍",n:"신흥국 국채",days:5,rate:.2,risk:.1,rk:2,rn:"위험"}];
+const BONDS=[{id:"b1",ic:"🇰🇷",n:"국채",days:3,rate:.03,risk:0,rk:0,rn:"안전"},{id:"b2",ic:"🏦",n:"은행채",days:4,rate:.06,risk:.01,rk:1,rn:"조금 위험"},{id:"b3",ic:"🏭",n:"회사채",days:5,rate:.13,risk:.05,rk:2,rn:"위험"},{id:"b4",ic:"🎲",n:"정크본드",days:4,rate:.32,risk:.18,rk:3,rn:"매우 위험"},{id:"b5",ic:"🇺🇸",n:"미국 국채",days:3,rate:.033,risk:0,rk:0,rn:"안전"},{id:"b6",ic:"🏙️",n:"지방채",days:3,rate:.032,risk:.002,rk:0,rn:"안전"},{id:"b7",ic:"🌍",n:"신흥국 국채",days:5,rate:.2,risk:.1,rk:2,rn:"위험"}];
 function buyBond(b,f){ const amt=Math.floor(bal()*f); if(amt<100){ toast("최소 100코인 이상 필요해요"); return; } spend(amt); S.bonds.push({id:b.id,amt,mat:S.mkt.day+b.days,rate:b.rate*brMul()}); S.stat.buys++; toast(b.ic+" "+b.n+" "+fmt(amt)+" 매입! "+b.days+"일 뒤 +"+(b.rate*brMul()*100).toFixed(1)+"%"); ping(1300,.12,.2); save(); renderFin(); }
 function bondMature(){ const keep=[]; S.bonds.forEach(x=>{ if(S.mkt.day+1<x.mat){ keep.push(x); return; } const b=BONDS.find(y=>y.id===x.id);
     if(Math.random()<b.risk){ const back=Math.floor(x.amt*.3); gain(back); S.stat.defaults++; toast("💥 "+b.ic+" "+b.n+" 부도!! 원금의 30%만 돌려받았어요 (+"+fmt(back)+")"); news("💥 [채권] "+b.n+" 발행 회사 부도 사태",-1,true); }
@@ -3314,7 +3332,7 @@ const LUX=[
   {id:"l11",ic:"💎",n:"핑크 다이아몬드",p:5e7,k:"walk",v:.007,dr:.0006,mt:.0001,fame:12,d:"세상에 몇 개 없어서 값이 꾸준히 오르는 편이에요"},
   {id:"l12",ic:"🦖",n:"공룡 화석",p:5e8,k:"walk",v:.015,dr:.0005,mt:.0003,fame:20,d:"박물관도 탐내는 진짜 화석 · 보관·습도 관리비가 들어요"},
   {id:"l13",ic:"🏰",n:"유럽 고성",p:2.5e10,k:"walk",v:.007,dr:.0003,mt:.001,fame:45,d:"수백 년 된 성 · 수리비가 어마어마해요"},
-  {id:"l14",ic:"🚁",n:"개인 헬리콥터",p:5e9,k:"dep",dep:.003,floor:.3,mt:.0018,fame:30,d:"출퇴근을 하늘로! 정비·조종사 비용이 많이 들어요"},
+  {id:"l14",ic:"🚁",n:"개인 헬리콥터",p:8e8,k:"dep",dep:.003,floor:.3,mt:.0018,fame:18,d:"출퇴근을 하늘로! 정비·조종사 비용이 많이 들어요"},
 ];
 const LUX_TAX=.2, LUX_SELL=.1;
 function initLux(){ if(!S.lux) S.lux={}; const L=S.lux; L.m=L.m||{}; L.h=L.h||{}; L.own=L.own||{}; L.paid=L.paid||0; L.next=L.next||Date.now()+60000;
@@ -3323,7 +3341,7 @@ const luxNew=x=>x.p*(x.k==="walk"?S.lux.m[x.id]:1);
 const luxUnit=x=>x.k==="walk"?x.p*S.lux.m[x.id]:x.p*S.lux.own[x.id].f;
 const luxValue=()=>S.lux?LUX.reduce((a,x)=>a+S.lux.own[x.id].n*luxUnit(x),0):0;
 const luxUpkeep=()=>S.lux?LUX.reduce((a,x)=>a+S.lux.own[x.id].n*x.p*x.mt,0):0;
-function fameScore(){ return S.lux?LUX.reduce((a,x)=>a+(S.lux.own[x.id].n?x.fame*Math.min(3,S.lux.own[x.id].n):0),0):0; }
+function fameScore(){ return S.lux&&S.lux.own?LUX.reduce((a,x)=>{ const n=(S.lux.own[x.id]||{}).n||0; return a+(n?x.fame*Math.min(3,n):0); },0):0; }
 function fameBonus(){ return Math.min(1,fameScore()*.01); }
 function luxBuy(x){ const unit=Math.ceil(luxNew(x)*(1+LUX_TAX)); if(bal()<unit){ toast("💸 코인이 부족해요 (사치세 20% 포함 "+fmt(unit)+")"); return; } spend(unit); const o=S.lux.own[x.id];
   if(x.k==="dep") o.f=(o.f*o.n+1)/(o.n+1); o.n++; o.cost+=unit; S.stat.buys++; S.stat.luxBuy=(S.stat.luxBuy||0)+1;
@@ -3858,12 +3876,12 @@ function worldInit(){ for(const id in stkImp) delete stkImp[id]; wLast=null; mTi
 load(); setCoins(coins); renderStatus();
 if (coins<1) $("msg").textContent="코인이 없어요! 💼 돈 벌기에서 일해서 벌어요 💪";
 for(let i=0;i<26;i++){ const e=document.createElement("div"); e.className="sp"; e.textContent="✦"; e.style.left=Math.random()*100+"vw"; e.style.top=Math.random()*100+"vh"; e.style.fontSize=(10+Math.random()*18)+"px"; e.style.animationDelay=(Math.random()*2.6)+"s"; e.style.animationDuration=(1.8+Math.random()*2)+"s"; document.body.appendChild(e); }
+initMarket(); for(const id in S.theme){ const t=S.theme[id]; if(Math.abs(t.s)>.005) t.s=t.s>0?.0012:-.0016; } initFx(); initRe(); initLux(); initIpo(); initCry(); initFriends(); worldInit(); fixCity(); updVipTag(); initLife();
 applySkin(); applyFx(); renderWork(); setCoins(coins); updMini(); updAchBadge(); renderHist(); updPool(); updBadges();
 (function addX(){ document.querySelectorAll(".overlay").forEach(ov=>{ const box=ov.querySelector(".paybox"); if(!box||box.querySelector(".xBtn")) return; const w=document.createElement("div"); w.className="xWrap"; const b=document.createElement("button"); b.className="xBtn"; b.type="button"; b.setAttribute("aria-label","닫기"); b.textContent="✕";
   b.onclick=()=>{ if(ov.id==="ceoModal"&&getComputedStyle($("ceoOk")).display==="none"){ closeModal("ceoModal"); ceoOpen=false; if(curView==="co") renderCo(); return; } const cb=[...box.querySelectorAll(".closeBtn")].find(x=>getComputedStyle(x).display!=="none"); if(cb) cb.click(); else closeModal(ov.id); };
   w.appendChild(b); box.insertBefore(w,box.firstChild);
   if(!["introModal","offModal","ceoModal","lifeModal"].includes(ov.id)) ov.addEventListener("click",e=>{ if(e.target===ov) b.click(); }); }); })();
-initMarket(); for(const id in S.theme){ const t=S.theme[id]; if(Math.abs(t.s)>.005) t.s=t.s>0?.0012:-.0016; } initFx(); initRe(); initLux(); initIpo(); initCry(); initFriends(); worldInit(); fixCity(); updVipTag(); initLife();
 if(!S.seen) setTimeout(()=>openModal("introModal"),500); else if(offlineInfo) setTimeout(showOffline,400);
 if(migMsg) setTimeout(()=>{ banner("💼 퇴직금 지급!<small>코인 클릭 대신 이제 직장에서 일해요 · +"+fmt(migMsg)+"</small>","big",3500); },1200);
 if(S.lastView==="pet") S.lastView="slot";
