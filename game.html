@@ -1662,6 +1662,8 @@ $("shopModal").onclick = e => { if(e.target.id==="shopModal") $("shopModal").cla
 
 /* ---------- 업적 ---------- */
 const ACH=[
+  {id:"x1",icon:"🧑‍🚀",name:"꿈의 직업",desc:"우주비행사 되기",goal:1,val:()=>JOBS[S.car.job]&&JOBS[S.car.job].n==="우주비행사"?1:0,reward:5e6},
+  {id:"x2",icon:"🎓",name:"자격증 부자",desc:"자격증·학위 10개 따기",goal:10,val:()=>Object.keys(S.car.edu||{}).length,reward:50000},
   {id:"lf1",icon:"🏢",name:"독립 만세!",desc:"부모님 집에서 나와 원룸 이상으로 이사",goal:2,val:()=>S.life?S.life.home:0,reward:3000},
   {id:"lf2",icon:"🏙️",name:"내 집 같은 아파트",desc:"신축 아파트 이상에서 살기",goal:4,val:()=>S.life?S.life.home:0,reward:200000},
   {id:"lf3",icon:"🧾",name:"13월의 월급",desc:"연말정산 3번 받기",goal:3,val:()=>S.stat.lifeYears||0,reward:20000},
@@ -1813,6 +1815,13 @@ const EDU=[
   {id:"med",ic:"🏥",n:"의대·의사 면허",c:4e7,t:600,req:["uni"]},
   {id:"cfa",ic:"📈",n:"국제 금융 자격증",c:8e7,t:480,req:["uni"]},
   {id:"mba",ic:"🎩",n:"해외 MBA",c:3e8,t:600,req:["uni"]},
+  {id:"cook",ic:"🍳",n:"한식·양식 조리사",c:80000,t:90,req:["hs"]},
+  {id:"draw",ic:"✏️",n:"웹툰 아카데미",c:150000,t:120,req:["hs"]},
+  {id:"elec",ic:"🔌",n:"전기기사 자격증",c:250000,t:120,req:["hs"]},
+  {id:"teach",ic:"🧑‍🏫",n:"교원 임용고시",c:2e6,t:300,req:["uni"]},
+  {id:"cpa",ic:"🧮",n:"공인회계사(CPA)",c:5e6,t:360,req:["uni"]},
+  {id:"pilot",ic:"🛩️",n:"비행 훈련·조종사 면허",c:2e7,t:420,req:["uni"]},
+  {id:"phd",ic:"🔬",n:"이공계 박사 학위",c:1.5e8,t:600,req:["uni"]},
 ];
 const JOBS=[
   {ic:"🏪",n:"편의점 알바",sal:3,req:[]},
@@ -1825,6 +1834,14 @@ const JOBS=[
   {ic:"🏥",n:"의사",sal:1800,req:["med"]},
   {ic:"🏦",n:"투자은행가",sal:3500,req:["cfa"]},
   {ic:"🚀",n:"대기업 CEO",sal:12000,req:["mba","cfa"],texp:1800},
+  {ic:"🍳",n:"호텔 셰프",sal:55,req:["cook"]},
+  {ic:"✏️",n:"웹툰 작가",sal:80,req:["draw","comp"]},
+  {ic:"🔌",n:"전기 기술자",sal:100,req:["elec"]},
+  {ic:"🧑‍🏫",n:"중학교 선생님",sal:260,req:["teach"]},
+  {ic:"🧮",n:"공인회계사",sal:600,req:["cpa"]},
+  {ic:"✈️",n:"항공기 조종사",sal:1300,req:["pilot"]},
+  {ic:"🧠",n:"AI 연구원",sal:5000,req:["phd","code"]},
+  {ic:"🧑‍🚀",n:"우주비행사",sal:8000,req:["phd","pilot"],texp:1200},
 ];
 const GIGS=[
   {id:"g1",ic:"🛵",n:"주말 배달",t:45,req:["drv"],pay:()=>2000+clickPay()*25,d:"고정 수입"},
@@ -1833,6 +1850,12 @@ const GIGS=[
   {id:"g4",ic:"📹",n:"유튜브 영상 올리기",t:120,req:[],pay:null,d:"조회수 운빨! 가끔 떡상"},
   {id:"g5",ic:"🎨",n:"외주 디자인",t:150,req:["comp"],pay:()=>10000+clickPay()*70,d:"고정 수입"},
   {id:"g6",ic:"📱",n:"앱 개발 외주",t:240,req:["code"],pay:()=>60000+clickPay()*120,d:"고정 수입"},
+  {id:"g7",ic:"🐕",n:"반려견 산책 알바",t:30,req:[],pay:()=>600+clickPay()*12,d:"짧고 귀여운 고정 수입"},
+  {id:"g8",ic:"📦",n:"물류센터 야간 상하차",t:75,req:[],pay:()=>3500+clickPay()*35,d:"힘들지만 확실한 고정 수입"},
+  {id:"g9",ic:"🍱",n:"주말 출장 요리",t:100,req:["cook"],pay:()=>8000+clickPay()*55,d:"고정 수입"},
+  {id:"g10",ic:"✏️",n:"웹툰 외주 원고",t:160,req:["draw"],pay:()=>Math.round((12000+clickPay()*80)*(.5+Math.random()*1.2)),d:"원고료는 작품 반응에 따라 달라요"},
+  {id:"g11",ic:"🧾",n:"세금 신고 대행",t:200,req:["cpa"],pay:()=>40000+clickPay()*100,d:"5월 종합소득세 시즌 고정 수입"},
+  {id:"g12",ic:"🎙️",n:"강연·특강",t:180,req:["uni"],pay:()=>Math.round((30000+clickPay()*90)*(.7+Math.random()*.8)),d:"유명할수록 강연료 ↑"},
 ];
 const eduById=id=>EDU.find(e=>e.id===id);
 const hasEdu=id=>!!S.car.edu[id];
@@ -2121,6 +2144,12 @@ const WEV=[
   ()=>{ const b=Math.floor(clickPay()*60); gain(b); S.run+=b; return "🎁 명절 상여금 +"+fmt(b); },
   ()=>{ S.cbUntil=Math.max(Date.now(),S.cbUntil)+30000; return "☕ 동료가 커피를 사 줬어요! 30초 동안 급여 ×2"; },
   ()=>{ const f=Math.floor(Math.min(bal()*.02,clickPay()*20)); spend(f); return "🚗 출근길 주차 위반 과태료 −"+fmt(f); },
+  ()=>{ S.car.exp+=90; S.car.texp+=90; return "📊 프레젠테이션 대성공! 경력 +90초"; },
+  ()=>{ const b=Math.floor(clickPay()*15); gain(b); S.run+=b; return "🧾 연차 수당 정산 +"+fmt(b); },
+  ()=>{ S.cbUntil=Math.max(Date.now(),S.cbUntil)+45000; return "🍕 팀장님이 피자를 쐈어요! 45초 동안 급여 ×2"; },
+  ()=>{ const f=Math.floor(Math.min(bal()*.01,clickPay()*10)); spend(f); return "🎉 팀 회식비 N분의 1 −"+fmt(f); },
+  ()=>{ const b=Math.floor(clickPay()*40); gain(b); S.run+=b; return "💡 사내 아이디어 공모전 1등! 상금 +"+fmt(b); },
+  ()=>{ S.car.exp=Math.max(0,S.car.exp-20); return "🤒 감기 때문에 병가를 냈어요 (경력 −20초)"; },
 ];
 function renderWork(){ updAC();
   const C=S.car, J=JOBS[C.job], sal=clickPay(), nr=C.rank+1<RANKS.length?REXP[C.rank+1]:null;
@@ -2128,10 +2157,10 @@ function renderWork(){ updAC();
   $("jobBig").innerHTML='<div class="jbI">'+J.ic+'</div><div class="jbT"><b>'+J.n+' · '+RANKS[C.rank]+'</b><span>급여 <b>'+fmt(sal)+'</b>/초 (기본급 '+fmt(J.sal)+' × 직급 ×'+RMUL[C.rank]+(C.study?' × 공부 중 70%':'')+(S.life?' × 생활 '+lifeMul().toFixed(2):'')+')</span>'+
     (nr!=null?'<span>다음 승진: '+RANKS[C.rank+1]+' (×'+RMUL[C.rank+1]+')까지 '+Math.max(0,nr-C.exp)+'초</span><div class="mbar"><i style="width:'+Math.min(100,(C.exp-REXP[C.rank])/(nr-REXP[C.rank])*100)+'%"></i></div>':'<span>🎖️ 최고 직급 부장!</span>')+'<small>총 경력 '+Math.floor(C.texp/60)+'분 '+(C.texp%60)+'초</small></div>';
   $("payBox").innerHTML='<div>🧾 다음 월급날</div><b>'+C.payIn+'초</b><div>쌓인 급여(세전) '+fmt(C.acc)+'</div><small>소득세 누진 6~45% · 4대보험 8.9% 공제</small><small>이번 월급 예상 소득세 '+fmt(incomeTax(C.acc))+' ('+(C.acc>0?(incomeTax(C.acc)/C.acc*100).toFixed(1):'6.0')+'%)</small>';
-  $("jobList").innerHTML=JOBS.map((Jb,i)=>{ const ok=jobOk(i), cur=i===C.job; return '<div class="jRow'+(cur?" cur":"")+(ok?"":" lock")+'"><span class="ji">'+Jb.ic+'</span><span class="jt"><b>'+Jb.n+'</b><small>기본급 '+fmt(Jb.sal)+'/초 · '+(Jb.req.length?Jb.req.map(r=>(hasEdu(r)?"✅":"❌")+eduById(r).n).join(" "):"자격 필요 없음")+(Jb.texp?" · "+(C.texp>=Jb.texp?"✅":"❌")+"총 경력 30분":"")+'</small></span><button data-j="'+i+'"'+(ok&&!cur?"":" disabled")+'>'+(cur?"근무 중":ok?"이직":"🔒")+'</button></div>'; }).join("");
+  $("jobList").innerHTML=JOBS.map((Jb,i)=>[Jb,i]).sort((a,b)=>a[0].sal-b[0].sal).map(([Jb,i])=>{ const ok=jobOk(i), cur=i===C.job; return '<div class="jRow'+(cur?" cur":"")+(ok?"":" lock")+'"><span class="ji">'+Jb.ic+'</span><span class="jt"><b>'+Jb.n+'</b><small>기본급 '+fmt(Jb.sal)+'/초 · '+(Jb.req.length?Jb.req.map(r=>(hasEdu(r)?"✅":"❌")+eduById(r).n).join(" "):"자격 필요 없음")+(Jb.texp?" · "+(C.texp>=Jb.texp?"✅":"❌")+"총 경력 30분":"")+'</small></span><button data-j="'+i+'"'+(ok&&!cur?"":" disabled")+'>'+(cur?"근무 중":ok?"이직":"🔒")+'</button></div>'; }).join("");
   $("jobList").querySelectorAll("button").forEach(b=>b.onclick=()=>switchJob(+b.dataset.j));
   if(C.study){ const e=eduById(C.study.id), left=Math.max(0,Math.ceil((C.study.end-Date.now())/1000)); $("studyNow").innerHTML='<div class="nowBox">📖 <b>'+e.n+'</b> 공부 중... '+left+'초 남음<div class="mbar"><i style="width:'+(100-left/C.study.t*100)+'%"></i></div></div>'; } else $("studyNow").innerHTML="";
-  $("eduList").innerHTML=EDU.map(e=>{ const have=hasEdu(e.id), ok=eduOk(e), c=eduCost(e), now=C.study&&C.study.id===e.id; return '<div class="eRow'+(have?" have":"")+'"><span class="ji">'+e.ic+'</span><span class="jt"><b>'+e.n+'</b><small>'+(have?"취득 완료 ✅":"💰"+fmt(c)+" · ⏱️"+e.t+"초"+(e.req.length?" · 필요: "+e.req.map(r=>(hasEdu(r)?"✅":"❌")+eduById(r).n).join(" "):""))+'</small></span><button data-e="'+e.id+'"'+(!have&&ok&&!C.study&&bal()>=c?"":" disabled")+'>'+(have?"✅":now?"📖":ok?"수강":"🔒")+'</button></div>'; }).join("");
+  $("eduList").innerHTML=EDU.slice().sort((a,b)=>a.c-b.c).map(e=>{ const have=hasEdu(e.id), ok=eduOk(e), c=eduCost(e), now=C.study&&C.study.id===e.id; return '<div class="eRow'+(have?" have":"")+'"><span class="ji">'+e.ic+'</span><span class="jt"><b>'+e.n+'</b><small>'+(have?"취득 완료 ✅":"💰"+fmt(c)+" · ⏱️"+e.t+"초"+(e.req.length?" · 필요: "+e.req.map(r=>(hasEdu(r)?"✅":"❌")+eduById(r).n).join(" "):""))+'</small></span><button data-e="'+e.id+'"'+(!have&&ok&&!C.study&&bal()>=c?"":" disabled")+'>'+(have?"✅":now?"📖":ok?"수강":"🔒")+'</button></div>'; }).join("");
   $("eduList").querySelectorAll("button").forEach(b=>b.onclick=()=>startStudy(eduById(b.dataset.e)));
   if(C.gig){ const g=GIGS.find(x=>x.id===C.gig.id), left=Math.max(0,Math.ceil((C.gig.end-Date.now())/1000)); $("gigNow").innerHTML='<div class="nowBox">'+g.ic+' <b>'+g.n+'</b> 하는 중... '+left+'초 남음<div class="mbar"><i style="width:'+(100-left/C.gig.t*100)+'%"></i></div></div>'; } else $("gigNow").innerHTML="";
   $("gigList").innerHTML=GIGS.map(g=>{ const ok=g.req.every(hasEdu), est=g.pay?Math.floor((g.id==="g2"?(1500+sal*30):g.pay())*gigMul()):null; return '<div class="gRow'+(ok?"":" lock")+'"><span class="ji">'+g.ic+'</span><span class="jt"><b>'+g.n+'</b><small>⏱️'+gigTime(g)+'초 · '+(est!=null?"약 +"+fmt(est):"?")+' · '+g.d+(g.req.length?" · 필요: "+g.req.map(r=>(hasEdu(r)?"✅":"❌")+eduById(r).n).join(" "):"")+'</small></span><button data-g="'+g.id+'"'+(ok&&!C.gig?"":" disabled")+'>'+(ok?"시작":"🔒")+'</button></div>'; }).join("");
@@ -2470,7 +2499,7 @@ $("petSlotBtn").onclick=()=>{ if(S.petSlots>=7) return; const c=slotPrice(); if(
 /* ---------- 👑 명예: VIP / 컬렉션 / 기부 ---------- */
 const VIP=[{ic:"🥉",n:"브론즈",p:5e4},{ic:"🥈",n:"실버",p:5e5},{ic:"🥇",n:"골드",p:5e6},{ic:"💎",n:"플래티넘",p:5e7},{ic:"👑",n:"다이아몬드",p:5e8}];
 const vipDaily=()=>1+0.5*S.vip;
-const COLL=[["🖼️","명화 액자",1e4,.02],["⌚","금시계",5e4,.03],["💍","다이아 반지",2.5e5,.04],["🎸","전설의 기타",1e6,.05],["🏍️","슈퍼 바이크",5e6,.06],["🚗","슈퍼카",2.5e7,.08],["🛥️","요트",1e8,.1],["🏰","성",5e8,.12],["✈️","전용기",2.5e9,.15],["🏝️","개인 섬",1e10,.2],["🚀","우주선",1e11,.25],["🌕","달 땅문서",1e12,.3]];
+const COLL=[["🖼️","명화 액자",1e4,.02],["⌚","금시계",5e4,.03],["💍","다이아 반지",2.5e5,.04],["🎸","전설의 기타",1e6,.05],["🏍️","슈퍼 바이크",5e6,.06],["🚗","슈퍼카",2.5e7,.08],["🛥️","요트",1e8,.1],["🏰","성",5e8,.12],["✈️","전용기",2.5e9,.15],["🏝️","개인 섬",1e10,.2],["🚀","우주선",1e11,.25],["🌕","달 땅문서",1e12,.3],["🦖","티라노 화석",1e13,.35],["🪐","토성 고리 명명권",1e14,.4],["🌌","은하 지도 원본",1e15,.5]];
 const colAll=()=>COLL.reduce((a,c,i)=>a+(S.coll[i]?c[3]:0),0);
 const DON=[[1e4,"💝 착한 마음"],[1e5,"🌸 나눔이"],[1e6,"🌟 천사"],[1e7,"🕊️ 대천사"],[1e8,"👼 수호천사"],[1e9,"🏛️ 자선왕"],[1e10,"🌍 세계의 빛"]];
 const donRank=()=>DON.filter(d=>S.don>=d[0]).length;
@@ -2505,7 +2534,7 @@ setInterval(()=>{ if(curView==="pet"&&!hatching) renderPets(); else if(curView==
 
 /* ---------- 🏙️ 도시 ---------- */
 const BLD=[{ic:"🏠",n:"집",p:2000,r:5},{ic:"🏪",n:"편의점",p:15000,r:40},{ic:"🍔",n:"식당",p:8e4,r:200},{ic:"🏫",n:"학교",p:4e5,r:900},{ic:"🏥",n:"병원",p:2e6,r:4000},
-  {ic:"🏟️",n:"경기장",p:1e7,r:18000},{ic:"🏢",n:"빌딩",p:5e7,r:8e4},{ic:"🎡",n:"놀이공원",p:3e8,r:4e5},{ic:"🗼",n:"타워",p:2e9,r:2.2e6},{ic:"🚀",n:"우주 센터",p:1.5e10,r:1.4e7}];
+  {ic:"🏟️",n:"경기장",p:1e7,r:18000},{ic:"🏢",n:"빌딩",p:5e7,r:8e4},{ic:"🎡",n:"놀이공원",p:3e8,r:4e5},{ic:"🗼",n:"타워",p:2e9,r:2.2e6},{ic:"🚀",n:"우주 센터",p:1.5e10,r:1.4e7},{ic:"🏨",n:"5성급 호텔",p:1e11,r:8.5e7},{ic:"🏝️",n:"리조트 섬",p:7e11,r:5.5e8},{ic:"🛸",n:"우주 정거장",p:5e12,r:3.6e9}];
 const MAXLOT=24, MAXBLV=5;
 function fixCity(){ while(S.city.tiles.length<S.city.lots) S.city.tiles.push(null); }
 const bPrice=i=>Math.round(BLD[i].p*Math.pow(1.25,S.bcnt[i]||0));
@@ -2552,7 +2581,7 @@ setInterval(()=>{ if(curView==="city") renderCity(); },2000);
 
 /* ---------- 📈 주식 시장 (현실 모드) ---------- */
 function gauss(){ let u=0,v=0; while(!u) u=Math.random(); while(!v) v=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
-const SECT={food:"음식",toy:"장난감",game:"게임",space:"우주",elec:"전자",car:"자동차",bio:"바이오",ent:"엔터",energy:"에너지",coin:"코인",fin:"금융",my:"내 회사",ship:"조선",semi:"반도체",beauty:"화장품",air:"항공",build:"건설",tel:"통신",plat:"플랫폼",steel:"철강",etf:"ETF"};
+const SECT={food:"음식",toy:"장난감",game:"게임",space:"우주",elec:"전자",car:"자동차",bio:"바이오",ent:"엔터",energy:"에너지",coin:"코인",fin:"금융",my:"내 회사",ship:"조선",semi:"반도체",beauty:"화장품",air:"항공",build:"건설",tel:"통신",plat:"플랫폼",steel:"철강",etf:"ETF",pet:"반려동물",edu:"교육",ins:"보험",deliv:"물류"};
 const STK=[
   {id:"s1",ic:"🍔",n:"냠냠버거",sec:"food",p:100,v:.016,b:.7,dv:.004,sh:2e6},
   {id:"s5",ic:"🍜",n:"후루룩라면",sec:"food",p:45,v:.015,b:.6,dv:.005,sh:3e6},
@@ -2580,6 +2609,18 @@ const STK=[
   {id:"s24",ic:"🔩",n:"강철철강",sec:"steel",p:210,v:.022,b:1,dv:.005,sh:5e6},
   {id:"s25",ic:"🎬",n:"팝콘필름",sec:"ent",p:120,v:.045,b:1.1,dv:0,sh:2e6},
   {id:"s26",ic:"🧪",n:"새싹제약",sec:"bio",p:55,v:.06,b:1,dv:0,sh:3e6},
+  {id:"s27",ic:"🐶",n:"멍냥펫케어",sec:"pet",p:140,v:.03,b:.9,dv:.002,sh:3e6},
+  {id:"s28",ic:"🦴",n:"꼬리흔들사료",sec:"pet",p:65,v:.022,b:.7,dv:.004,sh:2e6},
+  {id:"s29",ic:"📖",n:"쑥쑥에듀",sec:"edu",p:85,v:.025,b:.8,dv:.004,sh:3e6},
+  {id:"s30",ic:"🎒",n:"방과후코딩",sec:"edu",p:210,v:.04,b:1.1,dv:0,sh:1.5e6},
+  {id:"s31",ic:"🛡️",n:"든든생명",sec:"ins",p:120,v:.012,b:.7,dv:.007,sh:8e6},
+  {id:"s32",ic:"🚑",n:"안심손해보험",sec:"ins",p:75,v:.015,b:.8,dv:.006,sh:5e6},
+  {id:"s33",ic:"🚚",n:"씽씽택배",sec:"deliv",p:190,v:.028,b:1,dv:.002,sh:4e6},
+  {id:"s34",ic:"🛳️",n:"바다해운",sec:"deliv",p:330,v:.04,b:1.2,dv:.005,sh:3e6},
+  {id:"s35",ic:"☕",n:"별다방커피",sec:"food",p:160,v:.02,b:.8,dv:.003,sh:4e6},
+  {id:"s36",ic:"🔋",n:"찌릿배터리",sec:"elec",p:950,v:.045,b:1.4,dv:0,sh:3e6},
+  {id:"s37",ic:"🧬",n:"세포바이오",sec:"bio",p:38,v:.07,b:1.1,dv:0,sh:4e6},
+  {id:"s38",ic:"🎧",n:"쿵쿵오디오",sec:"elec",p:270,v:.03,b:1.1,dv:.001,sh:2e6},
   {id:"e1",ic:"📊",n:"슬롯200 ETF",sec:"etf",p:100,v:0,b:1,dv:.001,sh:5e7,etf:1},
   {id:"e2",ic:"⏫",n:"슬롯200 레버리지2X",sec:"etf",p:100,v:0,b:2,dv:0,sh:3e7,etf:2},
   {id:"e3",ic:"🔻",n:"슬롯200 인버스",sec:"etf",p:100,v:0,b:-1,dv:0,sh:3e7,etf:-1},
@@ -2607,8 +2648,12 @@ const SN={
   tel:[["6G 기술 선점","요금제 가입자 급증"],["통신 요금 인하 압박","통신 장애 사태"]],
   plat:[["앱 이용자 1억 돌파!","신규 서비스 대박"],["플랫폼 독점 규제","개인정보 유출 논란"]],
   steel:[["철강 가격 반등","인프라 투자 확대"],["철강 공급 과잉","원자재 값 폭등"]],
+  pet:[["반려동물 1,500만 시대! 펫 시장 급성장","프리미엄 사료 판매 신기록"],["사료 원료값 급등","동물병원비 규제 논란"]],
+  edu:[["방학 특강 등록 폭주","AI 교육 열풍에 수강생 급증"],["학생 수 감소 우려","사교육 규제 강화 발표"]],
+  ins:[["금리 상승에 보험사 투자수익 ↑","보험 가입자 역대 최대"],["태풍 피해로 보험금 지급 폭증","보험 사기 적발 논란"]],
+  deliv:[["온라인 쇼핑 대목! 물동량 폭증","해운 운임 급등"],["택배 파업 우려","해운 운임 급락"]],
 };
-const THEMES=["AI","우주여행","메타버스","초전도체","로봇","2차전지","K-푸드","게임 대박","신약","탄소중립"];
+const THEMES=["양자컴퓨터","도심항공(UAM)","저출산 대책","펫코노미","AI","우주여행","메타버스","초전도체","로봇","2차전지","K-푸드","게임 대박","신약","탄소중립"];
 const CN_UP=["신제품 출시에 주문 폭주!","대형 계약 체결!","외국인 투자자 대량 매수","사장님 '올해 매출 2배 자신'","해외 진출 대성공","특허 획득!","기관 투자자 집중 매수"];
 const CN_DN=["제품 결함으로 리콜...","사장님 갑자기 사임","공장에 정전 발생","나쁜 소문 확산","경쟁사가 더 싸게 팔아요","세금 문제로 조사받는 중","대주주 지분 대량 매도"];
 const LIMU=2, LIMD=.5, DAYTICKS=120, TICKMS=1500, FEE=.005, CANDLE=8;
@@ -2814,7 +2859,7 @@ setInterval(()=>{ if(curView==="stk"){ const left=(DAYTICKS-S.mkt.tick%DAYTICKS)
 
 /* ---------- 📱 주식 상세 화면 ---------- */
 let kPage="list", kTab="chart";
-const SDESC={food:"햄버거·라면·과자 같은 먹을거리를 만들어요. 경기가 나빠도 사람들은 밥을 먹으니까 주가가 비교적 덜 흔들려요.",toy:"아이들 장난감을 만들어요. 명절·크리스마스 시즌과 유행에 따라 실적이 달라져요.",game:"게임을 만들어 팔아요. 신작이 대박 나면 주가가 크게 오르고, 망하면 크게 떨어져요.",space:"로켓과 우주여행 사업을 해요. 꿈은 크지만 돈이 많이 들어서 주가 변동이 아주 심해요.",elec:"스마트폰·가전제품을 만들어요. 세계 경기와 수출에 영향을 많이 받아요.",car:"자동차를 만들어요. 환율이 오르면(원화 약세) 수출에 유리해요.",bio:"신약을 개발해요. 임상 성공·실패 소식 하나로 상한가·하한가가 나올 수 있는 고위험 업종이에요.",ent:"가수·배우를 키우는 연예 기획사예요. 소속 스타의 인기와 컴백 소식에 주가가 출렁여요.",energy:"전기·석유 같은 에너지를 만들어요. 유가와 경기에 영향을 받아요.",coin:"가상화폐 관련 회사예요. 하루에도 수십 % 오르내릴 수 있는 초고위험 종목이에요.",fin:"은행·증권 같은 금융 회사예요. 기준금리가 오르면 이자 장사가 잘돼서 유리해요.",my:"내가 세운 회사예요! 회사 실적이 좋아지면 주가도 올라가요.",ship:"큰 배를 만들어요. 한 번에 큰 계약을 따내면 주가가 크게 올라요.",semi:"반도체를 만들어요. 나라 경제를 이끄는 핵심 산업이고 경기에 민감해요.",beauty:"화장품을 만들어요. 해외 관광객과 수출이 중요해요.",air:"비행기를 띄우는 항공사예요. 유가가 오르면 기름값 부담이 커져요.",build:"아파트·빌딩을 지어요. 부동산 경기와 금리에 영향을 많이 받아요.",tel:"통신·인터넷 서비스를 해요. 매달 요금이 꾸준히 들어와서 안정적인 배당주예요.",plat:"앱·인터넷 플랫폼을 운영해요. 사용자 수가 늘면 크게 성장하는 성장주예요.",steel:"철을 만들어요. 건설·조선·자동차가 잘될수록 철이 많이 팔려요.",etf:"여러 종목을 한 번에 담은 상품이에요. 종합지수를 따라 움직여서 한 종목보다 위험이 적어요."};
+const SDESC={pet:"강아지·고양이 사료와 동물병원, 펫 용품을 팔아요. 반려동물을 키우는 집이 늘수록 커지는 시장이에요.",edu:"학원·인강·교육 앱 회사예요. 방학과 입시 시즌에 실적이 좋아요. 학생 수가 줄어드는 건 걱정거리예요.",ins:"사람들이 낸 보험료를 모아 투자해서 돈을 벌어요. 금리가 오르면 투자 수익이 늘고, 큰 재난이 나면 보험금이 많이 나가요. 배당이 짭짤해요.",deliv:"택배·해운처럼 물건을 실어 나르는 회사예요. 경기가 좋아서 물건이 많이 팔릴수록 바빠져요.",food:"햄버거·라면·과자 같은 먹을거리를 만들어요. 경기가 나빠도 사람들은 밥을 먹으니까 주가가 비교적 덜 흔들려요.",toy:"아이들 장난감을 만들어요. 명절·크리스마스 시즌과 유행에 따라 실적이 달라져요.",game:"게임을 만들어 팔아요. 신작이 대박 나면 주가가 크게 오르고, 망하면 크게 떨어져요.",space:"로켓과 우주여행 사업을 해요. 꿈은 크지만 돈이 많이 들어서 주가 변동이 아주 심해요.",elec:"스마트폰·가전제품을 만들어요. 세계 경기와 수출에 영향을 많이 받아요.",car:"자동차를 만들어요. 환율이 오르면(원화 약세) 수출에 유리해요.",bio:"신약을 개발해요. 임상 성공·실패 소식 하나로 상한가·하한가가 나올 수 있는 고위험 업종이에요.",ent:"가수·배우를 키우는 연예 기획사예요. 소속 스타의 인기와 컴백 소식에 주가가 출렁여요.",energy:"전기·석유 같은 에너지를 만들어요. 유가와 경기에 영향을 받아요.",coin:"가상화폐 관련 회사예요. 하루에도 수십 % 오르내릴 수 있는 초고위험 종목이에요.",fin:"은행·증권 같은 금융 회사예요. 기준금리가 오르면 이자 장사가 잘돼서 유리해요.",my:"내가 세운 회사예요! 회사 실적이 좋아지면 주가도 올라가요.",ship:"큰 배를 만들어요. 한 번에 큰 계약을 따내면 주가가 크게 올라요.",semi:"반도체를 만들어요. 나라 경제를 이끄는 핵심 산업이고 경기에 민감해요.",beauty:"화장품을 만들어요. 해외 관광객과 수출이 중요해요.",air:"비행기를 띄우는 항공사예요. 유가가 오르면 기름값 부담이 커져요.",build:"아파트·빌딩을 지어요. 부동산 경기와 금리에 영향을 많이 받아요.",tel:"통신·인터넷 서비스를 해요. 매달 요금이 꾸준히 들어와서 안정적인 배당주예요.",plat:"앱·인터넷 플랫폼을 운영해요. 사용자 수가 늘면 크게 성장하는 성장주예요.",steel:"철을 만들어요. 건설·조선·자동차가 잘될수록 철이 많이 팔려요.",etf:"여러 종목을 한 번에 담은 상품이에요. 종합지수를 따라 움직여서 한 종목보다 위험이 적어요."};
 function openStk(id){ kSel=id; kPage="detail"; kTab="chart"; beep(700,.03,"square",.05); renderMarket(true); const v=$("stkView"); if(v) v.scrollIntoView({block:"start"}); scrollTo(0,0); }
 function stkExtra(k,id,P){
   const o=S.stkO[id], hi=Math.max(S.stkHi[id],P), lo=Math.min(S.stkLo[id],P), c=chg(id);
@@ -2881,7 +2926,7 @@ function renderKNews(){ const nf=$("newsFeed"); const mine=id=>id&&S.stk[id]&&S.
 function renderKMy(val,cost){ const pl=val*(1-FEE)-cost; $("kMySum").innerHTML='<div class="mySum"><div><span>💼 총 평가금액</span><b>'+fmt(val)+'</b></div><div><span>🧾 총 투자원금</span><b>'+fmt(cost)+'</b></div><div><span>📊 평가손익</span><b class="'+cls(pl)+'">'+(pl>=0?"+":"−")+fmt(Math.abs(pl))+' ('+(cost?sgn(pl/cost*100):"0%")+')</b></div><div><span>✅ 지금까지 실현손익</span><b class="'+cls(S.stat.stkProfit)+'">'+(S.stat.stkProfit>=0?"+":"−")+fmt(Math.abs(S.stat.stkProfit))+'</b></div><div><span>💰 받은 배당금</span><b>'+fmt(S.stat.div)+'</b></div><div><span>🎟️ 공모주 수익</span><b class="'+cls(S.stat.ipoProfit||0)+'">'+fmt(S.stat.ipoProfit||0)+'</b></div></div>'; }
 
 /* ---------- 🎟️ 공모주 청약 ---------- */
-const IPO_N=[["🤖","로보틱스",["로봇","AI"]],["🔋","배터리",["2차전지"]],["🧬","바이오텍",["바이오"]],["🎤","엔터테인먼트",["K-팝"]],["🛰️","스페이스",["우주"]],["🍱","푸드",["밀키트"]],["💳","페이",["핀테크"]],["🚗","모빌리티",["자율주행"]],["🎮","스튜디오",["게임"]],["☁️","클라우드",["AI"]],["🧴","뷰티",["K-뷰티"]],["⚡","에너지",["수소"]]];
+const IPO_N=[["🐾","펫테크",["펫코노미"]],["🚁","에어모빌리티",["도심항공(UAM)"]],["⚛️","퀀텀랩",["양자컴퓨터"]],["🤖","로보틱스",["로봇","AI"]],["🔋","배터리",["2차전지"]],["🧬","바이오텍",["바이오"]],["🎤","엔터테인먼트",["K-팝"]],["🛰️","스페이스",["우주"]],["🍱","푸드",["밀키트"]],["💳","페이",["핀테크"]],["🚗","모빌리티",["자율주행"]],["🎮","스튜디오",["게임"]],["☁️","클라우드",["AI"]],["🧴","뷰티",["K-뷰티"]],["⚡","에너지",["수소"]]];
 const IPO_PRE=["한빛","미래","초록","푸른","대박","슈퍼","별빛","새싹","하늘","번개","다이아","무지개"];
 function newIpo(){ const t=IPO_N[rnd(IPO_N.length)], hot=Math.min(1,Math.max(.05,Math.random()*.7+S.mkt.reg*.15+(Math.random()<.2?.3:0)));
   const pp=Math.round((5+Math.random()*95)*(1+S.mkt.day*.02)); S.ipo.cur={ic:t[0],n:IPO_PRE[rnd(IPO_PRE.length)]+t[1],th:t[2][0],pp,hot,day:S.mkt.day,sh:Math.round(1e6+Math.random()*5e6)}; S.ipo.sub=0;
@@ -3010,7 +3055,7 @@ function initFriends(){ if(!S.pid) S.pid=Math.random().toString(36).slice(2,10);
 }
 
 /* ---------- 🏦 금융: 순자산 / 부자 순위 / 대출 ---------- */
-const NPC=[["🧒","옆집 초딩",5e3],["👵","용돈 많은 할머니",8e4],["🏪","동네 문방구 사장님",5e5],["🚕","개인택시 김기사",3e6],["🍗","치킨집 3호점 사장",2e7],["🏢","건물주 이씨",3e8],["💼","중소기업 최대표",1.5e9],["🏗️","건설왕 박회장",1e10],["🎮","게임회사 창업자",8e10],["🛳️","해운 재벌 3세",5e11],["📱","IT 거물 정의장",3e12],["🏦","금융 황제 J",2e13],["🌍","세계 최고 부자 미스터 X",3e14],["👽","화성 갑부 외계인",5e15]];
+const NPC=[["🧒","옆집 초딩",5e3],["👵","용돈 많은 할머니",8e4],["🏪","동네 문방구 사장님",5e5],["🚕","개인택시 김기사",3e6],["🍗","치킨집 3호점 사장",2e7],["🏢","건물주 이씨",3e8],["💼","중소기업 최대표",1.5e9],["🏗️","건설왕 박회장",1e10],["🎮","게임회사 창업자",8e10],["🛳️","해운 재벌 3세",5e11],["📱","IT 거물 정의장",3e12],["🏦","금융 황제 J",2e13],["🌍","세계 최고 부자 미스터 X",3e14],["👽","화성 갑부 외계인",5e15],["🐉","황금 드래곤",4e16],["🌠","우주 재벌 연합",3e17]];
 function assets(){ let stk=0; actStk().forEach(k=>{ const h=S.stk[k.id]; if(h) stk+=h.n*S.stkP[k.id]; });
   const city=S.city.tiles.reduce((a,t)=>a+(t?citySellVal(t):0),0), coll=COLL.reduce((a,c,i)=>a+(S.coll[i]?c[2]*.5:0),0);
   const re=S.re?RE.reduce((a,r)=>a+S.re.own[r.id].n*rePrice(r),0)-reDeposits():0, bond=S.bonds.reduce((a,b)=>a+b.amt,0), fx=fxValue();
@@ -3069,6 +3114,12 @@ const RE=[
   {id:"r11",ic:"🗽",n:"뉴욕 콘도",reg:"해외",p:6e8,y:.0015,fx:"usd"},
   {id:"r6",ic:"🏛️",n:"강남 꼬마빌딩",reg:"강남",p:3e9,y:.0025},
   {id:"r7",ic:"🌆",n:"랜드마크 타워",reg:"강남",p:5e10,y:.0022},
+  {id:"r13",ic:"🎓",n:"대학가 셰어하우스",reg:"수도권",p:1e6,y:.0033},
+  {id:"r14",ic:"⛷️",n:"강원 스키 콘도",reg:"지방",p:5e6,y:.0022},
+  {id:"r15",ic:"🏭",n:"산업단지 공장",reg:"지방",p:8e7,y:.0031},
+  {id:"r16",ic:"🗼",n:"파리 아파트",reg:"해외",p:4e8,y:.0014,fx:"eur"},
+  {id:"r17",ic:"🏨",n:"강남 비즈니스 호텔",reg:"강남",p:8e9,y:.0027},
+  {id:"r18",ic:"🌏",n:"상하이 오피스",reg:"해외",p:1.5e9,y:.0019,fx:"cny"},
 ];
 const REG=["지방","수도권","강남","해외"];
 function initRe(){ if(!S.re) S.re={}; const R=S.re; R.idx=R.idx||{}; R.tr=R.tr||{}; R.ih=R.ih||{}; REG.forEach(g=>{ if(!R.idx[g]) R.idx[g]=1; if(R.tr[g]==null) R.tr[g]=0; if(!Array.isArray(R.ih[g])||!R.ih[g].length) R.ih[g]=[R.idx[g]]; });
@@ -3116,7 +3167,7 @@ setInterval(()=>{ if(S.re) reTick(); },10000);
 
 /* ---------- 🏠 부동산 상세 ---------- */
 let reSel=null;
-const RDESC={r1:"대학가 근처의 작은 원룸이에요. 싸서 처음 사기 좋고 월세 수익률이 높은 편이에요.",r8:"수도권의 빌라예요. 아파트보다 싸지만 가격이 잘 안 오를 수 있어요.",r2:"직장인이 많이 사는 도시 오피스텔이에요. 월세가 꾸준히 들어와요.",r9:"제주도 관광지 펜션이에요. 관광객이 많을수록 수익이 좋아요.",r3:"수도권의 평범한 아파트예요. 가장 인기 많은 집 형태예요.",r4:"집값이 가장 비싼 강남 아파트예요. 월세 수익률은 낮지만 집값이 오를 가능성이 커요.",r10:"택배·쇼핑몰 물건을 보관하는 창고예요. 온라인 쇼핑이 늘수록 수요가 늘어요.",r12:"일본 도쿄의 맨션이에요. 엔화 환율이 오르면 원화로 계산한 가격도 올라요.",r5:"지하철역 앞 상가예요. 가게 월세가 높아서 수익률이 좋아요.",r11:"미국 뉴욕의 콘도예요. 달러 환율이 오르면 원화 가격도 올라요.",r6:"강남의 작은 빌딩 한 채예요. 부자들이 좋아하는 투자처예요.",r7:"도시를 대표하는 초고층 빌딩이에요. 엄청 비싸지만 월세도 엄청나요."};
+const RDESC={r13:"방을 여러 명에게 따로 빌려줘요. 학생이 많아서 공실이 적고 월세 수익률이 높아요.",r14:"겨울엔 스키 손님으로 붐비고 여름엔 한산해요. 지방이라 값은 천천히 움직여요.",r15:"공장을 기업에 빌려주고 임대료를 받아요. 경기가 나빠지면 공장이 비어 버릴 수도 있어요.",r16:"유로로 사는 파리 아파트예요. 유로 환율이 오르면 원화로 바꾼 가격도 올라요.",r17:"출장 온 손님이 묵는 호텔이에요. 비싸지만 강남이라 값이 잘 떨어지지 않아요.",r18:"위안화로 사는 상하이 사무실 빌딩이에요. 중국 경제와 위안화 환율에 따라 출렁여요.",r1:"대학가 근처의 작은 원룸이에요. 싸서 처음 사기 좋고 월세 수익률이 높은 편이에요.",r8:"수도권의 빌라예요. 아파트보다 싸지만 가격이 잘 안 오를 수 있어요.",r2:"직장인이 많이 사는 도시 오피스텔이에요. 월세가 꾸준히 들어와요.",r9:"제주도 관광지 펜션이에요. 관광객이 많을수록 수익이 좋아요.",r3:"수도권의 평범한 아파트예요. 가장 인기 많은 집 형태예요.",r4:"집값이 가장 비싼 강남 아파트예요. 월세 수익률은 낮지만 집값이 오를 가능성이 커요.",r10:"택배·쇼핑몰 물건을 보관하는 창고예요. 온라인 쇼핑이 늘수록 수요가 늘어요.",r12:"일본 도쿄의 맨션이에요. 엔화 환율이 오르면 원화로 계산한 가격도 올라요.",r5:"지하철역 앞 상가예요. 가게 월세가 높아서 수익률이 좋아요.",r11:"미국 뉴욕의 콘도예요. 달러 환율이 오르면 원화 가격도 올라요.",r6:"강남의 작은 빌딩 한 채예요. 부자들이 좋아하는 투자처예요.",r7:"도시를 대표하는 초고층 빌딩이에요. 엄청 비싸지만 월세도 엄청나요."};
 function renderReDet(){ const r=RE.find(y=>y.id===reSel), R=S.re, o=R.own[r.id], P=rePrice(r), H=R.h[r.id], c=(H[H.length-1]/H[0]-1)*100, w=o.n-o.js;
   const D=$("reDet"); if(D.dataset.id!==r.id){ D.dataset.id=r.id; D.innerHTML='<div class="dTop"><button id="reBack">← 목록</button><span class="t">'+r.ic+' '+r.n+'</span><span style="width:70px"></span></div><div id="reDH"></div><canvas class="big" id="reBig"></canvas><div id="reDB"></div>';
     $("reBack").onclick=()=>{ reSel=null; D.dataset.id=""; renderRe(); }; }
@@ -3132,7 +3183,7 @@ function renderReDet(){ const r=RE.find(y=>y.id===reSel), R=S.re, o=R.own[r.id],
 }
 
 /* ---------- 📜 채권 ---------- */
-const BONDS=[{id:"b1",ic:"🇰🇷",n:"국채",days:3,rate:.03,risk:0,rk:0,rn:"안전"},{id:"b2",ic:"🏦",n:"은행채",days:4,rate:.06,risk:.01,rk:1,rn:"조금 위험"},{id:"b3",ic:"🏭",n:"회사채",days:5,rate:.13,risk:.05,rk:2,rn:"위험"},{id:"b4",ic:"🎲",n:"정크본드",days:4,rate:.32,risk:.18,rk:3,rn:"매우 위험"}];
+const BONDS=[{id:"b1",ic:"🇰🇷",n:"국채",days:3,rate:.03,risk:0,rk:0,rn:"안전"},{id:"b2",ic:"🏦",n:"은행채",days:4,rate:.06,risk:.01,rk:1,rn:"조금 위험"},{id:"b3",ic:"🏭",n:"회사채",days:5,rate:.13,risk:.05,rk:2,rn:"위험"},{id:"b4",ic:"🎲",n:"정크본드",days:4,rate:.32,risk:.18,rk:3,rn:"매우 위험"},{id:"b5",ic:"🇺🇸",n:"미국 국채",days:6,rate:.045,risk:0,rk:0,rn:"안전"},{id:"b6",ic:"🏙️",n:"지방채",days:5,rate:.05,risk:.005,rk:0,rn:"안전"},{id:"b7",ic:"🌍",n:"신흥국 국채",days:5,rate:.2,risk:.1,rk:2,rn:"위험"}];
 function buyBond(b,f){ const amt=Math.floor(bal()*f); if(amt<100){ toast("최소 100코인 이상 필요해요"); return; } spend(amt); S.bonds.push({id:b.id,amt,mat:S.mkt.day+b.days,rate:b.rate*brMul()}); S.stat.buys++; toast(b.ic+" "+b.n+" "+fmt(amt)+" 매입! "+b.days+"일 뒤 +"+(b.rate*brMul()*100).toFixed(1)+"%"); ping(1300,.12,.2); save(); renderFin(); }
 function bondMature(){ const keep=[]; S.bonds.forEach(x=>{ if(S.mkt.day+1<x.mat){ keep.push(x); return; } const b=BONDS.find(y=>y.id===x.id);
     if(Math.random()<b.risk){ const back=Math.floor(x.amt*.3); gain(back); S.stat.defaults++; toast("💥 "+b.ic+" "+b.n+" 부도!! 원금의 30%만 돌려받았어요 (+"+fmt(back)+")"); news("💥 [채권] "+b.n+" 발행 회사 부도 사태",-1,true); }
@@ -3164,6 +3215,10 @@ const CRY=[
   {id:"dog",ic:"🐕",n:"도지멍멍",p:150,v:.032,meme:1,d:"장난으로 만든 밈코인 · 유명인 말 한마디에 폭등·폭락"},
   {id:"frg",ic:"🐸",n:"개굴코인",p:2,v:.05,meme:1,d:"초고위험 밈코인 · 하루아침에 휴지조각이 될 수도"},
   {id:"usdt",ic:"💲",n:"스테이블달러",p:1350,v:0,stable:1,d:"달러 가격에 맞춰 움직이는 코인 · 안전하게 잠시 대피할 때 써요"},
+  {id:"xwv",ic:"🌊",n:"파도페이",p:900,v:.022,d:"해외 송금을 빠르게 해 준다는 결제용 코인이에요"},
+  {id:"ait",ic:"🤖",n:"AI토큰",p:3500,v:.028,d:"AI 붐을 타고 뜬 코인 · AI 뉴스에 크게 움직여요"},
+  {id:"gmt",ic:"🎮",n:"겜블록",p:60,v:.035,d:"게임 아이템을 사고파는 코인 · 게임이 망하면 같이 망해요"},
+  {id:"piz",ic:"🍕",n:"피자코인",p:.5,v:.06,meme:1,d:"'피자 두 판' 밈으로 만든 초고위험 밈코인"},
 ];
 const CRY_FEE=.001;
 function initCry(){ if(!S.cry) S.cry={}; const C=S.cry; C.p=C.p||{}; C.a=C.a||{}; C.h=C.h||{}; C.own=C.own||{};
@@ -3254,6 +3309,12 @@ const LUX=[
   {id:"l6",ic:"🛥️",n:"초호화 요트",p:1.5e9,k:"dep",dep:.003,floor:.3,mt:.0015,fame:25,d:"선원 월급·정박료가 엄청 나가요"},
   {id:"l7",ic:"🛩️",n:"개인 전용기",p:1e10,k:"dep",dep:.0025,floor:.3,mt:.002,fame:40,d:"조종사·격납고·연료비… 유지비 끝판왕"},
   {id:"l8",ic:"🏝️",n:"개인 섬",p:8e10,k:"walk",v:.006,dr:.0004,mt:.0006,fame:70,d:"땅이라 값은 잘 안 떨어지지만 관리비가 들어요"},
+  {id:"l9",ic:"👟",n:"한정판 스니커즈",p:8e4,k:"walk",v:.012,dr:.0002,mt:0,fame:1,d:"발매가보다 리셀가가 높을 때가 많아요 · 유행이 지나면 뚝"},
+  {id:"l10",ic:"🃏",n:"희귀 트레이딩 카드",p:1e6,k:"walk",v:.018,dr:.0004,mt:0,fame:2,d:"등급 좋은 카드는 경매에서 값이 폭등하기도 해요"},
+  {id:"l11",ic:"💎",n:"핑크 다이아몬드",p:5e7,k:"walk",v:.007,dr:.0006,mt:.0001,fame:12,d:"세상에 몇 개 없어서 값이 꾸준히 오르는 편이에요"},
+  {id:"l12",ic:"🦖",n:"공룡 화석",p:5e8,k:"walk",v:.015,dr:.0005,mt:.0003,fame:20,d:"박물관도 탐내는 진짜 화석 · 보관·습도 관리비가 들어요"},
+  {id:"l13",ic:"🏰",n:"유럽 고성",p:2.5e10,k:"walk",v:.007,dr:.0003,mt:.001,fame:45,d:"수백 년 된 성 · 수리비가 어마어마해요"},
+  {id:"l14",ic:"🚁",n:"개인 헬리콥터",p:5e9,k:"dep",dep:.003,floor:.3,mt:.0018,fame:30,d:"출퇴근을 하늘로! 정비·조종사 비용이 많이 들어요"},
 ];
 const LUX_TAX=.2, LUX_SELL=.1;
 function initLux(){ if(!S.lux) S.lux={}; const L=S.lux; L.m=L.m||{}; L.h=L.h||{}; L.own=L.own||{}; L.paid=L.paid||0; L.next=L.next||Date.now()+60000;
@@ -3272,7 +3333,7 @@ function luxSell(x){ const o=S.lux.own[x.id]; if(o.n<1) return; const v=Math.flo
   toast(x.ic+" "+x.n+" 중고로 팔았어요 → +"+fmt(v)+" ("+(v-basis>=0?"💹 +":"📉 −")+fmt(Math.abs(v-basis))+")"); tone(v>=basis?1319:300,.12,"square",.1); save(); renderLux(); }
 function luxTick(){ const L=S.lux;
   LUX.forEach(x=>{ if(x.k==="walk"){ L.m[x.id]=Math.max(.2,L.m[x.id]*Math.exp(x.dr+x.v*gauss()+S.mkt.reg*.0005)); } else { const o=L.own[x.id]; if(o.n) o.f=Math.max(x.floor,o.f*(1-x.dep)); } const H=L.h[x.id]; H.push(x.k==="walk"?x.p*L.m[x.id]:x.p*L.own[x.id].f); if(H.length>60) H.shift(); });
-  if(Math.random()<.04){ const x=LUX.filter(y=>y.k==="walk")[rnd(5)], up=Math.random()<.55, m=.05+Math.random()*.15; L.m[x.id]*=up?1+m:1-m; news("💎 [명품] "+x.ic+" "+x.n+(up?" 리셀가 폭등! 품귀 현상 ▲":" 거품 꺼지나… 리셀가 급락 ▼")+(m*100).toFixed(0)+"%",up?1:-1,m>.12); }
+  if(Math.random()<.04){ const WL=LUX.filter(y=>y.k==="walk"), x=WL[rnd(WL.length)], up=Math.random()<.55, m=.05+Math.random()*.15; L.m[x.id]*=up?1+m:1-m; news("💎 [명품] "+x.ic+" "+x.n+(up?" 리셀가 폭등! 품귀 현상 ▲":" 거품 꺼지나… 리셀가 급락 ▼")+(m*100).toFixed(0)+"%",up?1:-1,m>.12); }
   if(Date.now()>=L.next){ L.next=Date.now()+60000; const up=Math.floor(luxUpkeep()); if(up>0){ const pay=Math.min(up,Math.max(0,Math.floor(bal()))); spend(pay); L.paid+=pay; toast("🧾 명품 유지비(보험·관리비) −"+fmt(pay)+(pay<up?" (돈이 모자라요!)":"")); } }
   if(curView==="lux" && !ptrDown) renderLux(); }
 function renderLux(){ $("lCoins").textContent=fmt(bal()); const L=S.lux, fs=fameScore();
@@ -3289,7 +3350,7 @@ setInterval(()=>{ if(S.lux&&S.mkt) luxTick(); },5000);
 
 /* ---------- 🌍 외환·원자재 상세 ---------- */
 let fxSel=null;
-const FDESC={usd:"세계에서 가장 많이 쓰는 돈이에요. 경제가 불안하면 사람들이 달러를 사서 환율이 올라요. 환율이 오르면 뉴욕 콘도 가격도 올라요.",jpy:"일본 돈이에요. 위기 때 오르는 안전자산이에요. 엔화가 오르면 도쿄 맨션 가격도 올라요.",eur:"유럽 여러 나라가 함께 쓰는 돈이에요. 유럽 경기 소식에 따라 움직여요.",cny:"중국 돈이에요. 중국 정부가 관리해서 비교적 천천히 움직여요.",gold:"대표적인 안전자산이에요. 불황이나 금리 인하 때 값이 오르는 경우가 많아요.",silver:"보석과 공업(태양광 등)에 함께 쓰여요. 금보다 가격이 더 크게 출렁여요.",oil:"모든 산업의 연료예요. 전쟁·산유국 소식에 크게 오르내리고, 호황일수록 많이 쓰여요.",gas:"난방과 발전에 써요. 날씨에 따라 가격이 아주 크게 변해요.",wheat:"빵과 국수의 원료예요. 가뭄·풍년 같은 날씨 소식에 따라 값이 바뀌어요.",coffee:"커피 원두예요. 산지 날씨(서리·가뭄)에 따라 가격이 크게 변해요."};
+const FDESC={gbp:"영국 돈이에요. 오래된 금융 중심지 런던의 통화라 달러·유로 다음으로 많이 거래돼요.",chf:"스위스 돈이에요. 스위스는 전쟁에도 중립을 지켜서, 위기 때 안전한 돈으로 인기가 많아요.",copper:"전선·전기차·건물에 쓰여요. 경기가 좋으면 많이 쓰여서 '경기를 아는 박사 구리'라고 불려요.",lith:"전기차 배터리의 핵심 재료예요. 전기차가 많이 팔리면 값이 뛰고, 공급이 늘면 폭락하기도 해요.",corn:"사료·식용유·바이오 연료로 쓰이는 곡물이에요. 날씨(가뭄·홍수)에 따라 값이 크게 변해요.",cocoa:"초콜릿의 원료예요. 아프리카 몇 나라에서 대부분 나와서 날씨가 나쁘면 값이 폭등해요.",usd:"세계에서 가장 많이 쓰는 돈이에요. 경제가 불안하면 사람들이 달러를 사서 환율이 올라요. 환율이 오르면 뉴욕 콘도 가격도 올라요.",jpy:"일본 돈이에요. 위기 때 오르는 안전자산이에요. 엔화가 오르면 도쿄 맨션 가격도 올라요.",eur:"유럽 여러 나라가 함께 쓰는 돈이에요. 유럽 경기 소식에 따라 움직여요.",cny:"중국 돈이에요. 중국 정부가 관리해서 비교적 천천히 움직여요.",gold:"대표적인 안전자산이에요. 불황이나 금리 인하 때 값이 오르는 경우가 많아요.",silver:"보석과 공업(태양광 등)에 함께 쓰여요. 금보다 가격이 더 크게 출렁여요.",oil:"모든 산업의 연료예요. 전쟁·산유국 소식에 크게 오르내리고, 호황일수록 많이 쓰여요.",gas:"난방과 발전에 써요. 날씨에 따라 가격이 아주 크게 변해요.",wheat:"빵과 국수의 원료예요. 가뭄·풍년 같은 날씨 소식에 따라 값이 바뀌어요.",coffee:"커피 원두예요. 산지 날씨(서리·가뭄)에 따라 가격이 크게 변해요."};
 function renderFxDet(){ const x=FXL.find(y=>y.id===fxSel), o=S.fx.own[x.id], P=fxP(x.id), H=S.fx.h[x.id], ch=(H[H.length-1]/H[0]-1)*100, buyP=P*(1+x.sp/2), sellP=P*(1-x.sp/2), pl=o.n?o.n*sellP-o.cost:0;
   const D=$("fxDet"); const keep=D.dataset.id===x.id;
   if(!keep){ D.dataset.id=x.id; D.innerHTML='<div class="dTop"><button id="fxBack">← 목록</button><span class="t">'+x.ic+' '+x.n+'</span><span style="width:70px"></span></div><div id="fxDH"></div><canvas class="big" id="fxBig"></canvas><div id="fxDB"></div>';
@@ -3315,6 +3376,12 @@ const FXL=[
   {id:"gas",ic:"🔥",n:"천연가스",u:"1단위",p:3800,v:.011,sp:.006,g:"cm"},
   {id:"wheat",ic:"🌾",n:"밀",u:"1부셸",p:9000,v:.007,sp:.006,g:"cm"},
   {id:"coffee",ic:"☕",n:"커피 원두",u:"1kg",p:7000,v:.008,sp:.006,g:"cm"},
+  {id:"gbp",ic:"💷",n:"영국 파운드",u:"1파운드",p:1720,v:.0026,sp:.012,g:"fx"},
+  {id:"chf",ic:"🇨🇭",n:"스위스 프랑",u:"1프랑",p:1530,v:.002,sp:.012,g:"fx"},
+  {id:"copper",ic:"🟫",n:"구리",u:"1kg",p:12500,v:.007,sp:.006,g:"cm"},
+  {id:"lith",ic:"🔋",n:"리튬",u:"1kg",p:18000,v:.012,sp:.006,g:"cm"},
+  {id:"corn",ic:"🌽",n:"옥수수",u:"1부셸",p:6000,v:.007,sp:.006,g:"cm"},
+  {id:"cocoa",ic:"🍫",n:"코코아",u:"1kg",p:11000,v:.01,sp:.006,g:"cm"},
 ];
 const fxImp={};
 const FX_EVT=[["oil",1,"🛢️ 중동 긴장 고조! 유가 급등"],["oil",-1,"🛢️ 산유국 증산 합의, 유가 하락"],["gold",1,"🥇 안전자산 선호! 금값 사상 최고 행진"],["gold",-1,"🥇 위험자산 선호로 금값 하락"],["usd",1,"💵 달러 강세! 환율 급등"],["usd",-1,"💵 달러 약세, 환율 하락"],["jpy",1,"💴 엔화 깜짝 반등"],["jpy",-1,"💴 엔저 심화..."],["wheat",1,"🌾 가뭄으로 밀 흉작 우려"],["wheat",-1,"🌾 밀 대풍년!"],["coffee",1,"☕ 커피 산지 서리 피해, 원두값 폭등"],["coffee",-1,"☕ 커피 원두 재고 넘쳐나"],["gas",1,"🔥 한파 예보, 가스 수요 폭증"],["gas",-1,"🔥 따뜻한 겨울, 가스값 하락"],["silver",1,"🥈 태양광 수요로 은값 상승"],["eur",1,"💶 유럽 경제 회복 신호"],["eur",-1,"💶 유럽 경기 둔화 우려"],["cny",1,"🧧 위안화 강세"],["cny",-1,"🧧 위안화 약세"]];
@@ -3359,6 +3426,10 @@ const CEO=[
   {t:"🕵️ 직원 횡령이 발각됐어요",d:"한 직원이 회삿돈을 몰래 가져갔어요. 어떻게 할까요?",a:["경찰에 신고",()=>{ const g=Math.floor(Math.abs(coProfitRate())*60+3000); gain(g); S.co.emp=Math.max(1,S.co.emp-1); return "👮 돈을 되찾았어요! +"+fmt(g); }],b:["조용히 해고",()=>{ S.co.emp=Math.max(1,S.co.emp-1); S.co.morale=Math.max(0,S.co.morale-10); return "🤐 조용히 처리했지만 소문이 났어요 (사기 −10)"; }]},
   {t:"🏛️ 정부 지원금 공고",d:"중소기업 지원금 신청 기간이에요. 서류가 엄청 많지만 받을 수 있을지도?",a:["신청한다",()=>{ if(Math.random()<.75){ const g=Math.floor(Math.max(30000,coProfitRate()*200)); gain(g); return "🎉 지원금 당첨! +"+fmt(g); } return "📄 서류 미비로 탈락... 다음 기회에!"; }],b:["귀찮아서 패스",()=>"😴 이번엔 그냥 넘어갔어요"]},
   {t:"🧑‍💼 스타 인재가 이직을 고민해요",d:"업계 최고 인재가 우리 회사에 올지 고민 중이래요. 연봉을 많이 줘야 해요.",a:["파격 연봉 제시",()=>{ const c=Math.floor(Math.max(15000,hireCost()*10)); if(bal()<c) return "💸 연봉을 맞춰줄 돈이 없어요"; spend(c); S.co.rd+=1; S.co.mk+=1; return "🌟 스타 인재 영입! 연구개발 +1, 마케팅 +1"; }],b:["포기한다",()=>"👋 다음 기회에..."]},
+  {t:"🌱 ESG 경영을 해 볼까요?",d:"환경을 지키는 설비로 바꾸면 돈이 들지만 회사 이미지가 좋아져요.",a:["친환경 설비 도입",()=>{ const c=Math.floor(Math.max(10000,coProfitRate()*120)); if(bal()<c) return "💸 설비 비용이 부족해요"; spend(c); S.co.mk++; S.co.morale=Math.min(100,S.co.morale+5); return "🌱 착한 기업으로 소문났어요! 마케팅 +1, 사기 +5"; }],b:["지금은 비용 절감",()=>"💰 일단 돈을 아끼기로 했어요"]},
+  {t:"🧑‍💻 해킹 공격을 받았어요!",d:"해커가 회사 서버를 잠그고 몸값을 요구해요.",a:["보안 전문가 고용",()=>{ const c=Math.floor(Math.max(8000,hireCost()*5)); if(bal()<c) return "💸 돈이 부족해서 서버가 하루 멈췄어요…"; spend(c); S.co.rd++; return "🛡️ 해커를 막고 보안도 강화! 연구개발 +1 (−"+fmt(c)+")"; }],b:["몸값을 낸다",()=>{ const c=Math.floor(Math.max(10000,coProfitRate()*200)); spend(Math.min(c,Math.max(0,bal()))); S.co.morale=Math.max(0,S.co.morale-10); return "😰 돈을 냈지만 또 노릴지도 몰라요… 사기 −10"; }]},
+  {t:"🏪 프랜차이즈 가맹 문의",d:"전국에서 우리 브랜드로 가게를 내고 싶다는 사람들이 몰려와요.",a:["가맹 사업 시작",()=>{ if(Math.random()<.7){ const g=Math.floor(Math.max(20000,coProfitRate()*150)); gain(g); S.co.mk++; return "🏪 가맹비 수입 +"+fmt(g)+", 브랜드가 유명해졌어요 (마케팅 +1)"; } S.co.morale=Math.max(0,S.co.morale-8); return "😓 가맹점 관리가 엉망이라 나쁜 기사가 났어요 (사기 −8)"; }],b:["직영점만 고집",()=>{ S.co.morale=Math.min(100,S.co.morale+3); return "🧑‍🍳 품질 관리에 집중! 사기 +3"; }]},
+  {t:"📦 원자재 값이 폭등했어요",d:"제품 만드는 재료값이 올랐어요. 가격을 올릴까요, 그냥 버틸까요?",a:["제품 가격 인상",()=>{ if(Math.random()<.5){ S.co.tmul=1.15; S.co.tmulUntil=Date.now()+180000; return "📈 손님들이 이해해 줬어요! 3분 동안 매출 +15%"; } S.co.tmul=.8; S.co.tmulUntil=Date.now()+180000; return "📉 손님들이 경쟁사로 떠났어요… 3분 동안 매출 −20%"; }],b:["가격 동결 (이익 감소)",()=>{ S.co.mk++; return "🙏 착한 가격 유지! 단골이 늘었어요 (마케팅 +1)"; }]},
 ];
 let ceoOpen=false;
 function ceoEvent(){
