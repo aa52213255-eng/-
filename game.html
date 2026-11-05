@@ -771,6 +771,12 @@
   .paper .quiz button { display:block; width:100%; text-align:left; margin:4px 0; padding:8px 10px; border-radius:8px; border:1px solid #bbb; background:#fff; font:inherit; font-size:.85rem; cursor:pointer; }
   .paper .quiz button.ok { background:#d3f9d8; border-color:#2f9e44; } .paper .quiz button.no { background:#ffe3e3; border-color:#e03131; }
   .paper .qx { font-size:.8rem; margin-top:6px; line-height:1.5; }
+  .helpFab { position:fixed; right:14px; bottom:14px; z-index:50; width:56px; height:56px; border-radius:50%; border:3px solid #7a4a00; background:linear-gradient(#fff3a0,#f0b429); color:#4a2a00; font:inherit; font-weight:900; font-size:1.4rem; cursor:pointer; box-shadow:0 4px 12px #0008; display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1; }
+  .helpFab span { font-size:.6rem; margin-top:2px; }
+  body:has(.overlay.show) .helpFab { display:none; }   /* 창이 열려 있으면 숨겨요 */
+  .helpTabs { display:flex; flex-wrap:wrap; gap:4px; margin:4px 0 10px; } .helpTabs button { font:inherit; font-size:.72rem; font-weight:800; padding:4px 8px; border-radius:8px; border:1px solid #ffffff33; background:#ffffff12; color:#fff; cursor:pointer; } .helpTabs button.on { background:#ffd23f; color:#3a2600; }
+  .helpBody { color:#fff; font-size:.86rem; line-height:1.65; text-align:left; } .helpBody h4 { margin:12px 0 4px; color:#ffe27a; font-size:.95rem; } .helpBody h4:first-child { margin-top:0; }
+  .helpBody ul { margin:0; padding-left:18px; } .helpBody .real { background:#4dabf71f; border-left:3px solid #4dabf7; padding:6px 10px; border-radius:6px; margin-top:8px; }
 </style>
 </head>
 <body>
@@ -1125,6 +1131,13 @@
   <div id="paperBody" class="paper"></div>
   <button class="closeBtn" id="paperClose">닫기</button>
 </div></div>
+<button id="helpFab" class="helpFab" title="이 화면 설명 보기">❓<span>설명</span></button>
+<div class="overlay" id="helpModal"><div class="paybox shopBox" style="max-width:600px !important">
+  <div class="shopHead"><h2 id="helpT">❓ 설명</h2></div>
+  <div id="helpTabs" class="helpTabs"></div>
+  <div id="helpBody" class="helpBody"></div>
+  <button class="closeBtn" id="helpClose">알겠어요!</button>
+</div></div>
 <div id="toasts"></div>
 
 <script>
@@ -1178,7 +1191,7 @@ function load(){
     if(d && typeof d.coins==="number"){ if(d.S) mergeS(d.S); coins=d.coins; best=Math.max(d.best||0,coins); S.charm=d.charm|0; S.amp=d.amp|0; S.potion=d.potion|0; S.ins=d.ins|0; S.free=d.free|0; S.jb=d.jb|0; S.dbl=d.dbl|0; S.glove=d.glove|0; S.batt=d.batt|0; S.clv=d.clv|0; S.cd=d.cd|0; if(d.skins) Object.assign(S.skins,d.skins); if(d.skin&&S.skins[d.skin]) S.skin=d.skin; S.rb=d.rb|0; S.soul=d.soul|0; S.run=d.run||0; if(d.perk) Object.assign(S.perk,d.perk);
       S.lc=d.lc|0; S.la=d.la|0; S.clicks=d.clicks|0; S.bonusAt=d.bonusAt||0;
       if(!S.car.mig){ S.car.mig=true; const sev=Math.round((15*Math.pow(1.32,S.lc)+25*Math.pow(1.34,S.la))*1.5); if(S.lc+S.la>0){ coins+=sev; migMsg=sev; } S.lc=0; S.la=0; }
-      const el=Math.min((Date.now()-(d.ts||Date.now()))/1000,7200+3600*S.offL); if(el>30){ const parts={auto:Math.floor(clickPay()*el*.5),city:Math.floor(cityRate()*el),robo:0,bank:Math.floor(S.bank.dep*(0.008+0.002*S.bank.rate)*el/60)}; offlineGain=parts.auto+parts.city+parts.robo+parts.bank; if(offlineGain>0){ offlineInfo={el,parts}; coins+=offlineGain; best=Math.max(best,coins); S.stat.interest+=parts.bank; } }
+      const el=Math.min((Date.now()-(d.ts||Date.now()))/1000,7200+3600*S.offL); if(el>30){ const parts={auto:Math.floor(clickPay()*el*.5),city:Math.floor(cityRate()*el),robo:0,bank:Math.floor(S.bank.dep*(0.008+0.002*S.bank.rate)*el/60*(1-.154))}; offlineGain=parts.auto+parts.city+parts.robo+parts.bank; if(offlineGain>0){ offlineInfo={el,parts}; coins+=offlineGain; best=Math.max(best,coins); S.stat.interest+=parts.bank; } }
       shown=coins; }
   }catch(e){}
 }
@@ -2861,7 +2874,7 @@ function mTick(){
 function chg(id){ return (S.stkP[id]/S.stkO[id]-1)*100; }
 const cls=v=>v>0.005?"up":v<-0.005?"dn":"flat";
 const sgn=v=>(v>0?"▲":v<0?"▼":"")+Math.abs(v).toFixed(2)+"%";
-const pfmt=p=>p<1000?(+p.toFixed(p<10?2:1)).toLocaleString("ko-KR"):fmt(p);
+const pfmt=p=>!isFinite(p)?"-":p<1&&p>0?String(+p.toPrecision(3)):p<1000?(+p.toFixed(p<10?2:1)).toLocaleString("ko-KR"):fmt(p);   // 1원 미만은 유효숫자 3자리 (0.00282)
 function spark(cv,arr,o){ const x=cv.getContext("2d"), W=cv.width, H=cv.height; x.clearRect(0,0,W,H); if(arr.length<2) return; const mx=Math.max(...arr,o||-Infinity), mn=Math.min(...arr,o||Infinity), rg=Math.max(1e-9,mx-mn); const up=arr[arr.length-1]>=(o||arr[0]);
   x.beginPath(); arr.forEach((v,i)=>{ const px=i/(arr.length-1)*W, py=H-2-(v-mn)/rg*(H-4); i?x.lineTo(px,py):x.moveTo(px,py); }); x.strokeStyle=up?"#ff5b5b":"#4d9bff"; x.lineWidth=1.6; x.stroke(); }
 function bigChart(id){
@@ -3414,8 +3427,8 @@ function evtDay(){ const M=S.mkt, E=M.evt; if(!E){ if(M.day>3&&Math.random()<.07
 function cashFlow(){ const inc=[], exp=[]; const sal=clickPay()*60*.875; inc.push(["💼 월급 (세후)",sal]);
   inc.push(["🏙️ 도시 건물",cityRate()*60]); const cp=coProfitRate()*60; if(cp>0) inc.push(["🏢 회사 이익 (법인세 후)",cp*.9]); else if(cp<0) exp.push(["🏢 회사 적자",-cp]);
   if(S.re) inc.push(["🏠 월세",RE.reduce((a,r)=>{ const o=S.re.own[r.id]; return a+(o.n-o.js)*reRent(r); },0)]);
-  inc.push(["🏦 예금 이자",S.bank.dep*bankRate()]);
-  let dv=0; actStk().forEach(k=>{ const h=S.stk[k.id]; if(k.dv&&h&&h.n) dv+=h.n*S.stkP[k.id]*k.dv; }); inc.push(["📈 주식 배당",dv/(DAYTICKS*TICKMS/60000)]);
+  inc.push(["🏦 예금 이자 (세후)",S.bank.dep*bankRate()*(1-.154)]);
+  let dv=0; actStk().forEach(k=>{ const h=S.stk[k.id]; if(k.dv&&h&&h.n) dv+=h.n*S.stkP[k.id]*k.dv; }); inc.push(["📈 주식 배당 (세후)",dv*(1-DIV_TAX)/(DAYTICKS*TICKMS/60000)]);
   exp.push(["💳 대출 이자",S.loan.debt*loanRate()]); if(S.lux) exp.push(["💎 명품 유지비",luxUpkeep()]); if(S.life){ const pm=DAYTICKS*TICKMS/60000; exp.push(["🏠 월세·관리비",homeCost()/pm]); exp.push(["🍽️ 식비",foodCost()/pm]); exp.push(["🛡️ 보험료",insTotal()/pm]); }
   return {inc:inc.filter(x=>x[1]>=1),exp:exp.filter(x=>x[1]>=1)}; }
 function renderCF(){ const box=$("cfBox"); if(!box) return; const {inc,exp}=cashFlow(), ti=inc.reduce((a,x)=>a+x[1],0), te=exp.reduce((a,x)=>a+x[1],0), net=ti-te, mx=Math.max(ti,te,1);
@@ -3611,6 +3624,31 @@ function renderPaper(){ const D=W_DAY(gTick()), e=econ(), today=S.news.filter(n=
 $("gTicker").onclick=()=>{ renderPaper(); openModal("paperModal"); };
 $("paperClose").onclick=()=>closeModal("paperModal");
 let paperDay=-1; setInterval(()=>{ const D=W_DAY(gTick()); if(paperDay<0){ paperDay=D; return; } if(D!==paperDay){ paperDay=D; toast("📰 새 경제신문이 나왔어요! (화면 위 속보 띠를 눌러요)"); } },3000);
+
+/* ---------- ❓ 화면별 설명 ---------- */
+const HELP={
+ slot:{t:"🎰 슬롯",a:"코인을 걸고 3개의 그림을 맞추는 게임이에요.",how:["베팅 금액을 정하고 SPIN(또는 레버 당기기, 스페이스바)","같은 그림 2개: ×1.5~6 · 3개: ×8~300 · 7️⃣7️⃣7️⃣는 누적 잭팟까지!","🌟 ⭐💎7️⃣ 럭키 콤보 ×30 · 🧺 서로 다른 과일 3개 ×1.5 · 7️⃣ 하나만 나와도 본전","🔁 오토로 여러 번 자동으로 돌릴 수 있어요","🛍️ 상점 아이템(물약·보험·자석·더블)은 아이템 한도 이하 베팅에서만 효과"],tip:["📊 배당표 버튼에서 확률과 기대값(평균 돌려받는 비율)을 볼 수 있어요","🎰 테이블 한도: 한 번에 거는 돈은 월급 30초치까지 (VIP마다 +50%)"],real:"진짜 카지노 슬롯은 기대값이 100%보다 낮아서(보통 85~95%) 오래 할수록 반드시 잃어요. 이 게임은 재미를 위해 더 후하게 만들었어요."},
+ work:{t:"💼 돈 벌기",a:"직장에서 일해서 월급을 받는 곳이에요. 모든 돈벌이의 시작!",how:["1초마다 급여가 쌓이고 30초마다 월급날 (세금·4대보험을 떼고 받아요)","오래 일하면 승진 → 급여 ×1.15~2.3","🎓 자격증을 따면 더 좋은 직업으로 이직할 수 있어요 (공부 중엔 급여 70%)","🧰 부업: 시간이 걸리지만 한 번에 목돈 (원천징수 3.3%)","🎁 무료 용돈은 1분마다"],tip:["🧾 소득세는 누진세(6~45%): 많이 벌수록 세율이 올라가요","🤖 AI 비서·🧲 자동 수령기로 자동화할 수 있어요","행복·건강이 높으면 급여가 올라요 (🧾 생활 탭)"],real:"실제 월급도 소득세·지방소득세와 국민연금·건강보험·고용보험을 떼고 받아요. 그래서 '세전 연봉'과 '실수령액'이 달라요."},
+ life:{t:"🧾 생활",a:"살면서 나가는 돈(월세·식비·보험)과 저축·노후 준비를 하는 곳이에요.",how:["장이 하루 지나면 1달 (12달 = 1년) · 매달 월세·식비·보험료가 자동으로 나가요","🏠 좋은 집 = 행복 ↑ = 급여 ↑, 대신 월세·보증금이 비싸요 (월세는 월급의 30% 이하로!)","🛡️ 보험: 평소엔 보험료가 나가지만 큰 사고 때 80~90% 보상","🏦 정기예금: 기간 동안 못 빼는 대신 이자 · 👴 연금저축: 연말정산 때 세금 환급","🎟️ 로또는 평균적으로 산 돈의 50%만 돌려받아요"],tip:["월세를 2번 밀리면 계약 해지 (밀린 월세는 보증금에서 빼요)","보이스피싱·투자 사기 선택지가 나오면 '송금하지 않기'가 정답!","12달마다 🧾 연말정산으로 13월의 월급"],real:"물가는 해마다 2~3%씩 올라요. 현금을 그냥 두면 실제 가치가 줄어들기 때문에 사람들은 저축·투자를 해요."},
+ pet:{t:"🐾 펫",a:"알을 부화시켜 펫을 모으고, 장착해서 효과를 받는 곳이에요.",how:["🥚 알을 사서 부화 → 희귀도에 따라 효과가 달라요","🎒 장착 칸에 넣은 펫만 효과가 있어요","⭐ 최고 펫 자동 장착 버튼으로 편하게"],tip:["같은 알을 많이 살수록 알값이 올라요"],real:"희귀한 아이템을 뽑는 '확률형 아이템'은 실제 게임에서도 확률 공개가 법으로 정해져 있어요."},
+ hon:{t:"👑 명예",a:"부자만 할 수 있는 VIP·컬렉션·기부로 명예를 쌓는 곳이에요.",how:["💎 VIP 등급: 돈을 내고 올리면 일일 보상·슬롯 한도 등 혜택","🖼️ 컬렉션: 비싼 수집품을 모으면 영구 보너스 (순자산에는 산 값의 절반으로 계산돼요)","💝 기부: 기부할수록 칭호가 생겨요"],tip:["컬렉션 보너스는 다 모을수록 커져요"],real:"실제 부자들도 재단·기부로 사회에 돈을 돌려줘요. 기부금은 연말정산 때 세금 공제도 받아요."},
+ city:{t:"🏙️ 도시",a:"땅에 건물을 지어서 매초 임대 수입을 받는 곳이에요.",how:["빈 땅을 누르고 건물 선택 → 건설","건물을 업그레이드하면 수입 ↑ (최대 Lv5)","같은 건물을 많이 지을수록 가격이 25%씩 올라요","팔면 지은 비용 일부를 돌려받아요"],tip:["🧲 자동 수령기로 자동 건설을 켤 수 있어요","수입 대비 가격(회수 기간)을 비교해서 지어요"],real:"부동산 임대업자는 건물을 빌려주고 월세를 받아요. 건물 값이 비쌀수록 회수(투자금을 다 돌려받는 데) 시간이 길어요."},
+ stk:{t:"📈 주식",a:"모든 플레이어가 같은 시세를 보는 주식 시장이에요. (장 1일 = 3분)",how:["종목을 눌러 차트·정보·뉴스를 보고 매수/매도","가격제한폭 하루 ±30% (상한가·하한가)","📋 실적 발표·📰 뉴스·🔮 단독 기사·💬 루머로 주가가 움직여요","배당주를 들고 있으면 장 마감 때 배당금 (배당소득세 15.4%)","🎟️ 공모주 청약·📉 공매도·🤖 AI 분석·🦾 로보어드바이저도 있어요"],tip:["뉴스는 이미 가격에 반영됐을 수도 있어요 ('소문에 사서 뉴스에 판다')","한 종목에 몰빵하지 말고 나눠서 (ETF도 좋아요)","수수료: 살 때 0.015% · 팔 때 0.195%(거래세 포함)"],real:"한국 주식시장도 하루 ±30% 가격제한폭이 있고, 팔 때 증권거래세를 내요. 주가는 실적·금리·경기·뉴스에 따라 움직여요."},
+ co:{t:"🏢 회사",a:"내 회사를 세우고 키워서 이익을 내고, 상장까지 하는 곳이에요.",how:["창업 비용 100,000 → 직원 고용 → 매출","사무실·마케팅·연구개발 레벨을 올리면 매출 ↑ (월급·유지비도 ↑)","직원 사기가 낮으면 매출이 줄고 파업이 날 수도","회사 가치가 충분하면 🔔 상장(IPO) → 주식 탭에 내 회사 주식이 생겨요","📩 사장님 결정 이벤트가 가끔 나와요"],tip:["적자면 돈이 줄어요. 매출 − 비용을 꼭 확인!","이익에는 법인세가 붙어요"],real:"실제 회사도 매출에서 월급·임대료·재료비를 빼야 이익이 남고, 이익에 법인세를 내요. 상장하면 누구나 그 회사 주식을 살 수 있어요."},
+ fin:{t:"🏦 금융",a:"내 재산 전체를 보고, 대출·채권·랭킹을 관리하는 곳이에요.",how:["🏦 순자산 = 가진 것 전부 − 빚 · 자산 구성 막대에서 비율 확인","💰 현금흐름: 1분 동안 들어오고 나가는 돈 (패시브 인컴!)","💳 대출: 신용점수가 좋을수록 이자 ↓ 한도 ↑ · 1%부터 원하는 만큼 갚기","📜 채권: 돈을 빌려주고 만기에 이자 (위험할수록 이자 ↑, 부도 위험)","🌐 랭킹에 이름을 등록하면 친구와 순위 비교"],tip:["빚이 재산보다 많아지면 압류당해요!","빚을 갚으면 신용점수가 올라요"],real:"은행은 신용점수를 보고 대출 이자와 한도를 정해요. 연체하면 신용점수가 떨어져서 나중에 돈 빌리기가 어려워져요."},
+ re:{t:"🏠 부동산",a:"집·건물을 사서 월세를 받거나 값이 오르면 파는 곳이에요.",how:["매물을 눌러 상세 정보 확인 → 구매 (취득세 3%)","월세로 놓으면 매달 수입 · 전세로 놓으면 보증금(목돈)을 받지만 나중에 돌려줘야 해요","팔 때 이익이 나면 양도소득세","지역(지방·수도권·강남·해외)마다 값이 다르게 움직여요 · 해외 부동산은 환율 영향"],tip:["금리가 오르면 부동산 값이 내려가는 경향","🚇 지하철·재개발 뉴스를 확인해요"],real:"한국에만 있는 '전세'는 큰 보증금을 맡기고 월세 없이 사는 제도예요. 집값이 떨어지면 보증금을 못 돌려받는 '전세 사기'도 생겨요."},
+ fx:{t:"🌍 해외 (외환·원자재)",a:"달러·엔화 같은 외국 돈과 금·석유·곡물 같은 원자재를 사고파는 곳이에요.",how:["카드를 눌러 상세 정보 → 사기/팔기","살 때와 팔 때 가격 차이(스프레드)가 수수료예요","불황·위기 땐 금·달러·엔화(안전자산)가 오르고, 호황엔 원자재가 올라요"],tip:["🌍 [국제] 뉴스로 유가·금값이 움직여요","환율이 오르면 해외 부동산의 원화 가치도 올라요"],real:"환율이 오르면(원화 약세) 수입품 값이 오르고 수출 기업은 이익이 늘어요. 금은 '위기 때 피난처'로 불려요."},
+ cry:{t:"🪙 코인",a:"비트골드·밈코인 같은 가상화폐를 사고파는 곳이에요. 주식보다 훨씬 위험해요!",how:["10%·50% 매수, 절반·전부 매도 (수수료 0.1%)","밈코인(🐕🐸🍕)은 유명인 한마디에 폭등, 러그풀(개발자 잠적)에 폭락","스테이블달러는 달러 가격을 따라가요 (잠깐 피신용)"],tip:["잃어도 괜찮은 돈만! 밈코인은 하루에 반토막도 흔해요","거래소 해킹·규제 뉴스에 전체가 떨어져요"],real:"실제 코인도 하루에 10~20%씩 움직이고, 수많은 밈코인이 휴지조각이 됐어요. 예금자 보호도 안 돼요."},
+ lux:{t:"💎 명품",a:"비싼 물건을 사서 명성을 얻고, 값이 오르면 되파는 곳이에요.",how:["살 때 사치세 20% · 팔 때 중고 수수료 10%","⭐ 명성: 급여·회사 매출 보너스 (최대 +100%)","시계·와인·그림·화석은 값이 오르내리고, 차·요트·헬기·비행기는 감가상각으로 계속 떨어져요","1분마다 유지비(보험·관리비)가 나가요"],tip:["유지비까지 생각하면 대부분 손해예요. 명성 보너스가 필요할 때만!"],real:"자동차는 사는 순간 값이 떨어져요(감가상각). 반대로 한정판 시계·미술품은 희소해서 값이 오를 수도 있지만 사고팔 때 비용이 커요."},
+ vc:{t:"🚀 스타트업",a:"막 시작한 회사에 투자해서, 성공하면 몇 배로 돌려받는 곳이에요.",how:["매일 투자 유치 중인 스타트업 목록이 바뀌어요 (모든 플레이어 같음)","시드 → 시리즈 A → 시리즈 B: 뒤 단계일수록 덜 위험하고 덜 벌어요","며칠 뒤 결과: 대박(×수십)·본전·망함(0원)"],tip:["대부분은 망해요! 여러 곳에 조금씩 나눠서 투자해요"],real:"벤처캐피털(VC)은 10곳에 투자해서 1곳만 크게 성공해도 이익이 나도록 투자해요. 나머지 대부분은 실패해요."},
+};
+let helpSel=null;
+function renderHelp(v){ helpSel=v; const H=HELP[v]||HELP.slot; $("helpT").textContent="❓ "+H.t+" 설명";
+  $("helpTabs").innerHTML=Object.keys(HELP).map(k=>'<button data-h="'+k+'" class="'+(k===v?"on":"")+'">'+HELP[k].t+'</button>').join("");
+  $("helpTabs").querySelectorAll("button").forEach(b=>b.onclick=()=>renderHelp(b.dataset.h));
+  $("helpBody").innerHTML='<h4>이 화면은?</h4><div>'+H.a+'</div><h4>🕹️ 이렇게 해요</h4><ul>'+H.how.map(x=>'<li>'+x+'</li>').join("")+'</ul><h4>💡 꿀팁 · 주의</h4><ul>'+H.tip.map(x=>'<li>'+x+'</li>').join("")+'</ul><div class="real">🌏 <b>현실에서는?</b> '+H.real+'</div>'; $("helpBody").scrollTop=0; }
+$("helpFab").onclick=()=>{ renderHelp(HELP[curView]?curView:"slot"); openModal("helpModal"); };
+$("helpClose").onclick=()=>closeModal("helpModal");
 
 /* ---------- 🧭 편의: HUD 이동 ---------- */
 function hudLinks(){ const map={"순자산":"fin","부자":"fin","경기":"stk","일차":"stk","빚":"fin","회사":"co","금리":"fin","환율":"fx","물가":"life","나이":"life"}; document.querySelectorAll("#hud span").forEach(sp=>{ for(const k in map){ if(sp.textContent.includes(k)){ sp.onclick=()=>showView(map[k]); break; } } }); }
@@ -3927,7 +3965,7 @@ function dayEvents(D){ if(W_CACHE.has(D)) return W_CACHE.get(D); const E=[], L=S
     else if(r<.55) E.push({t,mk:"cry",tg:"all",m:Math.log(.82),tau:800,txt:"🏴‍☠️ [코인] 거래소 해킹 사건! 코인 시장 전체 급락 −18%",dir:-1,big:true});
     else if(r<.65) E.push({t,mk:"cry",tg:"btc",m:Math.log(1.15),tau:3000,txt:"🏛️ [코인] 비트골드 ETF 승인! 기관 자금 유입 +15%",dir:1,big:true});
     else if(r<.75) E.push({t,mk:"cry",tg:"all",m:Math.log(.9),tau:1200,txt:"⚖️ [코인] 정부, 코인 규제 강화 발표… −10%",dir:-1,big:true});
-    else if(r<.79){ const x=wPick(memes,D,i,3); E.push({t,mk:"cry",tg:x.id,m:Math.log(.04),tau:9000,rug:1,txt:"🧶 [코인] "+x.ic+" "+x.n+" 개발자 잠적, 러그풀!! −96%",dir:-1,big:true}); }
+    else if(r<.77){ const x=wPick(memes,D,i,3); E.push({t,mk:"cry",tg:x.id,m:Math.log(.04),tau:1800,rug:1,txt:"🧶 [코인] "+x.ic+" "+x.n+" 개발자 잠적, 러그풀!! −96%",dir:-1,big:true}); }
     else { const x=wPick(coins,D,i,3), m=.08+hh(D,i,4)*.2; E.push({t,mk:"cry",tg:x.id,m:Math.log(1+m),tau:900,txt:"📈 [코인] "+x.ic+" "+x.n+" 대형 거래소 상장! +"+(m*100).toFixed(0)+"%",dir:1,big:false}); } }
   // 명품
   if(hh(D,130,1)<.35){ const ws=LUX.filter(y=>y.k==="walk"), x=wPick(ws,D,130,2), up=hh(D,130,3)<.55, m=.05+hh(D,130,4)*.15; E.push({t:at(130),mk:"lux",tg:x.id,m:up?Math.log(1+m):Math.log(1-m),tau:1500,txt:"💎 [명품] "+x.ic+" "+x.n+(up?" 리셀가 폭등! 품귀 현상 ▲":" 거품 꺼지나… 리셀가 급락 ▼")+(m*100).toFixed(0)+"%",dir:up?1:-1,big:m>.12}); }
@@ -3974,7 +4012,10 @@ const RE_SD={"지방":8101,"수도권":8202,"강남":8303,"해외":8404}, RE_G={
 function reIdxAt(g,T){ const D=W_DAY(T); return Math.max(.2,Math.exp(RE_G[g]*Math.log1p(Math.max(0,D)/100)+fbm(RE_SD[g],T,.00045)+regLevel(T)*.6-(brAt(D)-3.5)*.02+evSum("re",e=>e.tg===g?1:0,T,20)+evtC(T,"re",g))); }
 const CRY_SD={}; CRY.forEach((x,i)=>CRY_SD[x.id]=9100+i*151);
 function cryAt(id,T){ const x=CRY.find(y=>y.id===id); if(x.stable) return fxAt("usd",T); const D=W_DAY(T);
-  return Math.max(x.p*1e-6,x.p*Math.exp(fbm(9000,T,x.v*.5)+fbm(CRY_SD[id],T,x.v*.65)+.3*Math.log1p(Math.max(0,D)/150)+regLevel(T)*1.5+evSum("cry",e=>e.tg===id||e.tg==="all"?1:0,T,60)+evtC(T,"cry",id))); }
+  // 코인 변동폭을 현실 수준으로: 큰 흐름은 완만하게(되돌림 있음), 단기 출렁임은 크게 · 아무리 망해도 처음 가격의 0.5% 아래로는 안 내려가요
+  const lp=fbm(9000,T,x.v*CRY_K)+fbm(CRY_SD[id],T,x.v*CRY_K*1.3)+.15*Math.log1p(Math.max(0,D)/150)+regLevel(T)*1.2+evSum("cry",e=>e.tg===id||e.tg==="all"?1:0,T,60)+evtC(T,"cry",id);
+  const fl=Math.log(.005); return x.p*Math.exp(lp>fl+1?lp:fl+Math.log1p(Math.exp(lp-fl))); }
+var CRY_K=.2;   // 코인 장기 변동 크기 (비트골드 연간 약 ±50%)
 const LUX_SD={}; LUX.forEach((x,i)=>LUX_SD[x.id]=9500+i*173);
 function luxMAt(id,T){ const x=LUX.find(y=>y.id===id), D=W_DAY(T); return Math.max(.2,Math.exp(fbm(LUX_SD[id],T,x.v*.35)+x.dr*400*Math.log1p(Math.max(0,D)/100)+regLevel(T)*.3+evSum("lux",e=>e.tg===id?1:0,T,15))); }
 /* ---- 공모주 (날짜마다 같은 회사) ---- */
@@ -4019,7 +4060,8 @@ function wStep(T){ // 한 틱 진행 (실시간)
   wLast=T; }
 // 내 회사 주식(나만의 종목)은 내 폰에서만 움직여요
 function myCoTick(){ const k=STK.find(x=>x.id==="sMy"); if(!S.co.ipo||!S.stkP.sMy) return; const id="sMy", P=S.stkP[id], tgt=coValue()/1e6; if(tgt>0) S.stkA[id]=S.stkA[id]*.97+tgt*.03; const A=S.stkA[id]||P;
-  const lr=fbm(4444,S.mkt.tick,0)+(Math.random()-.5)*.006-.012*Math.log(P/A); const np=rt(Math.max(.01,P*Math.exp(lr))); S.stkP[id]=np; S.stkHi[id]=Math.max(S.stkHi[id],np); S.stkLo[id]=Math.min(S.stkLo[id],np);
+  const imp=(stkImp[id]||0)*.3; stkImp[id]=(stkImp[id]||0)-imp;   // 회사 사건(대형 계약·세무조사 등)이 주가에 서서히 반영돼요
+  const lr=imp+(Math.random()-.5)*.006-.012*Math.log(P/A); const np=rt(Math.max(.01,P*Math.exp(lr))); S.stkP[id]=np; S.stkHi[id]=Math.max(S.stkHi[id],np); S.stkLo[id]=Math.min(S.stkLo[id],np);
   const H=S.stkH[id]; H.push(np); if(H.length>120) H.shift(); stkV[id]=stkV[id]||[]; stkV[id].push(0); if(stkV[id].length>120) stkV[id].shift(); const c=curC[id]||(curC[id]={o:P,h:P,l:P,c:P,v:0}); c.h=Math.max(c.h,np); c.l=Math.min(c.l,np); c.c=np; if(S.mkt.tick%CANDLE===0){ S.cdl[id].push({o:c.o,h:c.h,l:c.l,c:c.c,v:0}); if(S.cdl[id].length>70) S.cdl[id].shift(); curC[id]={o:np,h:np,l:np,c:np,v:0}; } }
 // 하루가 끝날 때 (내 계좌에만 생기는 일: 배당·채권·공모주 배정)
 function wDayClose(D,live){ const M=S.mkt; let dv=0; actStk().forEach(k=>{ const h=S.stk[k.id]; if(k.dv&&h&&h.n) dv+=h.n*S.stkP[k.id]*k.dv; if(k.id==="sMy"&&S.stkP.sMy){ S.stkO.sMy=S.stkP.sMy; S.stkHi.sMy=S.stkP.sMy; S.stkLo.sMy=S.stkP.sMy; } });
@@ -4034,7 +4076,7 @@ function mTick(){ const T=gTick(), M=S.mkt;
   if(curView==="stk" && !ptrDown) renderMarket(false); }
 function endDay(){}
 function wLoadNews(T){ const mine=S.news.filter(n=>n.p); const L=[]; for(let d=W_DAY(T)-1;d<=W_DAY(T);d++) dayEvents(d).forEach(e=>{ if(e.t<=T) L.push({t:tickMs(e.t),text:e.txt,dir:e.dir,big:!!e.big,id:e.id||null,lead:e.lead,real:e.real}); });
-  S.news=L.concat(mine).sort((a,b)=>b.t-a.t).slice(0,80); const tk=$("tickerIn"); if(tk&&S.news[0]) tk.textContent="📰 "+S.news[0].text; }
+  S.news=L.concat(mine).sort((a,b)=>b.t-a.t).slice(0,80); const tk=$("tickerIn"); if(tk&&S.news[0]) tk.textContent="📰 "+S.news[0].text; const nt=$("newsTick"); if(nt&&S.news[0]) nt.textContent=S.news[0].text; }
 /* ---- 외환·원자재 ---- */
 function fxTick(){ const F=S.fx, T=gTick(); FXL.forEach(x=>{ F.p[x.id]=fxAt(x.id,T); F.a[x.id]=x.p*Math.exp(fbm(FX_SD[x.id],T,0)); const H=F.h[x.id]; if(!F._b){ H.length=0; for(let i=99;i>=1;i--) H.push(+fxAt(x.id,T-i*2).toFixed(2)); } H.push(+F.p[x.id].toFixed(2)); if(H.length>100) H.shift(); }); F._b=1; if(curView==="fx" && !ptrDown) renderFx(); }
 /* ---- 부동산 ---- */
