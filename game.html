@@ -2704,10 +2704,10 @@ const SN={
 const THEMES=["양자컴퓨터","도심항공(UAM)","저출산 대책","펫코노미","AI","우주여행","메타버스","초전도체","로봇","2차전지","K-푸드","게임 대박","신약","탄소중립"];
 const CN_UP=["신제품 출시에 주문 폭주!","대형 계약 체결!","외국인 투자자 대량 매수","사장님 '올해 매출 2배 자신'","해외 진출 대성공","특허 획득!","기관 투자자 집중 매수"];
 const CN_DN=["제품 결함으로 리콜...","사장님 갑자기 사임","공장에 정전 발생","나쁜 소문 확산","경쟁사가 더 싸게 팔아요","세금 문제로 조사받는 중","대주주 지분 대량 매도"];
-const LIMU=2, LIMD=.5, DAYTICKS=120, TICKMS=1500, FEE=.005, CANDLE=8;
+const LIMU=1.3, LIMD=.7, DAYTICKS=120, TICKMS=1500, FEE=.005, CANDLE=8;
 const stkImp={}, stkV={}, limHit={}, flashIds=new Set(), curC={};
 let kSel="s3", kFilter="all", kBuilt=false, chartMode="candle";
-function tickSz(p){ return p<10?.01:p<100?.1:p<1000?1:p<5000?5:p<10000?10:p<50000?50:p<100000?100:p<500000?500:1000; }
+function tickSz(p){ return p<10?.01:p<1000?.1:p<5000?1:p<10000?5:p<50000?10:p<100000?50:p<500000?100:500; }
 const rt=p=>{ const t=tickSz(p); return Math.max(t,Math.round(p/t)*t); };
 const idxNow=()=>{ const L=STK.filter(k=>k.id!=="sMy"&&!k.etf); return 1000*L.reduce((a,k)=>a+S.stkP[k.id]/k.p,0)/L.length; };
 function coValue(){ return Math.max(0,coProfitRate())*1200+S.co.emp*5000+(S.co.office-1)*50000; }
@@ -2763,8 +2763,8 @@ function applyPx(k,lr,P,opt){
   const M=S.mkt, id=k.id, th=S.theme[id];
   let np=P*Math.exp(lr);
   if(!k.etf){ const o=S.stkO[id], hi=rt(o*LIMU), lo=rt(o*LIMD);
-    if(np>=hi){ np=hi; if(limHit[id]!=="u"){ limHit[id]="u"; news("🚀🚀 [상한가] "+kName(id)+" 상한가 직행!! (+100%)",1,true,id); if(S.stk[id].n>0) S.stat.limUp++; } }
-    else if(np<=lo){ np=lo; if(limHit[id]!=="d"){ limHit[id]="d"; news("💥 [하한가] "+kName(id)+" 하한가 추락... (−50%)",-1,true,id); } } }
+    if(np>=hi){ np=hi; if(limHit[id]!=="u"){ limHit[id]="u"; news("🚀🚀 [상한가] "+kName(id)+" 상한가 직행!! (+30%)",1,true,id); if(S.stk[id].n>0) S.stat.limUp++; } }
+    else if(np<=lo){ np=lo; if(limHit[id]!=="d"){ limHit[id]="d"; news("💥 [하한가] "+kName(id)+" 하한가 추락... (−30%)",-1,true,id); } } }
   np=rt(Math.max(.01,np)); S.stkP[id]=np; S.stkHi[id]=Math.max(S.stkHi[id],np); S.stkLo[id]=Math.min(S.stkLo[id],np); S.ath[id]=Math.max(S.ath[id],np); S.atl[id]=Math.min(S.atl[id],np);
   const vol=Math.round(k.sh*.0004*(.5+Math.random())*(1+40*Math.abs(lr))*(th?4:1)); S.dvol[id]+=vol;
   const H=S.stkH[id]; H.push(np); if(H.length>120) H.shift(); const V=stkV[id]; V.push(vol); if(V.length>120) V.shift(); if(Math.abs(lr)>.06) flashIds.add(id);
@@ -2793,7 +2793,7 @@ function mTick(){
 function chg(id){ return (S.stkP[id]/S.stkO[id]-1)*100; }
 const cls=v=>v>0.005?"up":v<-0.005?"dn":"flat";
 const sgn=v=>(v>0?"▲":v<0?"▼":"")+Math.abs(v).toFixed(2)+"%";
-const pfmt=p=>p<100?(+p.toFixed(2)).toLocaleString("ko-KR"):fmt(p);
+const pfmt=p=>p<1000?(+p.toFixed(p<10?2:1)).toLocaleString("ko-KR"):fmt(p);
 function spark(cv,arr,o){ const x=cv.getContext("2d"), W=cv.width, H=cv.height; x.clearRect(0,0,W,H); if(arr.length<2) return; const mx=Math.max(...arr,o||-Infinity), mn=Math.min(...arr,o||Infinity), rg=Math.max(1e-9,mx-mn); const up=arr[arr.length-1]>=(o||arr[0]);
   x.beginPath(); arr.forEach((v,i)=>{ const px=i/(arr.length-1)*W, py=H-2-(v-mn)/rg*(H-4); i?x.lineTo(px,py):x.moveTo(px,py); }); x.strokeStyle=up?"#ff5b5b":"#4d9bff"; x.lineWidth=1.6; x.stroke(); }
 function bigChart(id){
@@ -2929,7 +2929,7 @@ function stkExtra(k,id,P){
       ["주당순이익(EPS)",k.etf?"-":pfmt(eps)],["PER (주가÷이익)",per?per.toFixed(1)+"배 "+(per<10?"· 싼 편":per>25?"· 비싼 편":"· 보통"):"-"],
       ["배당",k.dv?"하루 "+(k.dv*100).toFixed(1)+"% (장 마감 때 지급)":"없음"],["시장 민감도(베타)",k.b+(k.b>1.1?" · 시장보다 크게 움직여요":k.b<0?" · 시장과 반대로 움직여요":k.b<.8?" · 시장보다 덜 움직여요":" · 시장과 비슷해요")],
       ["변동성","★".repeat(Math.min(5,Math.max(1,Math.ceil(k.v/0.018))))],["다음 실적 발표",k.etf?"-":(Math.max(0,S.earnDay[id]-S.mkt.day)?"D-"+Math.max(0,S.earnDay[id]-S.mkt.day):"오늘!")],
-      ["가격제한폭","하루 +100% / −50% ("+pfmt(rt(o*LIMD))+" ~ "+pfmt(rt(o*LIMU))+")"]
+      ["가격제한폭","하루 ±30% ("+pfmt(rt(o*LIMD))+" ~ "+pfmt(rt(o*LIMU))+")"]
     ].map(x=>'<div class="kv"><span>'+x[0]+'</span><b>'+x[1]+'</b></div>').join("")+'</div>'+
     (peers.length?'<div class="infoCard"><h4>🤝 같은 업종 종목</h4>'+peers.map(x=>'<div class="peer" data-id="'+x.id+'"><span>'+x.ic+'</span><b>'+x.n+'</b><span>'+pfmt(S.stkP[x.id])+'</span><span class="'+cls(chg(x.id))+'" style="min-width:58px;text-align:right">'+sgn(chg(x.id))+'</span></div>').join("")+'</div>':'');
   $("dInfo").querySelectorAll(".peer").forEach(p=>p.onclick=()=>openStk(p.dataset.id));
@@ -3797,7 +3797,16 @@ function stkRaw(k,T){ const key=k.id+"|"+T, c=W_RAW.get(key); if(c!==undefined) 
 function stkRaw0(k,T){ const sd=strSeed(k.id), D=W_DAY(T);
   let lp=Math.log(k.p)+.1*Math.log1p(Math.max(0,D)/100)+k.b*(fbm(3001,T,.0009)+regLevel(T))+fbm(W_SECT[k.sec],T,.001)+fbm(sd,T,k.v*.05)+gh(sd,T,5)*k.v*.03;
   lp+=evSum("stk",e=>e.tg===k.id?1:e.tg==="all"?k.b:e.tg==="sec:"+k.sec?1:0,T,12)+evtC(T,"stk",k,k.b);
+  lp+=stkMicro(k,sd,T,D);
   return Math.exp(lp); }
+// 📈 현실적인 주가 움직임
+//  ① 변동성 군집: 조용한 날·요동치는 날이 몰려서 와요 (불황이면 더 출렁)
+//  ② 장중 잔물결: 틱마다 사고팔면서 생기는 들쭉날쭉한 움직임
+//  ③ 뉴스 없는 급등락: 가끔 큰손 매매·소문으로 확 뛰거나 빠졌다가 일부 되돌림
+function stkMicro(k,sd,T,D){ const fear=1+Math.max(0,-regLevel(T))*3, vr=Math.min(2.6,Math.exp(.55*vnoise(sd+555,T/180))*fear), m=Math.sqrt(k.v*.02);
+  let v=vr*m*(.07*gh(sd,T,21)+.09*vnoise(sd+77,T/2)+.12*vnoise(sd+91,T/7)+.16*vnoise(sd+93,T/25));
+  for(let d=D-4;d<=D;d++){ if(hh(sd,d,41)<.05+k.v*1.5){ const tj=d*DAYTICKS+Math.floor(hh(sd,d,42)*DAYTICKS); if(T>=tj){ const dt=T-tj, J=gh(sd,d,43)*k.v*2.2*vr; v+=J*(.55*Math.exp(-dt/25)+.45*Math.exp(-dt/280)); } } }
+  return v; }
 function stkPx(k,T){ const o=stkRaw(k,W_DAY(T)*DAYTICKS); let p=stkRaw(k,T), lim=null; if(p>=o*LIMU){ p=o*LIMU; lim="u"; } else if(p<=o*LIMD){ p=o*LIMD; lim="d"; } return {p:rt(Math.max(.01,p)),lim,o:rt(o)}; }
 function stkVol(k,T,r,th){ return Math.round(k.sh*.0004*(.5+hh(strSeed(k.id),T,9))*(1+40*Math.abs(r))*(th?4:1)); }
 function etfIdx(T){ const L=STK.filter(k=>k.id!=="sMy"&&!k.etf); return L.reduce((a,k)=>a+stkRaw(k,T)/k.p,0)/L.length; }
@@ -3843,7 +3852,7 @@ function wStep(T){ // 한 틱 진행 (실시간)
   const D=W_DAY(T), M=S.mkt, t0=D*DAYTICKS; M.tick=T; M.day=D+1; M.reg=regAt(D); M.br=brAt(D); M.evt=evtAt(D);
   const i0=idxNow();
   STK.forEach(k=>{ const id=k.id; if(id==="sMy") return; if(id!=="sMy"&&!S.stkP[id]) return; const P=S.stkP[id], r=wFillStock(k,T), np=r.p, ret=Math.log(np/P), th=k.etf?null:themeAt(id,T), v=stkVol(k,T,ret,th);
-    if(!k.etf){ if(r.lim==="u"&&limHit[id]!=="u"){ news("🚀🚀 [상한가] "+kName(id)+" 상한가 직행!! (+100%)",1,true,id); if(S.stk[id].n>0) S.stat.limUp++; } else if(r.lim==="d"&&limHit[id]!=="d") news("💥 [하한가] "+kName(id)+" 하한가 추락... (−50%)",-1,true,id); limHit[id]=r.lim;
+    if(!k.etf){ if(r.lim==="u"&&limHit[id]!=="u"){ news("🚀🚀 [상한가] "+kName(id)+" 상한가 직행!! (+30%)",1,true,id); if(S.stk[id].n>0) S.stat.limUp++; } else if(r.lim==="d"&&limHit[id]!=="d") news("💥 [하한가] "+kName(id)+" 하한가 추락... (−30%)",-1,true,id); limHit[id]=r.lim;
       if(th) S.theme[id]=th; else delete S.theme[id]; }
     S.stkP[id]=np; S.stkO[id]=r.o; S.stkHi[id]=Math.max(S.stkHi[id],np); S.stkLo[id]=Math.min(S.stkLo[id],np); S.ath[id]=Math.max(S.ath[id],np); S.atl[id]=Math.min(S.atl[id],np); S.dvol[id]+=v;
     const H=S.stkH[id]; H.push(np); if(H.length>120) H.shift(); const V=stkV[id]; V.push(v); if(V.length>120) V.shift(); if(Math.abs(ret)>.06) flashIds.add(id);
