@@ -3195,11 +3195,21 @@ function renderFin(){ setTimeout(renderBonds,0); setTimeout(renderFriends,0); se
     '<div class="kv" style="flex:1"><div>빌린 돈<b class="'+(S.loan.debt?"warn":"")+'">'+fmt(S.loan.debt)+'</b></div><div>대출 한도<b>'+fmt(lim)+'</b></div><div>이자율<b>1분에 '+(loanRate()*100).toFixed(2)+'%</b></div></div></div>'+
     (danger?'<div class="warn" style="margin-top:6px">⚠️ 빚이 한도를 넘었어요! 신용점수가 계속 떨어지고, 빚이 재산보다 많아지면 <b>압류</b>당해요!</div>':'')+
     '<div class="row2"><button class="btn2" data-l=".1">💳 10% 빌리기</button><button class="btn2" data-l=".5">💳 50% 빌리기</button><button class="btn2" data-l="1">💳 최대 빌리기</button></div>'+
-    '<div class="row2"><button class="btn2 gold" data-r=".5">💸 절반 갚기</button><button class="btn2 gold" data-r="1">💸 전부 갚기</button></div>'+
+    '<div style="font-size:.75rem;opacity:.8;margin-top:8px">💸 빚 갚기 (남은 빚 기준)</div><div class="row2" style="display:grid;grid-template-columns:repeat(3,1fr);margin-top:4px"><button class="btn2 gold" data-r=".01">1% 갚기</button><button class="btn2 gold" data-r=".05">5% 갚기</button><button class="btn2 gold" data-r=".1">10% 갚기</button><button class="btn2 gold" data-r=".25">25% 갚기</button><button class="btn2 gold" data-r=".5">절반 갚기</button><button class="btn2 gold" data-r="1">전부 갚기</button></div>'+
+    '<div class="row2" style="align-items:center"><input id="loanAmt" type="number" min="1" step="1" inputmode="numeric" placeholder="갚을 금액 직접 입력" value="'+escH(loanAmtStr)+'" style="flex:2;font:inherit;padding:8px 10px;border-radius:10px;border:2px solid #8a5a00;min-width:0"><button class="btn2 gold" id="loanPay" style="flex:1">💸 입력한 만큼 갚기</button></div>'+
     '<div style="font-size:.72rem;opacity:.75;margin-top:6px">💡 신용등급이 좋을수록 이자가 싸고 한도가 커져요. 빚을 갚으면 신용점수가 올라요. 빌린 돈으로 주식이나 사업에 투자해 이자보다 더 벌면 이득! (못 벌면 큰일...)</div></div>';
   $("loanBox").querySelectorAll("[data-l]").forEach(b=>{ const x=Math.floor(room*+b.dataset.l); b.disabled=x<1; b.onclick=()=>{ const r2=Math.max(0,loanLimit()-S.loan.debt), y=Math.floor(r2*+b.dataset.l); if(y<1) return; S.loan.debt+=y; gain(y); if(S.loan.debt>loanLimit()*.9) S.loan.credit=Math.max(300,S.loan.credit-5); toast("💳 "+fmt(y)+" 코인을 빌렸어요. 이자 조심!"); ping(1200,.12,.2); save(); renderFin(); }; });
-  $("loanBox").querySelectorAll("[data-r]").forEach(b=>{ b.disabled=S.loan.debt<1||bal()<1; b.onclick=()=>{ const y=Math.floor(Math.min(bal(),S.loan.debt*+b.dataset.r)); if(y<1) return; spend(y); S.loan.debt-=y; if(S.loan.debt<1){ S.loan.debt=0; S.loan.credit=Math.min(1000,S.loan.credit+15); toast("🎉 빚을 다 갚았어요! 신용점수 +15"); } else { S.loan.credit=Math.min(1000,S.loan.credit+4); toast("💸 "+fmt(y)+" 코인 상환!"); } melody([659,784],90,"square",.08,.15); save(); renderFin(); }; });
+  $("loanBox").querySelectorAll("[data-r]").forEach(b=>{ b.disabled=S.loan.debt<1||bal()<1; b.onclick=()=>payDebt(Math.max(1,Math.ceil(S.loan.debt*+b.dataset.r))); });
+  const la=$("loanAmt"); la.oninput=()=>{ loanAmtStr=la.value; }; la.onkeydown=e=>{ if(e.key==="Enter") $("loanPay").click(); };
+  $("loanPay").disabled=S.loan.debt<1||bal()<1; $("loanPay").onclick=()=>{ const v=Math.floor(Number(la.value)); if(!(v>=1)){ toast("✏️ 갚을 금액을 1 이상으로 적어요"); la.focus(); return; } loanAmtStr=""; payDebt(v); };
 }
+let loanAmtStr="";
+// 💸 빚 갚기 (아무 금액이나) · 신용점수는 갚은 비율만큼 올라요 (조금씩 여러 번 갚아도 합치면 같아요)
+function payDebt(want){ const before=S.loan.debt, y=Math.floor(Math.min(bal(),before,want)); if(y<1){ toast(bal()<1?"💸 갚을 현금이 없어요":"빚이 없어요"); return; }
+  spend(y); S.loan.debt-=y; S.loan.credit=Math.min(1000,S.loan.credit+8*y/before);
+  if(S.loan.debt<1){ S.loan.debt=0; S.loan.credit=Math.min(1000,S.loan.credit+15); toast("🎉 빚을 다 갚았어요! 신용점수 +15"); }
+  else toast("💸 "+fmt(y)+" 코인 상환! 남은 빚 "+fmt(S.loan.debt)+(y<want?" (현금이 모자라서 가진 만큼만 갚았어요)":""));
+  melody([659,784],90,"square",.08,.15); save(); renderFin(); }
 function seize(){
   const a=assets(); let need=S.loan.debt; const take=x=>{ const y=Math.min(x,need); need-=y; return y; };
   let got=take(Math.max(0,bal())); if(got) spend(got);
@@ -3208,7 +3218,7 @@ function seize(){
   S.loan.debt=Math.max(0,need); S.loan.credit=Math.max(300,S.loan.credit-250); S.stat.seized++;
   banner("🚨 압류!!<small>빚 "+fmt(got)+" 코인어치를 강제로 가져갔어요</small>","big",3200); thud(70,25,1.4,.8); shake("shake",600); news("🚨 [사회] 무리한 대출 투자자 재산 압류...",-1,true); save();
 }
-setInterval(()=>{ const L=S.loan; if(L.debt<1) return; L.debt*=1+loanRate()/12; const lim=loanLimit(); if(L.debt>lim*1.2) L.credit=Math.max(300,L.credit-2); const a=assets(); if(netWorth(a)<0) seize(); if(curView==="fin" && !ptrDown) renderFin(); },5000);
+setInterval(()=>{ const L=S.loan; if(L.debt<1) return; L.debt*=1+loanRate()/12; const lim=loanLimit(); if(L.debt>lim*1.2) L.credit=Math.max(300,L.credit-2); const a=assets(); if(netWorth(a)<0) seize(); if(curView==="fin" && !ptrDown && !(document.activeElement&&document.activeElement.id==="loanAmt")) renderFin(); },5000);
 
 /* ---------- 🧭 상단 HUD + 순위 알림 ---------- */
 function renderHud(){ const h=$("hud"); if(!h) return; const a=assets(), nw=netWorth(a), rk=myRank(nw);
