@@ -759,6 +759,18 @@
   .lTk { margin-top:8px; display:flex; flex-direction:column; gap:3px; } .lTk small { opacity:.7; font-size:.72rem; }
   .lRes { padding:3px 0; border-bottom:1px solid #ffffff10; }
   .lLog { font-size:.8rem; line-height:1.7; color:#fff; } .lLog small { opacity:.6; margin-right:4px; }
+  .gTicker { width:100%; max-width:1000px; display:flex; align-items:center; gap:8px; margin:-4px 0 10px; padding:5px 12px; border-radius:12px; background:#0b0620e6; border:1px solid #ffd23f55; color:#fff; font-size:.8rem; cursor:pointer; overflow:hidden; }
+  .gTicker b { flex:none; background:#e01010; color:#fff; border-radius:6px; padding:1px 7px; font-size:.72rem; animation:needp 1.6s infinite; }
+  .gTicker span { flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .gTicker em { flex:none; font-style:normal; color:#ffe27a; font-size:.72rem; }
+  .paper { color:#222; background:#fbf7ec; border-radius:12px; padding:12px 14px; font-family:"Nanum Myeongjo","Batang",serif; }
+  .paper h3 { margin:12px 0 6px; padding-bottom:3px; border-bottom:2px solid #222; font-size:1rem; } .paper h3:first-child { margin-top:0; }
+  .paper .hl { font-size:1.15rem; font-weight:900; line-height:1.4; margin:4px 0 8px; }
+  .paper ul { margin:0; padding-left:18px; font-size:.85rem; line-height:1.6; } .paper .ecoG { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:6px; }
+  .paper .ecoG div { background:#fff; border:1px solid #ddd; border-radius:8px; padding:6px 8px; font-size:.75rem; font-family:inherit; } .paper .ecoG b { display:block; font-size:1.05rem; }
+  .paper .mv { display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:.82rem; } .paper .u { color:#d6336c; } .paper .d { color:#1c7ed6; }
+  .paper .quiz button { display:block; width:100%; text-align:left; margin:4px 0; padding:8px 10px; border-radius:8px; border:1px solid #bbb; background:#fff; font:inherit; font-size:.85rem; cursor:pointer; }
+  .paper .quiz button.ok { background:#d3f9d8; border-color:#2f9e44; } .paper .quiz button.no { background:#ffe3e3; border-color:#e03131; }
+  .paper .qx { font-size:.8rem; margin-top:6px; line-height:1.5; }
 </style>
 </head>
 <body>
@@ -773,6 +785,7 @@
 
 <div class="tabs"><button id="tabSlot" class="on">🎰 슬롯</button><button id="tabWork">💼 돈 벌기</button><button id="tabLife">🧾 생활</button><button id="tabPet">🐾 펫</button><button id="tabHon">👑 명예</button><button id="tabCity">🏙️ 도시</button><button id="tabStk">📈 주식</button><button id="tabCo">🏢 회사</button><button id="tabFin">🏦 금융</button><button id="tabRe">🏠 부동산</button><button id="tabFx">🌍 해외</button><button id="tabCry">🪙 코인</button><button id="tabLux">💎 명품</button><button id="tabVc">🚀 스타트업</button></div>
 <div id="hud" class="hud"></div>
+<div id="gTicker" class="gTicker" title="눌러서 오늘의 경제신문 보기"><b>📰 속보</b><span id="newsTick">장이 열렸어요! 오늘의 뉴스를 확인해 보세요</span><em>신문 보기 ›</em></div>
 <div id="slotView">
 <div class="sub">일해서 번 가짜 코인으로 슬롯에 도전해서 불려 봐요!</div>
 
@@ -1106,6 +1119,11 @@
   <div class="row2" style="flex-direction:column"><button class="btn2 blue" id="lifeA"></button><button class="btn2 gold" id="lifeB"></button></div>
   <div id="lifeR" style="color:#9cf58a;font-weight:900;text-align:center;margin:10px 0;min-height:1.4em;white-space:pre-line"></div>
   <button class="closeBtn" id="lifeOk">확인</button>
+</div></div>
+<div class="overlay" id="paperModal"><div class="paybox shopBox" style="max-width:640px !important">
+  <div class="shopHead"><h2>📰 슬롯경제신문</h2><div class="shopTop" id="paperDate"></div></div>
+  <div id="paperBody" class="paper"></div>
+  <button class="closeBtn" id="paperClose">닫기</button>
 </div></div>
 <div id="toasts"></div>
 
@@ -1675,6 +1693,7 @@ $("shopModal").onclick = e => { if(e.target.id==="shopModal") $("shopModal").cla
 
 /* ---------- 업적 ---------- */
 const ACH=[
+  {id:"x4",icon:"🧠",name:"경제 박사",desc:"오늘의 경제 퀴즈 10번 맞히기",goal:10,val:()=>S.stat.quiz||0,reward:20000},
   {id:"x3",icon:"🌟",name:"럭키 콤보",desc:"⭐💎7️⃣ 럭키 콤보 1번",goal:1,val:()=>S.stat.lucky||0,reward:3000},
   {id:"x1",icon:"🧑‍🚀",name:"꿈의 직업",desc:"우주비행사 되기 (꿈의 직업이지만 월급은 공무원 수준이에요!)",goal:1,val:()=>JOBS[S.car.job]&&JOBS[S.car.job].n==="우주비행사"?1:0,reward:5e6},
   {id:"x2",icon:"🎓",name:"자격증 부자",desc:"자격증·학위 10개 따기",goal:10,val:()=>Object.keys(S.car.edu||{}).length,reward:50000},
@@ -2003,6 +2022,12 @@ function lifeMisc(){ const L=S.life, b=lifeBase(), r=Math.random();
     [L.home===0?.08:0,()=>{ L.happy=Math.max(0,L.happy-4); return ["🗣️ 엄마: \"언제 독립할 거니?\" (행복 −4)",-1]; }],
     [L.home===1?.06:0,()=>{ L.health=Math.max(0,L.health-3); return ["🛏️ 고시원 옆방 코골이 때문에 잠을 못 잤어요 (건강 −3)",-1]; }],
     [M_reg()<0?.03:0,()=>{ L.happy=Math.max(0,L.happy-5); return ["📉 불황이라 회사 분위기가 안 좋아요 (행복 −5)",-1]; }],
+    [.03,()=>{ const c=lifePay(b*1.5); return ["🦷 사랑니를 뽑았어요 (치과는 보험이 일부만 돼요) −"+fmt(c),-1]; }],
+    [.02,()=>{ L.health=Math.min(100,L.health+5); L.happy=Math.min(100,L.happy+3); return ["🏃 동네 마라톤 완주! (건강 +5 · 행복 +3)",1]; }],
+    [.02,()=>{ const c=lifePay(b*.4); return ["📦 택배가 분실됐어요… 다시 주문 −"+fmt(c),-1]; }],
+    [.02,()=>{ const g=Math.floor(b*.8); gain(g); return ["💳 카드 포인트·캐시백 모아서 +"+fmt(g),1]; }],
+    [.02,()=>{ const c=lifePay(b*1.2); return ["🧊 냉장고가 고장 나서 새로 샀어요 −"+fmt(c),-1]; }],
+    [.015,()=>{ const g=Math.floor(b*2); gain(g); return ["🏅 회사 우수사원 포상금 +"+fmt(g),1]; }],
   ];
   let acc=0; for(const [p,f] of ev){ acc+=p; if(r<acc){ const [t,v]=f(); lifeLog(t,v); if(curView==="life") toast(t); return; } } }
 const M_reg=()=>S.mkt?S.mkt.reg:0;
@@ -2025,6 +2050,11 @@ const LCH=[
   {t:"🏋️ 퇴근 후 뭐 할까요?",d:"오늘 회식이 있어요. 하지만 헬스장 등록도 고민 중이에요.",a:["헬스장 등록",()=>{ const c=lifePay(lifeBase()*.6); S.life.health=Math.min(100,S.life.health+8); return "💪 헬스 시작! 건강 +8 (−"+fmt(c)+")"; }],b:["회식 간다",()=>{ S.life.happy=Math.min(100,S.life.happy+5); S.life.health=Math.max(0,S.life.health-4); return "🍻 재밌었어요! 행복 +5, 건강 −4"; }]},
   {t:"🎓 야간 대학원 모집",d:"퇴근 후에 공부하면 몸은 힘들지만 몸값(급여)이 오를 수 있어요.",a:["등록한다",()=>{ if(S.life.grad>=5) return "🎓 이미 공부를 충분히 했어요!"; const c=Math.floor(lifeBase()*25); if(bal()<c) return "💸 등록금 "+fmt(c)+"이(가) 부족해요"; spend(c); S.life.grad++; S.life.health=Math.max(0,S.life.health-3); lifeLog("🎓 대학원 수료! 급여 +3%",1); return "🎓 수료했어요! 급여 영구 +3% (지금 +"+(S.life.grad*3)+"%) · 건강 −3"; }],b:["다음에…",()=>"📺 오늘은 쉬기로 했어요"]},
   {t:"🛍️ 블랙프라이데이 90% 세일!",d:"평소 갖고 싶던 물건이 엄청 싸요. 그런데 꼭 필요한 건 아니에요.",a:["질러버린다!",()=>{ const c=lifePay(lifeBase()*2); S.life.happy=Math.min(100,S.life.happy+6); return "🛍️ 샀다! 행복 +6 (−"+fmt(c)+")"; }],b:["참고 저축한다",()=>{ S.life.happy=Math.max(0,S.life.happy-1); return "🐷 참았어요! 이 돈을 정기예금에 넣으면 이자가 붙어요."; }]},
+  {t:"📈 \"수익률 300%\" 주식 리딩방 초대",d:"단톡방에서 '가입비만 내면 오를 종목을 찍어 준다'며 초대했어요.",a:["가입비 내고 들어간다",()=>{ const c=lifePay(lifeBase()*8); lifeLog("💀 주식 리딩방 사기 −"+fmt(c),-1); return "💀 가입비만 받고 방이 사라졌어요… −"+fmt(c)+"\n오를 종목을 확실히 아는 사람은 없어요!"; }],b:["무시하고 나간다",()=>{ S.stat.phish=(S.stat.phish||0)+1; return "✅ 현명해요! 리딩방은 대부분 사기거나 손실로 끝나요."; }]},
+  {t:"🎁 \"경품 당첨! 링크를 눌러 확인하세요\"",d:"모르는 번호로 경품 당첨 문자가 왔어요. 링크가 붙어 있어요.",a:["링크를 누른다",()=>{ const c=lifePay(Math.min(bal()*.1,lifeBase()*10)); lifeLog("📱 스미싱 피해 −"+fmt(c),-1); return "📱 스미싱이었어요! 휴대폰에 악성 앱이 깔려 결제가 됐어요 −"+fmt(c)+"\n모르는 링크는 절대 누르지 마세요."; }],b:["문자를 지우고 차단한다",()=>{ S.stat.phish=(S.stat.phish||0)+1; return "🛡️ 잘했어요! 스미싱 문자였어요."; }]},
+  {t:"🏦 은행 직원이 펀드를 추천해요",d:"'요즘 수익률 좋은 펀드'라며 가입을 권해요. 원금 손실이 날 수도 있대요.",a:["가입한다",()=>{ const c=lifePay(lifeBase()*10); const r=-.2+Math.random()*.5; setTimeout(()=>{ const g=Math.floor(c*(1+r)); gain(g); toast("🏦 펀드 환매 "+(r>=0?"+":"")+(r*100).toFixed(0)+"% → "+fmt(g)); lifeLog("🏦 펀드 수익률 "+(r*100).toFixed(0)+"%",r>=0?1:-1); },60000); return "🏦 "+fmt(c)+" 가입! 1분 뒤 결과가 나와요 (손실이 날 수도 있어요)"; }],b:["설명서를 더 읽어 본다",()=>"📄 투자 설명서를 읽는 건 좋은 습관이에요!"]},
+  {t:"💻 노트북이 고장 났어요",d:"새로 살까요, 고쳐서 쓸까요?",a:["새 노트북 구매",()=>{ const c=lifePay(lifeBase()*6); S.life.happy=Math.min(100,S.life.happy+3); return "💻 새 노트북! 행복 +3 (−"+fmt(c)+")"; }],b:["수리해서 쓴다",()=>{ const c=lifePay(lifeBase()*1.5); if(Math.random()<.4){ const c2=lifePay(lifeBase()*1.5); return "🔧 고쳤는데 또 고장… 두 번 냈어요 (−"+fmt(c+c2)+")"; } return "🔧 수리 성공! 돈을 아꼈어요 (−"+fmt(c)+")"; }]},
+  {t:"🏪 편의점 창업 설명회",d:"'월 순익 500만 원 보장'이래요. 하지만 자영업 3년 생존율은 절반 정도예요.",a:["창업한다",()=>{ const c=Math.floor(lifeBase()*40); if(bal()<c) return "💸 창업 자금 "+fmt(c)+"이(가) 부족해요"; spend(c); if(Math.random()<.45){ setTimeout(()=>{ const g=Math.floor(c*2.2); gain(g); toast("🏪 편의점 대박! 권리금 받고 넘겼어요 +"+fmt(g)); lifeLog("🏪 편의점 창업 성공 +"+fmt(g-c),1); },90000); return "🏪 개업! 1분 30초 뒤 결과가 나와요"; } setTimeout(()=>{ const g=Math.floor(c*.3); gain(g); toast("🏪 장사가 안 돼서 폐업… 남은 돈 +"+fmt(g)); lifeLog("🏪 편의점 폐업 −"+fmt(c-g),-1); },90000); return "🏪 개업! 1분 30초 뒤 결과가 나와요"; }],b:["좀 더 알아본다",()=>"📊 상권 분석부터 하기로 했어요. 신중한 선택!"]},
   {t:"🚕 택시 vs 지하철",d:"늦잠을 자서 지각할 것 같아요!",a:["택시 탄다",()=>{ const c=lifePay(lifeBase()*.3); return "🚕 지각은 면했어요 (−"+fmt(c)+")"; }],b:["지하철 + 뛴다",()=>{ if(Math.random()<.5){ S.car.exp=Math.max(0,S.car.exp-20); return "😵 지각했어요… 경력 −20초"; } S.life.health=Math.min(100,S.life.health+1); return "🏃 아슬아슬 세이프! 운동도 됐어요 (건강 +1)"; }]},
 ];
 let lifeOpen=false;
@@ -2712,10 +2742,37 @@ const SN={
   ins:[["금리 상승에 보험사 투자수익 ↑","보험 가입자 역대 최대"],["태풍 피해로 보험금 지급 폭증","보험 사기 적발 논란"]],
   deliv:[["온라인 쇼핑 대목! 물동량 폭증","해운 운임 급등"],["택배 파업 우려","해운 운임 급락"]],
 };
+const SN_MORE={
+  food:[["K-푸드 해외 수출 사상 최대","편의점 PB 상품 대박"],["설탕·밀가루 값 폭등","식중독 사고로 매출 급감"]],
+  toy:[["캐릭터 애니메이션 흥행 대박","키덜트 시장 급성장"],["저출산으로 장난감 수요 감소","안전 기준 미달 제품 적발"]],
+  game:[["글로벌 게임 시상식 대상 수상","신작 예약자 500만 돌파"],["핵심 개발자 퇴사","확률 조작 의혹 논란"]],
+  space:[["달 탐사선 궤도 진입 성공","위성 인터넷 가입자 급증"],["발사체 폭발 사고","우주 예산 삭감 우려"]],
+  elec:[["신형 스마트폰 판매 신기록","가전 교체 수요 폭발"],["중국산 저가 공세","부품 재고 쌓여 감산"]],
+  car:[["수출 선적 역대 최대","신차 계약 대기 1년"],["관세 인상 충격","차량 결함 집단 소송"]],
+  bio:[["희귀병 치료제 FDA 승인","대형 기술 수출 계약"],["임상 3상 실패","약값 인하 정책 발표"]],
+  ent:[["신인 그룹 데뷔 앨범 밀리언셀러","드라마 글로벌 OTT 1위"],["콘서트 티켓 암표 논란","소속사 분쟁 장기화"]],
+  energy:[["원전 수출 계약 성사","태양광 발전 효율 신기록"],["전기요금 동결로 적자","발전소 사고 조사"]],
+  coin:[["코인 거래량 폭증","블록체인 결제 도입 확대"],["거래소 출금 중단","코인 사기 수사 확대"]],
+  fin:[["은행 순이익 사상 최대","주주환원 확대 발표"],["부실 대출 급증","횡령 사고 적발"]],
+  my:[["사장님 경영 철학 화제","신규 투자 유치 성공"],["핵심 인력 이탈","거래처 대금 연체"]],
+  ship:[["친환경 선박 수주 1위","해운 운임 급등에 신조 발주"],["조선소 인력 부족","선박 인도 지연 배상금"]],
+  semi:[["HBM 메모리 주문 3년치 확보","파운드리 대형 고객 유치"],["반도체 수출 규제 강화","미세공정 수율 부진"]],
+  beauty:[["미국 아마존 뷰티 1위","면세점 매출 회복"],["원료 가격 급등","해외 브랜드에 점유율 뺏겨"]],
+  air:[["추석 연휴 항공권 매진","신규 노선 취항"],["항공기 엔진 결함 조사","저가 항공 출혈 경쟁"]],
+  build:[["해외 신도시 수주","정비사업 규제 완화"],["건설사 PF 부실 우려","원자재값 상승에 적자 공사"]],
+  tel:[["AI 데이터센터 수요 폭증","5G 요금제 가입 급증"],["통신망 장애 보상","알뜰폰에 가입자 이탈"]],
+  plat:[["간편결제 이용자 폭증","웹툰 해외 매출 급성장"],["수수료 인하 압박","입점 업체 집단 반발"]],
+  steel:[["건설 수요 회복","해상풍력 강재 수주"],["중국산 저가 철강 유입","전기료 인상에 원가 부담"]],
+  pet:[["펫보험 가입자 2배","프리미엄 간식 품절"],["사료 리콜 사태","유기동물 증가 우려"]],
+  edu:[["AI 튜터 앱 1위","해외 학교에 교육 콘텐츠 수출"],["입시 제도 개편 혼란","온라인 강의 무료화 정책"]],
+  ins:[["손해율 개선으로 이익 급증","배당 확대 발표"],["자연재해 보험금 폭증","불완전 판매 과징금"]],
+  deliv:[["새벽배송 물량 폭증","해운 운임 지수 급등"],["택배 기사 과로 문제","물류센터 화재"]],
+};
+for(const k in SN_MORE){ if(SN[k]){ SN[k][0].push(...SN_MORE[k][0]); SN[k][1].push(...SN_MORE[k][1]); } }
 const THEMES=["양자컴퓨터","도심항공(UAM)","저출산 대책","펫코노미","AI","우주여행","메타버스","초전도체","로봇","2차전지","K-푸드","게임 대박","신약","탄소중립"];
-const CN_UP=["신제품 출시에 주문 폭주!","대형 계약 체결!","외국인 투자자 대량 매수","사장님 '올해 매출 2배 자신'","해외 진출 대성공","특허 획득!","기관 투자자 집중 매수"];
-const CN_DN=["제품 결함으로 리콜...","사장님 갑자기 사임","공장에 정전 발생","나쁜 소문 확산","경쟁사가 더 싸게 팔아요","세금 문제로 조사받는 중","대주주 지분 대량 매도"];
-const LIMU=1.3, LIMD=.7, DAYTICKS=120, TICKMS=1500, FEE=.005, CANDLE=8;
+const CN_UP=["신제품 출시에 주문 폭주!","대형 계약 체결!","외국인 투자자 대량 매수","사장님 '올해 매출 2배 자신'","해외 진출 대성공","특허 획득!","기관 투자자 집중 매수","자사주 소각 발표 — 주주 가치 ↑","배당금 2배로 늘린다","'올해의 혁신 기업' 선정"];
+const CN_DN=["제품 결함으로 리콜...","사장님 갑자기 사임","공장에 정전 발생","나쁜 소문 확산","경쟁사가 더 싸게 팔아요","세금 문제로 조사받는 중","대주주 지분 대량 매도","개인정보 유출 사고","공정위 과징금 부과","신용등급 강등"];
+const LIMU=1.3, LIMD=.7, DAYTICKS=120, TICKMS=1500, FEE=.005, FEE_B=.00015, FEE_S=.00195, DIV_TAX=.154, CANDLE=8;   // 실제: 매수 수수료 0.015% · 매도 수수료 0.015%+증권거래세 0.18% · 배당소득세 15.4%
 const stkImp={}, stkV={}, limHit={}, flashIds=new Set(), curC={};
 let kSel="s3", kFilter="all", kBuilt=false, chartMode="candle";
 function tickSz(p){ return p<10?.01:p<1000?.1:p<5000?1:p<10000?5:p<50000?10:p<100000?50:p<500000?100:500; }
@@ -2733,7 +2790,7 @@ function initMarket(){
 }
 const kName=id=>{ const k=STK.find(x=>x.id===id); return k.ic+" "+k.n; };
 function news(text,dir,big,id){
-  S.news.unshift({t:Date.now(),text,dir,big:!!big,id:id||null}); if(S.news.length>50) S.news.pop();
+  S.news.unshift({t:Date.now(),text,dir,big:!!big,id:id||null}); if(S.news.length>80) S.news.pop();
   const tk=$("tickerIn"); if(tk) tk.textContent="📰 "+text;
   const nt=$("newsTick"); if(nt) nt.textContent=text;
   const mine=id&&S.stk[id]&&S.stk[id].n>0;
@@ -2742,10 +2799,10 @@ function news(text,dir,big,id){
 }
 const pickStk=()=>{ const L=actStk().filter(k=>!k.etf); return L[rnd(L.length)]; };
 function companyNews(){ const k=pickStk(), up=Math.random()<.5+S.mkt.reg*.1, m=(.015+Math.random()*.05)*(k.sec==="bio"||k.sec==="coin"?1.4:1);
-  stkImp[k.id]=(stkImp[k.id]||0)+(up?m:-m); const sp=SN[k.sec][up?0:1]; const t=Math.random()<.4?sp[rnd(sp.length)]:(up?CN_UP:CN_DN)[rnd(7)];
+  stkImp[k.id]=(stkImp[k.id]||0)+(up?m:-m); const sp=SN[k.sec][up?0:1]; const t=Math.random()<.4?sp[rnd(sp.length)]:(up?CN_UP:CN_DN)[rnd(CN_UP.length)];
   news((m>.07?"🚨 [속보] ":"📰 ")+k.ic+" "+k.n+": "+t+" ("+(up?"▲":"▼")+Math.round(m*100)+"%)",up?1:-1,m>.07,k.id); }
 function sectorNews(){ const keys=Object.keys(SECT).filter(x=>x!=="my"&&x!=="etf"), sc=keys[rnd(keys.length)], up=Math.random()<.5, m=.01+Math.random()*.035; actStk().filter(k=>k.sec===sc).forEach(k=>stkImp[k.id]=(stkImp[k.id]||0)+(up?m:-m));
-  news("🏭 ["+SECT[sc]+" 업종] "+SN[sc][up?0:1][rnd(2)]+" — 관련주 "+(up?"동반 상승 ▲":"일제히 하락 ▼"),up?1:-1,m>.03); }
+  news("🏭 ["+SECT[sc]+" 업종] "+SN[sc][up?0:1][rnd(SN[sc][up?0:1].length)]+" — 관련주 "+(up?"동반 상승 ▲":"일제히 하락 ▼"),up?1:-1,m>.03); }
 function marketNews(){ const up=Math.random()<.5+S.mkt.reg*.15, m=.008+Math.random()*.022; actStk().forEach(k=>stkImp[k.id]=(stkImp[k.id]||0)+(up?m:-m)*k.b);
   news(up?["📈 [시장] 투자 열기 후끈! 전 종목 강세","📈 [시장] 외국인 대규모 순매수","📈 [시장] 경제 성장률 깜짝 상승","📈 [시장] 중앙은행 금리 인하 발표!"][rnd(4)]:["📉 [시장] 세계 경제 불안에 일제히 하락","📉 [시장] 공포 지수 급등...","📉 [시장] 금리 걱정에 투자 심리 위축","📉 [시장] 외국인 대규모 매도 폭탄"][rnd(4)],up?1:-1,true); }
 function rumor(){ const k=pickStk(), up=Math.random()<.5; stkImp[k.id]=(stkImp[k.id]||0)+(up?.03:-.03);
@@ -2841,12 +2898,12 @@ function orderBook(id){
 }
 function setQty(v){ const q=$("kQty"); if(q){ q.value=Math.max(0,Math.floor(v)); updEst(); } }
 function updEst(){ const id=kSel, P=S.stkP[id], q=Math.floor(Number($("kQty").value))||0, h=S.stk[id];
-  $("kEst").textContent=q?("매수 약 "+fmt(Math.ceil(P*q*(1+FEE)))+" · 매도 약 "+fmt(Math.floor(P*Math.min(q,h.n)*(1-FEE)))+" (수수료 0.5%)"):"수량을 정해요";
-  $("kBuy").disabled=!q||bal()<P*q*(1+FEE); $("kSell").disabled=!q||h.n<1; }
+  $("kEst").textContent=q?("매수 약 "+fmt(Math.ceil(P*q*(1+FEE_B)))+" · 매도 약 "+fmt(Math.floor(P*Math.min(q,h.n)*(1-FEE_S)))+" (매수 수수료 0.015% · 매도 수수료+거래세 0.195%)"):"수량을 정해요";
+  $("kBuy").disabled=!q||bal()<P*q*(1+FEE_B); $("kSell").disabled=!q||h.n<1; }
 function tradeK(buy){
   const id=kSel, k=STK.find(x=>x.id===id), P=S.stkP[id], h=S.stk[id]; let q=Math.floor(Number($("kQty").value))||0; if(q<1) return; ac();
-  if(buy){ const c=Math.ceil(P*q*(1+FEE)); if(bal()<c){ toast("코인이 부족해요"); return; } spend(c); h.n+=q; h.cost+=c; S.dvol[id]+=q; tone(880,.06,"square",.1); setTimeout(()=>tone(1175,.08,"square",.1),60); toast("🔴 "+k.ic+" "+k.n+" "+fmt(q)+"주 매수 체결! (@"+pfmt(P)+")"); if(S.theme[id]&&S.theme[id].s>0) S.stat.themeHit++; }
-  else { q=Math.min(q,h.n); if(q<1) return; const g=Math.floor(P*q*(1-FEE)), part=h.cost*(q/h.n); h.n-=q; h.cost-=part; if(h.n===0) h.cost=0; const pr=g-part; S.stat.stkProfit+=pr; gain(g); S.dvol[id]+=q;
+  if(buy){ const c=Math.ceil(P*q*(1+FEE_B)); if(bal()<c){ toast("코인이 부족해요"); return; } spend(c); h.n+=q; h.cost+=c; S.dvol[id]+=q; tone(880,.06,"square",.1); setTimeout(()=>tone(1175,.08,"square",.1),60); toast("🔴 "+k.ic+" "+k.n+" "+fmt(q)+"주 매수 체결! (@"+pfmt(P)+")"); if(S.theme[id]&&S.theme[id].s>0) S.stat.themeHit++; }
+  else { q=Math.min(q,h.n); if(q<1) return; const g=Math.floor(P*q*(1-FEE_S)), part=h.cost*(q/h.n); h.n-=q; h.cost-=part; if(h.n===0) h.cost=0; const pr=g-part; S.stat.stkProfit+=pr; gain(g); S.dvol[id]+=q;
     tone(pr>=0?1319:300,.12,"square",.1); toast("🔵 "+k.ic+" "+fmt(q)+"주 매도 체결 → "+(pr>=0?"💹 수익 +":"📉 손실 −")+fmt(Math.abs(pr))); if(pr>0){ coinCascade(Math.min(12,3+Math.floor(Math.log10(pr+1))),50); sparks(innerWidth/2,innerHeight/2,16,true); } }
   S.stat.trades++; S.tlog.unshift({id,b:buy?1:0,q,p:P,t:Date.now()}); if(S.tlog.length>60) S.tlog.pop(); save(); renderMarket(true);
 }
@@ -2872,7 +2929,7 @@ function buildMarket(){
   $("dGoBuy").onclick=()=>{ kTab="order"; renderMarket(true); const q=$("kQty"); if(q){ q.focus(); q.select(); } };
   $("dGoSell").onclick=()=>{ kTab="order"; setQty(S.stk[kSel].n); renderMarket(true); };
   $("stkDetail").querySelectorAll(".chTabs button").forEach(b=>b.onclick=()=>{ chartMode=b.dataset.m; renderMarket(true); });
-  $("stkDetail").querySelectorAll(".qRowS button").forEach(b=>b.onclick=()=>{ const P=S.stkP[kSel]; if(b.dataset.q) setQty(+b.dataset.q); else if(b.dataset.p) setQty(bal()*+b.dataset.p/(P*(1+FEE))); else setQty(S.stk[kSel].n); beep(800,.03,"square",.05); });
+  $("stkDetail").querySelectorAll(".qRowS button").forEach(b=>b.onclick=()=>{ const P=S.stkP[kSel]; if(b.dataset.q) setQty(+b.dataset.q); else if(b.dataset.p) setQty(bal()*+b.dataset.p/(P*(1+FEE_B))); else setQty(S.stk[kSel].n); beep(800,.03,"square",.05); });
   $("kQty").oninput=updEst; $("kBuy").onclick=()=>tradeK(true); $("kSell").onclick=()=>tradeK(false); kBuilt=true;
 }
 const capFmt=k=>fmt(S.stkP[k.id]*k.sh);
@@ -2881,7 +2938,7 @@ function renderMarket(full){
   if(!kBuilt) buildMarket();
   if(!actStk().find(k=>k.id===kSel)) kSel="s3";
   $("kCoins").textContent=fmt(bal());
-  let val=0, cost=0; actStk().forEach(k=>{ const h=S.stk[k.id]; val+=h.n*S.stkP[k.id]; cost+=h.cost; }); const pl=val*(1-FEE)-cost;
+  let val=0, cost=0; actStk().forEach(k=>{ const h=S.stk[k.id]; val+=h.n*S.stkP[k.id]; cost+=h.cost; }); const pl=val*(1-FEE_S)-cost;
   $("kVal").textContent=fmt(val); $("kPL").className=cls(pl); $("kPL").textContent=val?((pl>=0?"+":"−")+fmt(Math.abs(pl))+" ("+(cost?sgn(pl/cost*100):"0%")+")"):"보유 주식 없음";
   const iv=idxNow(), ic=(iv/S.mkt.idxO-1)*100; $("kIdx").textContent=iv.toFixed(1); $("kIdxCh").className=cls(ic); $("kIdxCh").textContent=sgn(ic);
   $("mDay").textContent=S.mkt.day; const left=(DAYTICKS-S.mkt.tick%DAYTICKS)*TICKMS/1000; $("mLeft").textContent=Math.floor(left/60)+":"+String(Math.floor(left%60)).padStart(2,"0");
@@ -2906,11 +2963,11 @@ function renderMarket(full){
   if(kPage==="detail"){ if(kTab==="chart") bigChart(id); stkExtra(k,id,P); if(kTab==="order"){ renderKAuto(id); renderKShort(id); } if(kTab==="chart") $("dChartX").insertAdjacentHTML("afterbegin",aiStockCard(k)); }
   const per=P/S.eps[id];
   $("dStats").innerHTML=[["시가",pfmt(S.stkO[id])],["고가",pfmt(S.stkHi[id])],["저가",pfmt(S.stkLo[id])],["상한가",pfmt(rt(S.stkO[id]*LIMU))],["하한가",pfmt(rt(S.stkO[id]*LIMD))],["거래량",fmt(S.dvol[id])+"주"],["시가총액",capFmt(k)],["PER",k.etf?"-":per.toFixed(1)+"배"],["배당",k.dv?(k.dv*100).toFixed(1)+"%/일":"없음"],["역대 최고",pfmt(S.ath[id])],["역대 최저",pfmt(S.atl[id])],["호가 단위",pfmt(tickSz(P))]].map(r=>'<div><span>'+r[0]+'</span><b>'+r[1]+'</b></div>').join("");
-  const ev=h.n*P, epl=ev*(1-FEE)-h.cost; $("dHold").innerHTML=h.n?('💼 보유 <b>'+fmt(h.n)+'주</b> · 평균 단가 <b>'+pfmt(h.cost/h.n)+'</b> · 지분 '+(h.n/k.sh*100).toFixed(3)+'%<br>평가금액 <b>'+fmt(ev)+'</b> · 손익 <b class="'+cls(epl)+'">'+(epl>=0?"+":"−")+fmt(Math.abs(epl))+' ('+(h.cost?sgn(epl/h.cost*100):"-")+')</b>'):'아직 이 주식이 없어요. 사 볼까요?';
+  const ev=h.n*P, epl=ev*(1-FEE_S)-h.cost; $("dHold").innerHTML=h.n?('💼 보유 <b>'+fmt(h.n)+'주</b> · 평균 단가 <b>'+pfmt(h.cost/h.n)+'</b> · 지분 '+(h.n/k.sh*100).toFixed(3)+'%<br>평가금액 <b>'+fmt(ev)+'</b> · 손익 <b class="'+cls(epl)+'">'+(epl>=0?"+":"−")+fmt(Math.abs(epl))+' ('+(h.cost?sgn(epl/h.cost*100):"-")+')</b>'):'아직 이 주식이 없어요. 사 볼까요?';
   $("obBox").innerHTML=orderBook(id);
   updEst();
   renderKSeg(); if(kPage!=="detail"){ if(kSeg==="mkt") renderKSum(); else if(kSeg==="news") renderKNews(); else if(kSeg==="my") renderKMy(val,cost); else if(kSeg==="ipo") renderIpo(); else if(kSeg==="ai") renderAiSeg(); }
-  const pf=$("portf"), hs=actStk().filter(x=>S.stk[x.id].n>0); pf.innerHTML=hs.length?hs.map(x=>{ const hh=S.stk[x.id], v=hh.n*S.stkP[x.id], p=v*(1-FEE)-hh.cost; return '<div class="pRow" data-id="'+x.id+'"><span class="si">'+x.ic+'</span><span><b>'+x.n+'</b> '+fmt(hh.n)+'주<br><small>평가 '+fmt(v)+' · 비중 '+(val?(v/val*100).toFixed(1):0)+'%</small></span><b class="'+cls(p)+'">'+(p>=0?"+":"−")+fmt(Math.abs(p))+'</b></div>'; }).join(""):'<div style="opacity:.6">보유한 주식이 없어요</div>';
+  const pf=$("portf"), hs=actStk().filter(x=>S.stk[x.id].n>0); pf.innerHTML=hs.length?hs.map(x=>{ const hh=S.stk[x.id], v=hh.n*S.stkP[x.id], p=v*(1-FEE_S)-hh.cost; return '<div class="pRow" data-id="'+x.id+'"><span class="si">'+x.ic+'</span><span><b>'+x.n+'</b> '+fmt(hh.n)+'주<br><small>평가 '+fmt(v)+' · 비중 '+(val?(v/val*100).toFixed(1):0)+'%</small></span><b class="'+cls(p)+'">'+(p>=0?"+":"−")+fmt(Math.abs(p))+'</b></div>'; }).join(""):'<div style="opacity:.6">보유한 주식이 없어요</div>';
   pf.querySelectorAll(".pRow").forEach(r=>r.onclick=()=>openStk(r.dataset.id));
 }
 setInterval(mTick,TICKMS);
@@ -2982,7 +3039,7 @@ function renderKNews(){ const nf=$("newsFeed"); const mine=id=>id&&S.stk[id]&&S.
   nf.innerHTML=list.length?list.map(n=>{ const k=n.id&&S.stk[n.id]?STK.find(x=>x.id===n.id):null; return '<div class="nItem'+(n.big?" big":"")+(n.dir>0?" nu":n.dir<0?" nd":" nr")+(k?" go":"")+'"'+(k?' data-id="'+k.id+'"':'')+'><small>'+ago(n.t)+'</small>'+(k?'<span class="nTag">'+k.ic+' '+k.n+' ›</span>':'')+n.text+'</div>'; }).join(""):'<div style="opacity:.6;padding:10px">해당하는 뉴스가 없어요</div>';
   nf.querySelectorAll(".nItem.go").forEach(e=>e.onclick=()=>openStk(e.dataset.id));
   $("nFilt").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.f===kNF)); }
-function renderKMy(val,cost){ const pl=val*(1-FEE)-cost; $("kMySum").innerHTML='<div class="mySum"><div><span>💼 총 평가금액</span><b>'+fmt(val)+'</b></div><div><span>🧾 총 투자원금</span><b>'+fmt(cost)+'</b></div><div><span>📊 평가손익</span><b class="'+cls(pl)+'">'+(pl>=0?"+":"−")+fmt(Math.abs(pl))+' ('+(cost?sgn(pl/cost*100):"0%")+')</b></div><div><span>✅ 지금까지 실현손익</span><b class="'+cls(S.stat.stkProfit)+'">'+(S.stat.stkProfit>=0?"+":"−")+fmt(Math.abs(S.stat.stkProfit))+'</b></div><div><span>💰 받은 배당금</span><b>'+fmt(S.stat.div)+'</b></div><div><span>🎟️ 공모주 수익</span><b class="'+cls(S.stat.ipoProfit||0)+'">'+fmt(S.stat.ipoProfit||0)+'</b></div></div>'; }
+function renderKMy(val,cost){ const pl=val*(1-FEE_S)-cost; $("kMySum").innerHTML='<div class="mySum"><div><span>💼 총 평가금액</span><b>'+fmt(val)+'</b></div><div><span>🧾 총 투자원금</span><b>'+fmt(cost)+'</b></div><div><span>📊 평가손익</span><b class="'+cls(pl)+'">'+(pl>=0?"+":"−")+fmt(Math.abs(pl))+' ('+(cost?sgn(pl/cost*100):"0%")+')</b></div><div><span>✅ 지금까지 실현손익</span><b class="'+cls(S.stat.stkProfit)+'">'+(S.stat.stkProfit>=0?"+":"−")+fmt(Math.abs(S.stat.stkProfit))+'</b></div><div><span>💰 받은 배당금</span><b>'+fmt(S.stat.div)+'</b></div><div><span>🎟️ 공모주 수익</span><b class="'+cls(S.stat.ipoProfit||0)+'">'+fmt(S.stat.ipoProfit||0)+'</b></div></div>'; }
 
 /* ---------- 🎟️ 공모주 청약 ---------- */
 const IPO_N=[["🐾","펫테크",["펫코노미"]],["🚁","에어모빌리티",["도심항공(UAM)"]],["⚛️","퀀텀랩",["양자컴퓨터"]],["🤖","로보틱스",["로봇","AI"]],["🔋","배터리",["2차전지"]],["🧬","바이오텍",["바이오"]],["🎤","엔터테인먼트",["K-팝"]],["🛰️","스페이스",["우주"]],["🍱","푸드",["밀키트"]],["💳","페이",["핀테크"]],["🚗","모빌리티",["자율주행"]],["🎮","스튜디오",["게임"]],["☁️","클라우드",["AI"]],["🧴","뷰티",["K-뷰티"]],["⚡","에너지",["수소"]]];
@@ -3002,7 +3059,7 @@ function ipoDayEnd(){ const I=S.ipo, c=I.cur; if(!c) return;
   const tag=mult>=3.9?"🎉🎉 따따블!! (×4)":mult>=2?"🎉 따상! (×"+mult.toFixed(1)+")":mult>=1.2?"상장 첫날 상승 (×"+mult.toFixed(2)+")":mult>=1?"공모가 근처에서 출발":"😱 공모가 깨짐 (×"+mult.toFixed(2)+")";
   news("🔔 [상장] "+c.ic+" "+c.n+" 경쟁률 "+fmt(comp)+":1 · "+tag,mult>=1?1:-1,mult>=2||mult<.9);
   I.hist.unshift({ic:c.ic,n:c.n,comp,mult,pp:c.pp}); if(I.hist.length>8) I.hist.pop(); I.sub=0; I.cur=null; newIpo(); }
-function ipoSell(){ const H=S.ipo.hold; if(!H) return; const g=Math.floor(H.q*H.p*(1-FEE)), pr=g-H.q*H.pp; gain(g); S.stat.ipoProfit=(S.stat.ipoProfit||0)+pr; S.ipo.hold=null;
+function ipoSell(){ const H=S.ipo.hold; if(!H) return; const g=Math.floor(H.q*H.p*(1-FEE_S)), pr=g-H.q*H.pp; gain(g); S.stat.ipoProfit=(S.stat.ipoProfit||0)+pr; S.ipo.hold=null;
   toast("🎟️ "+H.n+" "+fmt(H.q)+"주 매도 → +"+fmt(g)+" ("+(pr>=0?"💹 수익 +":"📉 손실 −")+fmt(Math.abs(pr))+")"); if(pr>0) coinCascade(8,50); save(); renderMarket(true); }
 setInterval(()=>ipoHoldTick(),2000);
 function renderIpo(){ const I=S.ipo, c=I.cur, H=I.hold, box=$("kIpoSec"); if(!box) return;
@@ -3013,7 +3070,7 @@ function renderIpo(){ const I=S.ipo, c=I.cur, H=I.hold, box=$("kIpoSec"); if(!bo
       '<div class="kv" style="margin-top:6px"><span>내 증거금</span><b>'+fmt(I.sub)+'</b></div><div class="kv"><span>신청 수량</span><b>'+fmt(Math.floor(I.sub*2/c.pp))+'주</b></div>'+
       '<div class="detBtns"><button data-f=".1">10% 넣기</button><button data-f=".25">25% 넣기</button><button data-f=".5">50% 넣기</button><button class="s" data-f="x"'+(I.sub?"":" disabled")+'>청약 취소</button></div></div>':'')+
     (H?'<div class="ipoCard" style="border-color:#ff5b5b"><div class="hd"><span class="ic">'+H.ic+'</span><div style="flex:1"><b>'+H.n+'</b> <small>상장 중!</small><br><small>'+fmt(H.q)+'주 보유 · 공모가 '+fmt(H.pp)+' · 시초가 '+pfmt(H.open)+'</small></div><div style="text-align:right"><b style="font-size:1.3rem">'+pfmt(H.p)+'</b><br><span class="'+cls(H.p/H.pp*100-100)+'">'+sgn(H.p/H.pp*100-100)+'</span></div></div><canvas class="big" id="ipoCv" style="height:120px"></canvas>'+
-      '<div class="kv"><span>지금 팔면</span><b class="'+cls(H.p-H.pp)+'">'+fmt(H.q*H.p*(1-FEE))+' ('+(H.p>=H.pp?"+":"−")+fmt(Math.abs(H.q*(H.p*(1-FEE)-H.pp)))+')</b></div><small style="opacity:.7">상장 첫날 반짝 오른 뒤 떨어지는 경우가 많아요 · 10분 뒤 자동 매도</small>'+
+      '<div class="kv"><span>지금 팔면</span><b class="'+cls(H.p-H.pp)+'">'+fmt(H.q*H.p*(1-FEE_S))+' ('+(H.p>=H.pp?"+":"−")+fmt(Math.abs(H.q*(H.p*(1-FEE_S)-H.pp)))+')</b></div><small style="opacity:.7">상장 첫날 반짝 오른 뒤 떨어지는 경우가 많아요 · 10분 뒤 자동 매도</small>'+
       '<div class="detBtns"><button class="s" id="ipoSellB" style="grid-column:1/-1">💸 전부 팔기</button></div></div>':'')+
     '<div class="infoCard"><h4>📜 최근 상장 결과</h4>'+(I.hist.length?I.hist.map(h=>'<div class="kv"><span>'+h.ic+' '+h.n+' <small>('+fmt(h.comp)+':1)</small></span><b class="'+cls(h.mult*100-100)+'">'+(h.mult>=3.9?"따따블 ":h.mult>=2?"따상 ":"")+'×'+h.mult.toFixed(2)+'</b></div>').join(""):'<div style="opacity:.6">아직 없어요</div>')+'</div>';
   box.querySelectorAll("button[data-f]").forEach(b=>b.onclick=()=>ipoSub(b.dataset.f==="x"?"x":+b.dataset.f));
@@ -3147,7 +3204,7 @@ function seize(){
   const a=assets(); let need=S.loan.debt; const take=x=>{ const y=Math.min(x,need); need-=y; return y; };
   let got=take(Math.max(0,bal())); if(got) spend(got);
   if(need>0){ const y=take(S.bank.dep); S.bank.dep-=y; got+=y; }
-  actStk().forEach(k=>{ if(need<=0) return; const h=S.stk[k.id]; if(!h||!h.n) return; const per=S.stkP[k.id]*(1-FEE); const q=Math.min(h.n,Math.ceil(need/per)); const v=Math.floor(q*per); h.cost*=(h.n-q)/h.n; h.n-=q; need-=Math.min(need,v); got+=v; });
+  actStk().forEach(k=>{ if(need<=0) return; const h=S.stk[k.id]; if(!h||!h.n) return; const per=S.stkP[k.id]*(1-FEE_S); const q=Math.min(h.n,Math.ceil(need/per)); const v=Math.floor(q*per); h.cost*=(h.n-q)/h.n; h.n-=q; need-=Math.min(need,v); got+=v; });
   S.loan.debt=Math.max(0,need); S.loan.credit=Math.max(300,S.loan.credit-250); S.stat.seized++;
   banner("🚨 압류!!<small>빚 "+fmt(got)+" 코인어치를 강제로 가져갔어요</small>","big",3200); thud(70,25,1.4,.8); shake("shake",600); news("🚨 [사회] 무리한 대출 투자자 재산 압류...",-1,true); save();
 }
@@ -3316,13 +3373,13 @@ function renderKAuto(id){ const el=$("kAuto"); if(!el) return; const a=S.sauto[i
   const html='<div class="infoCard"><h4>🎯 자동 매도 예약 <small style="opacity:.6">(보유 중일 때 조건이 되면 전부 팔아요)</small></h4>'+
     '<div class="kv"><span>📈 익절 (평균단가보다)</span><span class="chips">'+TPS.map(v=>'<button data-tp="'+v+'" class="'+(a.tp===v?"on":"")+'">'+(v?"+"+v+"%":"끔")+'</button>').join("")+'</span></div>'+
     '<div class="kv"><span>📉 손절 (평균단가보다)</span><span class="chips">'+SLS.map(v=>'<button data-sl="'+v+'" class="'+(a.sl===v?"on":"")+'">'+(v?"−"+v+"%":"끔")+'</button>').join("")+'</span></div>'+
-    '<small style="opacity:.7">'+(h.n?'지금 수익률 <b class="'+cls(h.cost?(S.stkP[id]*(1-FEE)*h.n/h.cost-1)*100:0)+'">'+sgn(h.cost?(S.stkP[id]*(1-FEE)*h.n/h.cost-1)*100:0)+'</b>':'주식을 사면 작동해요')+' · 진짜 투자자들은 "손절은 짧게, 익절은 길게!"라고 해요</small></div>';
+    '<small style="opacity:.7">'+(h.n?'지금 수익률 <b class="'+cls(h.cost?(S.stkP[id]*(1-FEE_S)*h.n/h.cost-1)*100:0)+'">'+sgn(h.cost?(S.stkP[id]*(1-FEE_S)*h.n/h.cost-1)*100:0)+'</b>':'주식을 사면 작동해요')+' · 진짜 투자자들은 "손절은 짧게, 익절은 길게!"라고 해요</small></div>';
   if(el._h===html) return; el._h=html; el.innerHTML=html;
   el.querySelectorAll("button").forEach(b=>b.onclick=()=>{ const s=S.sauto[id]||(S.sauto[id]={tp:0,sl:0}); if(b.dataset.tp!=null) s.tp=+b.dataset.tp; else s.sl=+b.dataset.sl; if(!s.tp&&!s.sl) delete S.sauto[id]; beep(800,.03,"square",.05); save(); renderKAuto(id); }); }
-function autoSellStk(id,why){ const k=STK.find(x=>x.id===id), h=S.stk[id], P=S.stkP[id], q=h.n; if(q<1) return; const g=Math.floor(P*q*(1-FEE)), pr=g-h.cost; h.n=0; h.cost=0; S.stat.stkProfit+=pr; gain(g); S.dvol[id]+=q; S.stat.trades++; S.stat.autoSell=(S.stat.autoSell||0)+1;
+function autoSellStk(id,why){ const k=STK.find(x=>x.id===id), h=S.stk[id], P=S.stkP[id], q=h.n; if(q<1) return; const g=Math.floor(P*q*(1-FEE_S)), pr=g-h.cost; h.n=0; h.cost=0; S.stat.stkProfit+=pr; gain(g); S.dvol[id]+=q; S.stat.trades++; S.stat.autoSell=(S.stat.autoSell||0)+1;
   S.tlog.unshift({id,b:0,q,p:P,t:Date.now()}); if(S.tlog.length>60) S.tlog.pop(); delete S.sauto[id];
   toast((why==="tp"?"🎯 익절 체결! ":"🛑 손절 체결! ")+k.ic+" "+k.n+" "+fmt(q)+"주 → "+(pr>=0?"+":"−")+fmt(Math.abs(pr))); tone(why==="tp"?1319:300,.15,"square",.1); if(pr>0) coinCascade(8,50); save(); }
-setInterval(()=>{ if(!S.sauto) return; for(const id in S.sauto){ const a=S.sauto[id], h=S.stk[id]; if(!h||h.n<1||!h.cost) continue; const r=(S.stkP[id]*(1-FEE)*h.n/h.cost-1)*100; if(a.tp&&r>=a.tp) autoSellStk(id,"tp"); else if(a.sl&&r<=-a.sl) autoSellStk(id,"sl"); } },1500);
+setInterval(()=>{ if(!S.sauto) return; for(const id in S.sauto){ const a=S.sauto[id], h=S.stk[id]; if(!h||h.n<1||!h.cost) continue; const r=(S.stkP[id]*(1-FEE_S)*h.n/h.cost-1)*100; if(a.tp&&r>=a.tp) autoSellStk(id,"tp"); else if(a.sl&&r<=-a.sl) autoSellStk(id,"sl"); } },1500);
 
 /* ---------- 🌪️ 경제 대사건 ---------- */
 const EVT_N={bub:"🫧 자산 버블",cri:"💥 금융위기",tech:"🤖 AI 혁명"};
@@ -3443,7 +3500,7 @@ const FXL=[
   {id:"cocoa",ic:"🍫",n:"코코아",u:"1kg",p:11000,v:.01,sp:.006,g:"cm"},
 ];
 const fxImp={};
-const FX_EVT=[["oil",1,"🛢️ 중동 긴장 고조! 유가 급등"],["oil",-1,"🛢️ 산유국 증산 합의, 유가 하락"],["gold",1,"🥇 안전자산 선호! 금값 사상 최고 행진"],["gold",-1,"🥇 위험자산 선호로 금값 하락"],["usd",1,"💵 달러 강세! 환율 급등"],["usd",-1,"💵 달러 약세, 환율 하락"],["jpy",1,"💴 엔화 깜짝 반등"],["jpy",-1,"💴 엔저 심화..."],["wheat",1,"🌾 가뭄으로 밀 흉작 우려"],["wheat",-1,"🌾 밀 대풍년!"],["coffee",1,"☕ 커피 산지 서리 피해, 원두값 폭등"],["coffee",-1,"☕ 커피 원두 재고 넘쳐나"],["gas",1,"🔥 한파 예보, 가스 수요 폭증"],["gas",-1,"🔥 따뜻한 겨울, 가스값 하락"],["silver",1,"🥈 태양광 수요로 은값 상승"],["eur",1,"💶 유럽 경제 회복 신호"],["eur",-1,"💶 유럽 경기 둔화 우려"],["cny",1,"🧧 위안화 강세"],["cny",-1,"🧧 위안화 약세"]];
+const FX_EVT=[["gbp",1,"💷 영국 금리 인상, 파운드 강세"],["gbp",-1,"💷 영국 경기 둔화 우려, 파운드 약세"],["chf",1,"🇨🇭 안전자산 선호, 스위스 프랑 강세"],["chf",-1,"🇨🇭 스위스 중앙은행 개입, 프랑 약세"],["copper",1,"🟫 전력망 투자 붐, 구리값 급등"],["copper",-1,"🟫 중국 수요 둔화, 구리값 하락"],["lith",1,"🔋 전기차 판매 급증, 리튬 품귀"],["lith",-1,"🔋 리튬 광산 증설, 공급 과잉"],["corn",1,"🌽 미국 가뭄, 옥수수 작황 비상"],["corn",-1,"🌽 대풍년! 옥수수 값 하락"],["cocoa",1,"🍫 서아프리카 폭우, 코코아 생산 급감"],["cocoa",-1,"🍫 코코아 수확 회복, 가격 안정"],["wheat",1,"🌾 흑해 곡물 수출 중단, 밀값 급등"],["coffee",1,"☕ 브라질 서리 피해, 원두값 폭등"],["silver",1,"🥈 태양광 패널 수요로 은값 상승"],["jpy",-1,"💴 일본 초저금리 유지, 엔화 약세"],["oil",1,"🛢️ 중동 긴장 고조! 유가 급등"],["oil",-1,"🛢️ 산유국 증산 합의, 유가 하락"],["gold",1,"🥇 안전자산 선호! 금값 사상 최고 행진"],["gold",-1,"🥇 위험자산 선호로 금값 하락"],["usd",1,"💵 달러 강세! 환율 급등"],["usd",-1,"💵 달러 약세, 환율 하락"],["jpy",1,"💴 엔화 깜짝 반등"],["jpy",-1,"💴 엔저 심화..."],["wheat",1,"🌾 가뭄으로 밀 흉작 우려"],["wheat",-1,"🌾 밀 대풍년!"],["coffee",1,"☕ 커피 산지 서리 피해, 원두값 폭등"],["coffee",-1,"☕ 커피 원두 재고 넘쳐나"],["gas",1,"🔥 한파 예보, 가스 수요 폭증"],["gas",-1,"🔥 따뜻한 겨울, 가스값 하락"],["silver",1,"🥈 태양광 수요로 은값 상승"],["eur",1,"💶 유럽 경제 회복 신호"],["eur",-1,"💶 유럽 경기 둔화 우려"],["cny",1,"🧧 위안화 강세"],["cny",-1,"🧧 위안화 약세"]];
 function initFx(){ if(!S.fx) S.fx={}; const F=S.fx; F.p=F.p||{}; F.a=F.a||{}; F.h=F.h||{}; F.own=F.own||{}; FXL.forEach(x=>{ if(!F.p[x.id]) F.p[x.id]=x.p; if(!F.a[x.id]) F.a[x.id]=x.p; if(!Array.isArray(F.h[x.id])||!F.h[x.id].length) F.h[x.id]=[F.p[x.id]]; if(!F.own[x.id]) F.own[x.id]={n:0,cost:0}; }); S.fxD=1; }
 const fxP=id=>S.fx?S.fx.p[id]:FXL.find(x=>x.id===id).p;
 const fxRatio=id=>fxP(id)/FXL.find(x=>x.id===id).p;
@@ -3501,6 +3558,50 @@ function ceoEvent(){
 }
 setInterval(()=>{ if(Math.random()<.004) ceoEvent(); },1000);
 
+/* ---------- 📰 경제신문 · 경제 지표 · 오늘의 경제 퀴즈 ---------- */
+const QUIZ=[
+  ["물가가 계속 오르는 현상을 뭐라고 할까요?",["인플레이션","디플레이션","리세션"],0,"인플레이션이 생기면 같은 돈으로 살 수 있는 물건이 줄어요. 그래서 현금만 들고 있으면 손해예요."],
+  ["중앙은행이 기준금리를 올리면 보통 어떻게 될까요?",["예금·대출 이자가 오른다","주식이 무조건 오른다","물가가 바로 2배가 된다"],0,"금리가 오르면 돈 빌리기가 비싸져서 소비·투자가 줄고, 물가 오름세가 꺾여요."],
+  ["달걀을 한 바구니에 담지 말라는 투자 격언의 뜻은?",["분산 투자","몰빵 투자","단타 매매"],0,"여러 곳에 나눠 투자하면 하나가 망해도 전체 손실이 작아져요."],
+  ["'원금 보장 + 월 30% 수익'을 약속하는 투자는?",["사기일 가능성이 매우 높다","정부가 보장하는 상품이다","무조건 가입해야 한다"],0,"높은 수익에는 항상 높은 위험이 따라요. 원금 보장과 고수익을 같이 약속하면 사기예요."],
+  ["주식을 가진 사람에게 회사가 이익을 나눠 주는 돈은?",["배당금","월세","보험금"],0,"배당금에도 배당소득세 15.4%가 붙어요."],
+  ["복리란 무엇일까요?",["이자에 또 이자가 붙는 것","이자를 두 번 내는 것","은행이 두 개인 것"],0,"오래 둘수록 눈덩이처럼 불어나요. 그래서 일찍 시작하는 게 중요해요."],
+  ["월급이 많을수록 세율도 높아지는 세금 방식은?",["누진세","정액세","부가세"],0,"한국 소득세는 6%부터 45%까지 구간별로 올라가요."],
+  ["보험의 진짜 목적은?",["큰 사고 때 한 번에 큰돈이 나가는 걸 막는 것","돈을 불리는 것","세금을 안 내는 것"],0,"평균적으로는 낸 보험료보다 조금 덜 돌려받지만, 큰 위험을 나눠 지는 거예요."],
+  ["로또를 많이 살수록 평균적으로는?",["손해가 커진다","무조건 이익이다","본전이다"],0,"로또는 산 돈의 약 50%만 당첨금으로 돌아와요."],
+  ["환율이 오르면(원화 약세) 이득을 보는 쪽은?",["수출 기업","해외여행 가는 사람","수입품을 사는 사람"],0,"같은 1달러를 벌어도 더 많은 원화로 바꿀 수 있어요."],
+  ["경기가 나빠서 물건이 안 팔리고 일자리가 줄어드는 시기는?",["불황(경기 침체)","호황","버블"],0,"불황 때는 금·달러 같은 안전자산이 오르는 경우가 많아요."],
+  ["신용점수가 높으면 좋은 점은?",["대출 이자가 싸진다","세금이 없어진다","월급이 2배가 된다"],0,"빚을 제때 갚으면 신용점수가 올라요."],
+  ["월세 계약에서 보증금은?",["나갈 때 돌려받는 돈","매달 내는 돈","집주인에게 주는 선물"],0,"단, 밀린 월세가 있으면 보증금에서 빼고 돌려줘요."],
+  ["'버블(거품)'이란?",["가치보다 가격이 지나치게 오른 상태","가격이 아주 싼 상태","거래가 멈춘 상태"],0,"거품은 언젠가 꺼지고, 꼭대기에서 산 사람이 크게 손해를 봐요."],
+  ["정기예금을 만기 전에 깨면?",["이자를 거의 못 받는다","이자를 2배 받는다","원금이 사라진다"],0,"약속한 기간을 지키는 대신 이자를 더 주는 상품이에요."],
+  ["ETF란?",["여러 주식을 묶어 한 번에 사는 상품","코인의 한 종류","은행 예금"],0,"지수 ETF 하나만 사도 분산 투자 효과가 있어요."],
+  ["연금저축에 넣으면 생기는 세금 혜택은?",["연말정산 때 세금을 돌려받는다","세금을 영원히 안 낸다","월급이 오른다"],0,"넣은 돈의 13.2~16.5%를 돌려받아요. 대신 55살 전에 빼면 세금을 내요."],
+  ["회사가 처음으로 주식을 시장에 파는 것은?",["IPO(기업공개)","M&A","배당"],0,"공모주 청약으로 상장 전에 주식을 살 수 있어요."],
+];
+function econ(){ const T=gTick(), rl=regLevel(T), M=S.mkt, L=S.life;
+  return {gdp:2.1+rl*14, unemp:Math.max(2,3.4-rl*9), cpi:L&&L.cpiH&&L.cpiH.length>12?(L.cpi/L.cpiH[L.cpiH.length-13]-1)*100:2.4+rl*4, br:M.br, usd:fxP("usd"), oil:fxP("oil"), gold:fxP("gold"), idx:idxNow(), idxCh:(idxNow()/M.idxO-1)*100}; }
+function renderPaper(){ const D=W_DAY(gTick()), e=econ(), today=S.news.filter(n=>n.t>=Date.now()-DAYTICKS*TICKMS*1.2);
+  const big=today.filter(n=>n.big).slice(0,5), rest=today.filter(n=>!n.big).slice(0,10);
+  const mv=actStk().filter(k=>!k.etf&&k.id!=="sMy").map(k=>[k,(S.stkP[k.id]/S.stkO[k.id]-1)*100]).sort((a,b)=>b[1]-a[1]);
+  const q=QUIZ[D%QUIZ.length], done=S.quizD===D, rw=Math.max(500,Math.floor(clickPay()*40));
+  $("paperDate").textContent=(D+1)+"일차 · "+(S.life?S.life.age+"살 "+(S.life.mon%12+1)+"월":"");
+  $("paperBody").innerHTML=
+    '<h3>🗞️ 오늘의 헤드라인</h3>'+(big.length?'<div class="hl">'+escH(big[0].text)+'</div><ul>'+big.slice(1).map(n=>'<li>'+escH(n.text)+'</li>').join("")+'</ul>':'<div class="hl">조용한 하루… 큰 뉴스가 없어요</div>')+
+    '<h3>📊 경제 지표</h3><div class="ecoG">'+[["종합지수",e.idx.toFixed(1),(e.idxCh>=0?"▲":"▼")+Math.abs(e.idxCh).toFixed(2)+"%"],["기준금리",e.br.toFixed(2)+"%",""],["경제성장률",e.gdp.toFixed(1)+"%","연간 추정"],["실업률",e.unemp.toFixed(1)+"%",""],["물가상승률",e.cpi.toFixed(1)+"%","1년 전 대비"],["원/달러",fmt(e.usd),""],["국제 유가",fmt(e.oil),"1배럴"],["금 1g",fmt(e.gold),""],["경기",S.mkt.reg>0?"🐂 호황":S.mkt.reg<0?"🐻 불황":"⚖️ 보통",S.mkt.evt?EVT_N[S.mkt.evt.t]:""]].map(x=>'<div>'+x[0]+'<b>'+x[1]+'</b>'+(x[2]?'<small>'+x[2]+'</small>':'')+'</div>').join("")+'</div>'+
+    '<h3>📈 오늘의 증시</h3><div class="mv"><div><b>상승 TOP 3</b>'+mv.slice(0,3).map(([k,c])=>'<div>'+k.ic+' '+k.n+' <span class="u">▲'+c.toFixed(1)+'%</span></div>').join("")+'</div><div><b>하락 TOP 3</b>'+mv.slice(-3).reverse().map(([k,c])=>'<div>'+k.ic+' '+k.n+' <span class="d">▼'+Math.abs(c).toFixed(1)+'%</span></div>').join("")+'</div></div>'+
+    '<h3>📰 그 밖의 소식</h3><ul>'+(rest.length?rest.map(n=>'<li>'+escH(n.text)+'</li>').join(""):'<li>새 소식이 없어요</li>')+'</ul>'+
+    '<h3>🧠 오늘의 경제 퀴즈 <small>(하루 한 번 · 맞히면 💰'+fmt(rw)+')</small></h3><div class="quiz"><b>Q. '+q[0]+'</b>'+
+      q[1].map((o,i)=>[o,i]).sort((a,b)=>((a[1]*7+D)%3)-((b[1]*7+D)%3)).map(([o,i])=>'<button data-qa="'+i+'"'+(done?" disabled":"")+' class="'+(done&&i===q[2]?"ok":"")+'">'+o+'</button>').join("")+
+      '<div class="qx" id="quizX">'+(done?"✅ 오늘의 퀴즈는 끝났어요! 해설: "+q[3]:"")+'</div></div>';
+  $("paperBody").querySelectorAll("[data-qa]").forEach(b=>b.onclick=()=>{ if(S.quizD===D) return; S.quizD=D; const ok=+b.dataset.qa===q[2];
+    b.classList.add(ok?"ok":"no"); $("paperBody").querySelectorAll("[data-qa]").forEach(x=>{ x.disabled=true; if(+x.dataset.qa===q[2]) x.classList.add("ok"); });
+    if(ok){ gain(rw); S.stat.quiz=(S.stat.quiz||0)+1; toast("🧠 정답! +"+fmt(rw)); coinCascade(6,60); } else toast("🧠 아쉬워요! 내일 다시 도전해요");
+    $("quizX").textContent=(ok?"⭕ 정답! ":"❌ 오답! ")+"해설: "+q[3]; save(); }); }
+$("gTicker").onclick=()=>{ renderPaper(); openModal("paperModal"); };
+$("paperClose").onclick=()=>closeModal("paperModal");
+let paperDay=-1; setInterval(()=>{ const D=W_DAY(gTick()); if(paperDay<0){ paperDay=D; return; } if(D!==paperDay){ paperDay=D; toast("📰 새 경제신문이 나왔어요! (화면 위 속보 띠를 눌러요)"); } },3000);
+
 /* ---------- 🧭 편의: HUD 이동 ---------- */
 function hudLinks(){ const map={"순자산":"fin","부자":"fin","경기":"stk","일차":"stk","빚":"fin","회사":"co","금리":"fin","환율":"fx","물가":"life","나이":"life"}; document.querySelectorAll("#hud span").forEach(sp=>{ for(const k in map){ if(sp.textContent.includes(k)){ sp.onclick=()=>showView(map[k]); break; } } }); }
 setInterval(hudLinks,2100);
@@ -3520,7 +3621,7 @@ function updAC(){
   const ab=$("abBtn"); if(S.abuy.un){ ab.textContent="✔ 작동 중 (체크로 켜고 꺼요)"; ab.disabled=true; } else { ab.innerHTML="🔓 자동 구매 잠금 해제 · 💰"+fmt(AB_PRICE); ab.disabled=bal()<AB_PRICE; }
   const cb=$("aclBtn"); if(S.acla.un){ cb.textContent=S.acla.on?"✔ 켜짐 (누르면 꺼져요)":"꺼짐 (누르면 켜져요)"; cb.className=S.acla.on?"":"off"; cb.disabled=false; $("aclInfo").textContent=S.acla.on?"🧲 보상을 알아서 챙기는 중!":"잠시 쉬는 중"; }
   else { cb.innerHTML="🔓 자동 수령기 구입 · 💰"+fmt(AC_PRICE); cb.className=""; cb.disabled=bal()<AC_PRICE; $("aclInfo").textContent="아직 없어요"; }
-  const cap=bankCap(); $("bankInfo").innerHTML='예금 <b>'+fmt(S.bank.dep)+'</b> / 한도 '+fmt(cap)+'<div class="bankBar"><i style="width:'+Math.min(100,S.bank.dep/cap*100)+'%"></i></div>이자율 <b>1분에 '+(bankRate()*100).toFixed(1)+'%</b> · 지금 1분마다 약 <b>+'+fmt(S.bank.dep*bankRate())+'</b> · 지금까지 받은 이자 '+fmt(S.stat.interest);
+  const cap=bankCap(); $("bankInfo").innerHTML='예금 <b>'+fmt(S.bank.dep)+'</b> / 한도 '+fmt(cap)+'<div class="bankBar"><i style="width:'+Math.min(100,S.bank.dep/cap*100)+'%"></i></div>이자율 <b>1분에 '+(bankRate()*100).toFixed(1)+'%</b> · 지금 1분마다 약 <b>+'+fmt(S.bank.dep*bankRate()*(1-.154))+'</b> (이자소득세 15.4% 뗀 금액) · 지금까지 받은 이자 '+fmt(S.stat.interest);
   document.querySelectorAll(".bankBtns button[data-d]").forEach(b=>b.disabled=S.bank.dep>=cap||bal()<1); document.querySelector(".bankBtns button[data-w]").disabled=S.bank.dep<1;
   $("bankCapBtn").innerHTML="📦 한도 ×4 · 💰"+fmt(capCost()); $("bankCapBtn").disabled=bal()<capCost();
   const rt=$("bankRateBtn"); if(S.bank.rate>=RATE_MAX){ rt.textContent="이자율 최대!"; rt.disabled=true; } else { rt.innerHTML="📈 이자율 +0.2% · 💰"+fmt(rateCost()); rt.disabled=bal()<rateCost(); }
@@ -3534,7 +3635,7 @@ document.querySelector(".bankBtns button[data-w]").onclick=()=>{ const x=Math.fl
 $("bankCapBtn").onclick=()=>{ const c=capCost(); if(bal()<c) return; spend(c); S.bank.cap++; S.stat.buys++; toast("📦 은행 한도가 "+fmt(bankCap())+"(으)로 늘었어요!"); save(); renderWork(); };
 $("bankRateBtn").onclick=()=>{ if(S.bank.rate>=RATE_MAX) return; const c=rateCost(); if(bal()<c) return; spend(c); S.bank.rate++; S.stat.buys++; toast("📈 이자율 1분에 "+(bankRate()*100).toFixed(1)+"%!"); save(); renderWork(); };
 // 은행 이자 (5초마다)
-let bankAcc=0; setInterval(()=>{ if(S.bank.dep<1) return; bankAcc+=S.bank.dep*bankRate()/12; const n=Math.floor(bankAcc); if(n>=1){ bankAcc-=n; gain(n); S.stat.interest+=n; } },5000);
+let bankAcc=0; setInterval(()=>{ if(S.bank.dep<1) return; bankAcc+=S.bank.dep*bankRate()/12*(1-.154); const n=Math.floor(bankAcc); if(n>=1){ bankAcc-=n; gain(n); S.stat.interest+=n; } },5000);
 // 자동 구매 (1.5초마다)
 let abLast=0, abCount=0;
 setInterval(()=>{
@@ -3752,28 +3853,58 @@ function evtC(T,kind,key,b){ let v=0; const B=Math.floor(W_DAY(T)/25);
 /* ---- 하루치 뉴스·사건 일정 (날짜마다 고정) ---- */
 const W_CACHE=new Map();
 function wPick(arr,D,i,c){ return arr[Math.floor(hh(D,i,c)*arr.length)]; }
-const LEAD_X=["AI 칩","전고체 배터리","자율주행 2.0","초고속 충전","양자 암호","스마트 글래스","AR 렌즈","로봇 팔","신약 후보물질","6G 통신"];
-const LEAD_UP=["신기술 '{x}' 공개 예정… 업계 판도 바꿀까","해외 대기업과 대형 공급 계약 협상 막바지","신제품 사전예약 폭주, 출시 앞둬","정부 대형 프로젝트 우선협상대상자 선정 임박","'{x}' 시험 결과 기대 이상이라는 소문","대주주, 자사주 대량 매입 계획 발표","해외 진출 앞두고 현지 공장 착공","'{x}' 특허 출원… 경쟁사 긴장"];
-const LEAD_DN=["야심 차게 내놓은 '{x}', 고객사 도입 실패 소식","핵심 개발자들 대거 경쟁사로 이직","공장 설비 고장으로 생산 차질 우려","주요 거래처와 계약 갱신 불투명","규제 당국, 불공정 거래 조사 착수 예정","경쟁사가 반값 '{x}' 출시 예고","신제품 결함 의혹 제기… 리콜 가능성","'{x}' 개발 일정 또 연기"];
+const LEAD_X=["초소형 모듈","무선 충전 패드","친환경 소재","구독 서비스","스마트 공장","AI 칩","전고체 배터리","자율주행 2.0","초고속 충전","양자 암호","스마트 글래스","AR 렌즈","로봇 팔","신약 후보물질","6G 통신"];
+const LEAD_UP=["신기술 '{x}' 공개 예정… 업계 판도 바꿀까","해외 대기업과 대형 공급 계약 협상 막바지","신제품 사전예약 폭주, 출시 앞둬","정부 대형 프로젝트 우선협상대상자 선정 임박","'{x}' 시험 결과 기대 이상이라는 소문","대주주, 자사주 대량 매입 계획 발표","해외 진출 앞두고 현지 공장 착공","'{x}' 특허 출원… 경쟁사 긴장","글로벌 1위 기업과 '{x}' 공동 개발 MOU 체결 임박","'{x}' 양산 수율 90% 돌파 소식","연기금, 지분 5% 이상 신규 취득 공시 예정","증권사 목표주가 줄줄이 상향","'{x}' 수출 계약 규모 사상 최대 전망","CEO '올해 '{x}'로 흑자 전환' 자신감","미국 대형 유통사 입점 확정 소식"];
+const LEAD_DN=["야심 차게 내놓은 '{x}', 고객사 도입 실패 소식","핵심 개발자들 대거 경쟁사로 이직","공장 설비 고장으로 생산 차질 우려","주요 거래처와 계약 갱신 불투명","규제 당국, 불공정 거래 조사 착수 예정","경쟁사가 반값 '{x}' 출시 예고","신제품 결함 의혹 제기… 리콜 가능성","'{x}' 개발 일정 또 연기","대주주 친인척 지분 대량 매도 공시","증권사 목표주가 하향… '성장 둔화'","'{x}' 핵심 부품 수입 막혀 생산 중단 위기","노조 파업 예고… 생산 차질 우려","해외 법인 대규모 적자 사실 드러나","'{x}' 안전성 논란, 소비자 불매 움직임","대규모 유상증자 검토설… 주식 가치 희석 우려"];
 function earnAt(D,k,j){ if(hh(D,60+j,1)>=.12) return null; return gh(D,60+j,2)*.14+regAt(D)*.04; }
+const IND=[
+  {n:"이번 달 수출",v:(g,r)=>(g?"+":"−")+(1+r*12).toFixed(1)+"%",g:["반도체·자동차가 이끌었어요","3개월 연속 증가"],b:["9개월 만에 감소 전환","주력 품목 부진"]},
+  {n:"실업률",v:(g,r)=>(g?2.4+r*.8:3.6+r*1.4).toFixed(1)+"%",g:["일자리 증가로 하락","청년 취업 늘어"],b:["구조조정 여파로 상승","청년 실업 비상"]},
+  {n:"소비자물가 상승률",v:(g,r)=>(g?1.6+r*.9:3.4+r*1.6).toFixed(1)+"%",g:["물가 안정 → 금리 인하 기대","목표치 2%에 근접"],b:["장바구니 물가 비상 → 금리 인상 우려","식료품·기름값 급등"]},
+  {n:"GDP 성장률(분기)",v:(g,r)=>(g?"+":"−")+(.2+r*1.1).toFixed(1)+"%",g:["예상보다 높은 성장","소비·투자 동반 회복"],b:["역성장 쇼크","경기 침체 공식화 우려"]},
+  {n:"제조업 경기지수(PMI)",v:(g,r)=>(g?51+r*5:44+r*5).toFixed(1),g:["50 넘어 확장 국면","공장 주문 증가"],b:["50 아래 위축 국면","재고 쌓이는 중"]},
+  {n:"소비자 심리지수",v:(g,r)=>(g?101+r*10:84+r*12).toFixed(1),g:["지갑 열린다","여행·외식 소비 회복"],b:["지갑 닫는다","소비 위축 심화"]},
+  {n:"가계 저축률",v:(g,r)=>(g?7+r*3:3+r*2).toFixed(1)+"%",g:["미래를 대비하는 가정 늘어","예금 잔액 사상 최대"],b:["생활비 부담에 저축 여력 줄어","빚으로 버티는 가계 늘어"]},
+];
+const POLICY=[["semi",1,"정부, 반도체 산업에 대규모 세금 혜택"],["car",1,"전기차 구매 보조금 확대"],["bio",1,"신약 허가 절차 간소화"],["edu",-1,"사교육비 경감 대책 발표"],["build",1,"공공주택 50만 호 공급 계획"],["build",-1,"건설 현장 안전 규제 강화"],["plat",-1,"플랫폼 독점 방지법 국회 통과"],["fin",1,"은행 배당 확대 허용"],["energy",1,"신재생 에너지 보조금 확대"],["game",-1,"확률형 아이템 규제 강화"],["air",1,"해외여행 무비자 국가 확대"],["pet",1,"반려동물 진료비 표준화 추진"],["tel",-1,"통신비 인하 압박"],["ins",1,"보험료 인상 허용"],["deliv",1,"택배 요금 현실화 합의"],["food",-1,"식품 가격 인상 자제 요청"],["beauty",1,"K-뷰티 수출 지원 확대"],["ship",1,"친환경 선박 지원금 신설"],["steel",-1,"탄소세 도입 검토"],["space",1,"우주항공 예산 2배 증액"],["ent",1,"K-콘텐츠 해외 진출 펀드 조성"],["elec",1,"AI 가전 구매 시 세금 환급"],["toy",1,"아동수당 인상 확정"]];
+const WEATHER=[["food",1,"🥵 역대급 폭염! 아이스크림·음료 판매 급증"],["elec",1,"🥵 폭염에 에어컨 판매 신기록"],["energy",1,"🥶 기록적 한파, 난방 수요 폭증"],["deliv",-1,"🌧️ 긴 장마로 배송 지연 속출"],["air",-1,"🌀 태풍 북상, 항공편 무더기 결항"],["ins",-1,"🌀 태풍 피해로 보험금 청구 폭주"],["build",-1,"🌧️ 장마로 공사 현장 멈춤"],["beauty",1,"☀️ 자외선 지수 최고, 선크림 품절"],["deliv",1,"❄️ 폭설에 집콕… 배달 주문 폭증"],["pet",1,"🌸 봄나들이 시즌, 반려동물 용품 판매 쑥"]];
+const GLOB_UP=["🇺🇸 [해외] 뉴욕 증시 사상 최고치 경신","🇯🇵 [해외] 일본 증시 급등, 아시아 훈풍","🇨🇳 [해외] 중국 대규모 경기 부양책 발표","🇺🇸 [해외] 미국 중앙은행 금리 인하 시사","🇪🇺 [해외] 유럽 경기 회복세 뚜렷"];
+const GLOB_DN=["🇺🇸 [해외] 뉴욕 증시 급락, 기술주 매도","🇨🇳 [해외] 중국 대형 부동산 업체 부도 위기","🇪🇺 [해외] 유럽 경기 침체 우려 확산","🇺🇸 [해외] 미국 물가 예상 웃돌아… 금리 인상 공포","🌏 [해외] 무역 분쟁 재점화, 관세 폭탄 예고"];
+const SOCIAL=["👥 [사회] 청년 취업률 소폭 상승… 'IT·보건 분야 구인 많아'","🏠 [생활] 원룸 평균 월세 또 올랐다… '월급의 30% 넘으면 위험'","📞 [사회] 경찰청 '검찰 사칭 보이스피싱 주의보' 발령","🛒 [생활] 장바구니 물가 비상… 배추 한 포기 값 2배","💳 [금융] 20대 신용카드 할부 연체율 증가","🎓 [교육] 대학 등록금 동결 16년째","🐷 [금융] 전문가 '월급 받으면 20%는 먼저 저축하세요'","🧾 [세금] 연말정산 시즌… '연금저축 세액공제 꼭 챙기세요'","🏦 [금융] 정기예금 금리 오르자 예금으로 돈 몰려","⚠️ [금융] '원금 보장 고수익' 투자 사기 피해 급증","👴 [사회] 국민연금 개혁안 발표… '더 내고 더 받는다'","🍜 [생활] 라면·과자값 줄줄이 인상","🏪 [사회] 내년 최저임금 인상 확정","📱 [생활] 중고폰 거래 급증, '알뜰족' 늘어","🏥 [생활] 실손보험료 내년 평균 8% 오른다","🚗 [생활] 자동차 보험료 소폭 인하","💍 [사회] '결혼할 때 가장 큰 부담은 집' 설문 1위","🎰 [사회] '로또 1등 당첨자 상당수가 몇 년 뒤 돈을 다 잃어' 조사","📚 [교육] 중학교 금융·경제 교육 확대 추진","🧑‍💻 [사회] AI가 바꾸는 일자리… '새로 배우는 사람이 살아남는다'","🏢 [사회] 주 4.5일제 시범 도입 기업 늘어","🐶 [생활] 반려동물 양육비 월평균 15만 원","🌱 [사회] 친환경 소비 늘어… 다회용기 매출 2배","💡 [생활] 전기요금 인상, 여름 냉방비 부담","🏧 [금융] 모바일 뱅킹 이용률 90% 돌파","📈 [금융] 20대 주식 투자자 300만 명 돌파… '분산 투자 필수'","🧮 [금융] '복리의 마법' 매달 10만 원 30년이면 원금의 2배 넘어","🏘️ [부동산] 전세 사기 예방법… '등기부등본 꼭 확인'","🚕 [사회] 플랫폼 노동자 1백만 명 시대","🎮 [사회] 청소년 게임 과금 평균 월 3만 원… '용돈 관리 교육 필요'"];
 function dayEvents(D){ if(W_CACHE.has(D)) return W_CACHE.get(D); const E=[], L=STK.filter(k=>k.id!=="sMy"&&!k.etf), reg=regAt(D), t0=D*DAYTICKS, secs=Object.keys(SECT).filter(x=>x!=="my"&&x!=="etf");
   const at=i=>t0+Math.floor(hh(D,i,1)*DAYTICKS);
-  const nC=7+Math.floor(hh(D,0,2)*4); for(let i=0;i<nC;i++){ const k=wPick(L,D,i,3), up=hh(D,i,4)<.5+reg*.1, m=(.015+hh(D,i,5)*.05)*(k.sec==="bio"||k.sec==="coin"?1.4:1), o=hh(D,i,8), real=o<.68?1:o<.88?.2:-.6, x=wPick(LEAD_X,D,i,9), tx=wPick(up?LEAD_UP:LEAD_DN,D,i,7).replace("{x}",x);
+  const nC=10+Math.floor(hh(D,0,2)*5); for(let i=0;i<nC;i++){ const k=wPick(L,D,i,3), up=hh(D,i,4)<.5+reg*.1, m=(.015+hh(D,i,5)*.05)*(k.sec==="bio"||k.sec==="coin"?1.4:1), o=hh(D,i,8), real=o<.68?1:o<.88?.2:-.6, x=LEAD_X[(Math.floor(hh(D,0,79)*LEAD_X.length)+i*11)%LEAD_X.length], LA=up?LEAD_UP:LEAD_DN, tx=LA[(Math.floor(hh(D,0,77)*LA.length)+i*7)%LA.length].replace("{x}",x);   // 같은 날 같은 문구가 겹치지 않게
     E.push({t:at(i),mk:"stk",tg:k.id,m:(up?m:-m)*real,lead:up?1:-1,real:Math.sign((up?1:-1)*real),delay:15+Math.floor(hh(D,i,10)*50),span:25,tau:220,txt:(m>.05?"🔮 [단독] ":"📰 ")+k.ic+" "+k.n+", "+tx,dir:up?1:-1,big:m>.05,id:k.id}); }
   L.forEach((k,j)=>{ const nx=earnAt(D+1,k,j); if(nx==null) return; const ok=hh(D,90+j,1)<.65, sayUp=ok?nx>=0:nx<0; E.push({t:at(90+j),mk:"info",lead:sayUp?1:-1,real:nx>=0?1:-1,txt:"🔮 [실적 전망] 증권가 \""+k.ic+" "+k.n+" 내일 실적 "+(sayUp?"기대 이상일 것":"기대에 못 미칠 것")+"\"",dir:sayUp?1:-1,big:false,id:k.id}); });
   for(let i=20;i<23;i++){ if(hh(D,i,2)>.75) continue; const sc=wPick(secs,D,i,3), up=hh(D,i,4)<.5, m=.01+hh(D,i,5)*.03; E.push({t:at(i),mk:"stk",tg:"sec:"+sc,m:up?m:-m,tau:160,txt:"🏭 ["+SECT[sc]+" 업종] "+wPick(SN[sc][up?0:1],D,i,6)+" — 관련주 "+(up?"동반 상승 ▲":"일제히 하락 ▼"),dir:up?1:-1,big:m>.03}); }
-  for(let i=30;i<32;i++){ if(hh(D,i,2)>.6) continue; const up=hh(D,i,4)<.5+reg*.15, m=.006+hh(D,i,5)*.016; E.push({t:at(i),mk:"stk",tg:"all",m:up?m:-m,tau:200,txt:up?wPick(["📈 [시장] 투자 열기 후끈! 전 종목 강세","📈 [시장] 외국인 대규모 순매수","📈 [시장] 경제 성장률 깜짝 상승"],D,i,6):wPick(["📉 [시장] 세계 경제 불안에 일제히 하락","📉 [시장] 공포 지수 급등...","📉 [시장] 외국인 대규모 매도 폭탄"],D,i,6),dir:up?1:-1,big:true}); }
+  for(let i=30;i<32;i++){ if(hh(D,i,2)>.6) continue; const up=hh(D,i,4)<.5+reg*.15, m=.006+hh(D,i,5)*.016; E.push({t:at(i),mk:"stk",tg:"all",m:up?m:-m,tau:200,txt:up?wPick(["📈 [시장] 투자 열기 후끈! 전 종목 강세","📈 [시장] 외국인 대규모 순매수","📈 [시장] 경제 성장률 깜짝 상승","📈 [시장] 연기금 저가 매수 나서","📈 [시장] 공매도 세력 '백기'… 숏커버링 랠리"],D,i,6):wPick(["📉 [시장] 세계 경제 불안에 일제히 하락","📉 [시장] 공포 지수 급등...","📉 [시장] 외국인 대규모 매도 폭탄","📉 [시장] 빚투 반대매매 쏟아져","📉 [시장] 환율 급등에 외국인 이탈"],D,i,6),dir:up?1:-1,big:true}); }
   for(let i=40;i<42;i++){ if(hh(D,i,2)>.7) continue; const k=wPick(L,D,i,3), up=hh(D,i,4)<.5, t=at(i), real=hh(D,i,5)<.5, m=.05+hh(D,i,6)*.1, t2=t+6+Math.floor(hh(D,i,7)*10);
     E.push({t,mk:"stk",tg:k.id,m:up?.03:-.03,tau:120,txt:"💬 [루머] "+k.ic+" "+k.n+(up?" 인수합병 추진설? 사실이면 대박!":" 회계 문제설? 사실이면 큰일!"),dir:0,big:false,id:k.id});
     E.push(real?{t:t2,mk:"stk",tg:k.id,m:up?m:-m,tau:220,txt:"✅ [확인] "+k.ic+" "+k.n+" 루머 사실로 밝혀짐! ("+(up?"▲":"▼")+Math.round(m*100)+"%)",dir:up?1:-1,big:true,id:k.id}:{t:t2,mk:"stk",tg:k.id,m:up?-.035:.035,tau:120,txt:"❌ [해명] "+k.ic+" "+k.n+" \"루머는 사실무근\"",dir:up?-1:1,big:false,id:k.id}); }
   if(hh(D,50,1)<.08){ const small=L.slice().sort((a,b)=>a.p*a.sh-b.p*b.sh).slice(0,Math.ceil(L.length*.6)), k=wPick(small,D,50,2), t=at(50), bad=hh(D,50,3)<.22, mega=!bad&&hh(D,50,4)<.07, th=wPick(THEMES,D,50,5), dur=(bad?2+Math.floor(hh(D,50,6)*2):mega?4+Math.floor(hh(D,50,6)*3):2+Math.floor(hh(D,50,6)*3))*DAYTICKS;
     E.push({t,mk:"stk",tg:k.id,theme:1,s:bad?-.0016:mega?.0034:.0012,dur,th:bad?"악재":th,tau:400,txt:bad?"💀💀 [충격] "+k.ic+" "+k.n+" 분식회계 의혹! 거래 폭주, 주가 폭락 우려":(mega?"🌋🌋🌋 [대폭등] ":"🔥🔥 [테마주] ")+k.ic+" "+k.n+", '"+th+"' 테마 대장주 등극! "+(mega?"몇 배 간다는 소문까지?!":"급등 행진 시작?"),dir:bad?-1:1,big:true,id:k.id}); }
   L.forEach((k,j)=>{ const sur=earnAt(D,k,j); if(sur!=null){ const op=Math.round(sur*100+hh(D,60+j,3)*10); E.push({t:at(60+j),mk:"stk",tg:k.id,m:sur*.35,tau:300,earn:1,txt:"📋 [실적] "+k.ic+" "+k.n+" 이번 분기 영업이익 "+(op>=0?"+":"")+op+"% "+(sur>.08?"— 어닝 서프라이즈!! 🎉":sur<-.08?"— 어닝 쇼크... 😱":"— 예상 수준"),dir:sur>=0?1:-1,big:Math.abs(sur)>.08,id:k.id}); } });
+  // 📊 경제 지표 발표 (경기에 따라 좋게/나쁘게)
+  for(let i=140;i<142;i++){ const ty=Math.floor(hh(D,i,2)*IND.length), good=hh(D,i,3)<.5+reg*.22, I=IND[ty], v=I.v(good,hh(D,i,4)), m=(.003+hh(D,i,5)*.009)*(good?1:-1);
+    E.push({t:at(i),mk:"stk",tg:"all",m,tau:220,txt:"📊 [지표] "+I.n+" "+v+" — "+wPick(good?I.g:I.b,D,i,6),dir:good?1:-1,big:Math.abs(m)>.009}); }
+  // 🏛️ 정부 정책 (특정 업종)
+  for(let i=143;i<145;i++){ if(hh(D,i,1)>.55) continue; const P=wPick(POLICY,D,i,2), m=(.008+hh(D,i,3)*.02)*P[1]; if(!SECT[P[0]]) continue;
+    E.push({t:at(i),mk:"stk",tg:"sec:"+P[0],m,tau:260,txt:"🏛️ [정책] "+P[2]+" → "+SECT[P[0]]+" 관련주 "+(P[1]>0?"▲":"▼"),dir:P[1],big:Math.abs(m)>.022}); }
+  // 🌦️ 날씨·계절
+  if(hh(D,146,1)<.45){ const P=wPick(WEATHER,D,146,2), m=(.006+hh(D,146,3)*.015)*P[1]; E.push({t:at(146),mk:"stk",tg:"sec:"+P[0],m,tau:200,txt:"🌦️ [날씨] "+P[2]+" → "+SECT[P[0]]+" 관련주 "+(P[1]>0?"▲":"▼"),dir:P[1],big:false}); }
+  // 🌐 해외 증시
+  if(hh(D,147,1)<.6){ const up=hh(D,147,2)<.5+reg*.15, m=(.004+hh(D,147,3)*.012)*(up?1:-1); E.push({t:at(147),mk:"stk",tg:"all",m,tau:180,txt:"🌐 "+wPick(up?GLOB_UP:GLOB_DN,D,147,4),dir:up?1:-1,big:Math.abs(m)>.012}); }
+  // 👥 생활·사회 뉴스 (가격엔 영향 없음, 생활 정보)
+  for(let i=150;i<153;i++){ E.push({t:at(i),mk:"info",txt:wPick(SOCIAL,D,i,2),dir:0,big:false}); }
+  // 💎 명품 한 번 더
+  if(hh(D,131,1)<.3){ const ws=LUX.filter(y=>y.k==="walk"), x=wPick(ws,D,131,2), up=hh(D,131,3)<.5, m=.04+hh(D,131,4)*.1; E.push({t:at(131),mk:"lux",tg:x.id,m:up?Math.log(1+m):Math.log(1-m),tau:1500,txt:"💎 [경매] "+x.ic+" "+x.n+(up?" 경매 최고가 낙찰! 시세 ▲":" 경매 유찰… 시세 ▼")+(m*100).toFixed(0)+"%",dir:up?1:-1,big:false}); }
+  // 🤖 AI·게임 코인
+  if(hh(D,125,1)<.35){ const ai=hh(D,125,2)<.5, up=hh(D,125,3)<.55, m=.08+hh(D,125,4)*.25, id=ai?"ait":"gmt"; if(CRY.find(x=>x.id===id)) E.push({t:at(125),mk:"cry",tg:id,m:Math.log(up?1+m:1-m*.7),tau:700,txt:"🪙 [코인] "+(ai?"🤖 AI토큰":"🎮 겜블록")+(up?(ai?" 빅테크 AI 서비스에 결제 수단 채택! +":" 인기 게임과 제휴! +")+(m*100).toFixed(0)+"%":(ai?" 개발팀 내분설… −":" 제휴 게임 서비스 종료… −")+(m*70).toFixed(0)+"%"),dir:up?1:-1,big:m>.2}); }
   // 외환·원자재
-  for(let i=100;i<104;i++){ if(hh(D,i,1)>.6) continue; const e=FX_EVT[Math.floor(hh(D,i,2)*FX_EVT.length)], m=.02+hh(D,i,3)*.05; E.push({t:at(i),mk:"fx",tg:e[0],m:e[1]*m,tau:600,txt:"🌍 [국제] "+e[2]+" ("+(e[1]>0?"▲":"▼")+(m*100).toFixed(1)+"%)",dir:e[1],big:m>.05}); }
+  for(let i=100;i<106;i++){ if(hh(D,i,1)>.6) continue; const e=FX_EVT[Math.floor(hh(D,i,2)*FX_EVT.length)], m=.02+hh(D,i,3)*.05; E.push({t:at(i),mk:"fx",tg:e[0],m:e[1]*m,tau:600,txt:"🌍 [국제] "+e[2]+" ("+(e[1]>0?"▲":"▼")+(m*100).toFixed(1)+"%)",dir:e[1],big:m>.05}); }
   // 부동산
-  for(let i=110;i<112;i++){ if(hh(D,i,1)>.55) continue; const g=REG[Math.floor(hh(D,i,2)*4)], up=hh(D,i,3)<.5+reg*.1, m=.01+hh(D,i,4)*.025;
-    const T2=g==="해외"?(up?["🌏 해외 부동산 투자 붐","✈️ 관광객 급증으로 숙박 수요 폭발","🏙️ 해외 도심 재개발 호재"]:["🌏 해외 부동산 거품 경고","💱 해외 취득세 강화","🏚️ 해외 공실률 상승"]):(up?["🚇 지하철 신설 호재","🏫 명문 학군 소문 확산","🏗️ 대규모 재개발 확정"]:["📉 미분양 아파트 급증","🏦 대출 규제 강화","🏚️ 인구 감소로 빈집 증가"]);
+  for(let i=110;i<113;i++){ if(hh(D,i,1)>.55) continue; const g=REG[Math.floor(hh(D,i,2)*4)], up=hh(D,i,3)<.5+reg*.1, m=.01+hh(D,i,4)*.025;
+    const T2=g==="해외"?(up?["🌏 해외 부동산 투자 붐","✈️ 관광객 급증으로 숙박 수요 폭발","🏙️ 해외 도심 재개발 호재"]:["🌏 해외 부동산 거품 경고","💱 해외 취득세 강화","🏚️ 해외 공실률 상승"]):(up?["🚇 지하철 신설 호재","🏫 명문 학군 소문 확산","🏗️ 대규모 재개발 확정","🏢 대기업 본사 이전 확정","🌳 대형 공원 조성 계획","📉 대출 금리 인하로 매수 문의 급증"]:["📉 미분양 아파트 급증","🏦 대출 규제 강화","🏚️ 인구 감소로 빈집 증가","💸 보유세 인상 발표","🏗️ 신도시 대량 공급 계획","⚠️ 전세 사기 여파로 거래 절벽"]);
     E.push({t:at(i),mk:"re",tg:g,m:up?m:-m,tau:2400,txt:"🏠 [부동산] "+g+": "+wPick(T2,D,i,5)+" ("+(up?"▲":"▼")+(m*100).toFixed(1)+"%)",dir:up?1:-1,big:m>.025}); }
   // 코인
   for(let i=120;i<124;i++){ if(hh(D,i,1)>.55) continue; const r=hh(D,i,2), coins=CRY.filter(x=>!x.stable), memes=CRY.filter(x=>x.meme), t=at(i);
@@ -3878,7 +4009,7 @@ function myCoTick(){ const k=STK.find(x=>x.id==="sMy"); if(!S.co.ipo||!S.stkP.sM
   const H=S.stkH[id]; H.push(np); if(H.length>120) H.shift(); stkV[id]=stkV[id]||[]; stkV[id].push(0); if(stkV[id].length>120) stkV[id].shift(); const c=curC[id]||(curC[id]={o:P,h:P,l:P,c:P,v:0}); c.h=Math.max(c.h,np); c.l=Math.min(c.l,np); c.c=np; if(S.mkt.tick%CANDLE===0){ S.cdl[id].push({o:c.o,h:c.h,l:c.l,c:c.c,v:0}); if(S.cdl[id].length>70) S.cdl[id].shift(); curC[id]={o:np,h:np,l:np,c:np,v:0}; } }
 // 하루가 끝날 때 (내 계좌에만 생기는 일: 배당·채권·공모주 배정)
 function wDayClose(D,live){ const M=S.mkt; let dv=0; actStk().forEach(k=>{ const h=S.stk[k.id]; if(k.dv&&h&&h.n) dv+=h.n*S.stkP[k.id]*k.dv; if(k.id==="sMy"&&S.stkP.sMy){ S.stkO.sMy=S.stkP.sMy; S.stkHi.sMy=S.stkP.sMy; S.stkLo.sMy=S.stkP.sMy; } });
-  dv=Math.floor(dv); if(dv>0){ gain(dv); S.stat.div+=dv; if(live){ toast("💰 배당금 +"+fmt(dv)+" 코인이 들어왔어요!"); coinCascade(6,60); } }
+  dv=Math.floor(dv*(1-DIV_TAX)); if(dv>0){ gain(dv); S.stat.div+=dv; if(live){ toast("💰 배당금 +"+fmt(dv)+" 코인 (배당소득세 15.4% 떼고) 들어왔어요!"); coinCascade(6,60); } }
   if(live){ const ich=(idxNow()/M.idxO-1)*100; news("🔔 ["+(D+1)+"일차 장 마감] 종합지수 "+(ich>=0?"▲":"▼")+Math.abs(ich).toFixed(2)+"%"+(dv>0?" · 배당금 "+fmt(dv):"")+" — 다음 날 장이 열렸어요!",ich>=0?1:-1,true); }
   M.day=D+2; if(typeof bondMature==="function") bondMature(); ipoSettle(); return dv; }
 function mTick(){ const T=gTick(), M=S.mkt;
@@ -3889,7 +4020,7 @@ function mTick(){ const T=gTick(), M=S.mkt;
   if(curView==="stk" && !ptrDown) renderMarket(false); }
 function endDay(){}
 function wLoadNews(T){ const mine=S.news.filter(n=>n.p); const L=[]; for(let d=W_DAY(T)-1;d<=W_DAY(T);d++) dayEvents(d).forEach(e=>{ if(e.t<=T) L.push({t:tickMs(e.t),text:e.txt,dir:e.dir,big:!!e.big,id:e.id||null,lead:e.lead,real:e.real}); });
-  S.news=L.concat(mine).sort((a,b)=>b.t-a.t).slice(0,50); const tk=$("tickerIn"); if(tk&&S.news[0]) tk.textContent="📰 "+S.news[0].text; }
+  S.news=L.concat(mine).sort((a,b)=>b.t-a.t).slice(0,80); const tk=$("tickerIn"); if(tk&&S.news[0]) tk.textContent="📰 "+S.news[0].text; }
 /* ---- 외환·원자재 ---- */
 function fxTick(){ const F=S.fx, T=gTick(); FXL.forEach(x=>{ F.p[x.id]=fxAt(x.id,T); F.a[x.id]=x.p*Math.exp(fbm(FX_SD[x.id],T,0)); const H=F.h[x.id]; if(!F._b){ H.length=0; for(let i=99;i>=1;i--) H.push(+fxAt(x.id,T-i*2).toFixed(2)); } H.push(+F.p[x.id].toFixed(2)); if(H.length>100) H.shift(); }); F._b=1; if(curView==="fx" && !ptrDown) renderFx(); }
 /* ---- 부동산 ---- */
@@ -3907,7 +4038,7 @@ function luxTick(){ const L=S.lux, T=gTick();
   if(curView==="lux" && !ptrDown) renderLux(); }
 /* ---- 공모주 ---- */
 function newIpo(){ S.ipo.cur=ipoAt(W_DAY(gTick())); }
-function initIpo(){ if(!S.ipo) S.ipo={cur:null,sub:0,hold:null,hist:[]}; const I=S.ipo; if(I.sub>0&&I.subD==null){ gain(I.sub); I.sub=0; } if(I.hold&&I.hold.D==null){ const g=Math.floor(I.hold.q*I.hold.p*(1-FEE)); gain(g); I.hold=null; } newIpo(); }
+function initIpo(){ if(!S.ipo) S.ipo={cur:null,sub:0,hold:null,hist:[]}; const I=S.ipo; if(I.sub>0&&I.subD==null){ gain(I.sub); I.sub=0; } if(I.hold&&I.hold.D==null){ const g=Math.floor(I.hold.q*I.hold.p*(1-FEE_S)); gain(g); I.hold=null; } newIpo(); }
 function ipoSub(f){ const I=S.ipo, c=ipoAt(W_DAY(gTick())); if(f==="x"){ if(I.sub>0){ gain(I.sub); toast("↩️ 청약을 취소했어요. 증거금 "+fmt(I.sub)+" 반환"); I.sub=0; } save(); renderMarket(true); return; }
   const a=Math.floor(bal()*f); if(a<c.pp*2){ toast("💸 최소 증거금은 "+fmt(c.pp*2)+" 코인이에요"); return; } spend(a); I.sub+=a; I.subD=c.D; toast("🎟️ "+c.n+" 청약 완료! 증거금 "+fmt(a)+" (오늘 장 마감 때 배정)"); ping(1300,.12,.2); save(); renderMarket(true); }
 function ipoSettle(){ const I=S.ipo; if(!I) return; const curD=W_DAY(gTick());
