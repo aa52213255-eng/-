@@ -924,7 +924,7 @@
     <div class="kStat"><span>📊 종합지수</span><b id="kIdx">1,000</b><small id="kIdxCh"></small></div>
   </div>
   <div class="ticker"><div id="tickerIn" class="tickerIn">📰 장이 열렸어요! 오늘도 성투하세요 📈</div></div>
-  <div class="mktBar"><span>📅 <b id="mDay">1</b>일차</span><span>🔔 장 마감까지 <b id="mLeft">3:00</b></span><span id="mReg"></span><span class="badge2" style="background:#4dabf7;color:#03203a">🌐 모든 플레이어 같은 시세</span><span id="mThemes"></span><canvas id="idxCv" width="160" height="34"></canvas></div>
+  <div class="mktBar"><span>📅 <b id="mDay">1</b>일차</span><span>🔔 장 마감까지 <b id="mLeft">3:00</b></span><span id="mReg"></span><span class="badge2" style="background:#4dabf7;color:#03203a">🌐 모든 플레이어 같은 시세</span><span id="mSync" class="badge2" style="background:#1d2a4a;color:#fff"></span><span id="mThemes"></span><canvas id="idxCv" width="160" height="34"></canvas></div>
   <div class="kSeg" id="kSeg"><button data-s="mkt">📊 시세</button><button data-s="news">📰 뉴스</button><button data-s="my">💼 내 자산</button><button data-s="ipo">🎟️ 공모주</button><button data-s="ai">🤖 AI</button></div>
   <div id="kSum" class="kSum"></div>
   <div class="stkWrap">
@@ -2484,7 +2484,7 @@ function applySave(d){
   mergeS(T); SAVE_TOP.forEach(k=>{ if(T[k]===undefined&&d[k]!==undefined) S[k]=d[k]; });
   if(S.car) S.car.mig=true; if(S.skins&&!S.skins[S.skin]) S.skin="gold";
   coins=d.coins; best=Math.max(+d.best||0,coins); shown=coins; pending=0; offlineInfo=null;
-  initMarket(); for(const id in S.theme){ const t=S.theme[id]; if(Math.abs(t.s)>.005) t.s=t.s>0?.0012:-.0016; } initFx(); initRe(); initLux(); initIpo(); initCry(); initFriends(); worldInit(); fixCity(); updVipTag(); initLife();
+  initMarket(); for(const id in S.theme){ const t=S.theme[id]; if(Math.abs(t.s)>.005) t.s=t.s>0?.0012:-.0016; } initFx(); initRe(); initLux(); initIpo(); initCry(); initFriends(); worldInit(); fixCity(); updVipTag(); initLife(); updSync(); setTimeout(syncTime,800);
   S.seen=true; save();
   applySkin(); applyFx(); setCoins(coins); renderStatus(); renderWork(); renderHist(); updPool(); updBadges(); updAchBadge(); renderHud();
   const v=curView; curView=null; showView(v==="pet"?"slot":v);
@@ -2985,7 +2985,7 @@ function stkExtra(k,id,P){
   const fr=Math.round(vol*(c/100*3+(r()-.5)*.25)), ins=Math.round(vol*(c/100*1.5+(r()-.5)*.2)), ind=-(fr+ins), mx=Math.max(1,Math.abs(fr),Math.abs(ins),Math.abs(ind));
   const inv=(n,v)=>'<div class="invRow"><span>'+n+'</span><div class="invBar"><i style="'+(v>=0?'left:50%;background:#ff5b5b;':'right:50%;background:#4d9bff;')+'width:'+(Math.abs(v)/mx*50)+'%"></i></div><b class="'+cls(v)+'" style="text-align:right">'+(v>=0?"+":"−")+fmt(Math.abs(v))+'주</b></div>';
   $("dChartX").innerHTML='<div class="infoCard"><h4>📏 오늘의 가격 범위</h4><div class="rangeBar"><i style="left:'+pos+'%"></i></div><div class="rangeLbl"><span>저가 '+pfmt(lo)+'</span><span>시가 '+pfmt(o)+'</span><span>고가 '+pfmt(hi)+'</span></div>'+
-    '<h4 style="margin-top:12px">🏔️ 역대 가격 범위</h4><div class="rangeBar"><i style="left:'+apos+'%"></i></div><div class="rangeLbl"><span>최저 '+pfmt(S.atl[id])+'</span><span>최고 '+pfmt(S.ath[id])+'</span></div></div>'+
+    '<h4 style="margin-top:12px">🏔️ 최근 60일 가격 범위 <small style="opacity:.6">(모든 플레이어 같음)</small></h4><div class="rangeBar"><i style="left:'+apos+'%"></i></div><div class="rangeLbl"><span>최저 '+pfmt(S.atl[id])+'</span><span>최고 '+pfmt(S.ath[id])+'</span></div></div>'+
     '<div class="infoCard"><h4>👥 투자자별 매매 동향 <small style="opacity:.6">(오늘 · 순매수)</small></h4>'+inv("🙋 개인",ind)+inv("🌏 외국인",fr)+inv("🏛️ 기관",ins)+'<small style="opacity:.6">외국인·기관이 사면 주가가 오르는 경우가 많아요</small></div>';
   // 정보 탭
   const all=actStk().filter(x=>!x.etf).sort((a,b)=>S.stkP[b.id]*b.sh-S.stkP[a.id]*a.sh), rank=all.findIndex(x=>x.id===id)+1;
@@ -3150,10 +3150,10 @@ const b64d=s=>{ s=s.replace(/-/g,"+").replace(/_/g,"/"); while(s.length%4) s+="=
 function myCard(){ const a=assets(); return {n:(S.nick||"이름 없음").slice(0,12),nw:Math.floor(netWorth(a)),d:S.mkt.day,rb:S.rb,j:JOBS[S.car.job].ic+" "+JOBS[S.car.job].n,co:S.co.on?(S.co.name||"내 회사"):"",t:Date.now(),id:S.pid}; }
 const RK_URL="https://leaderboard-70e82-default-rtdb.asia-southeast1.firebasedatabase.app/rank";
 let rkList=[], rkErr=false, rkLast=0, rkLoading=false;
-function rkCard(){ const c=myCard(); const k=new Date().toDateString(); if(!S.nw0||S.nw0.k!==k) S.nw0={k:k,v:c.nw}; c.e=c.nw-S.nw0.v; delete c.id; return c; }
+function rkCard(){ const c=myCard(); const k=new Date().toDateString(); if(!S.nw0||S.nw0.k!==k) S.nw0={k:k,v:c.nw}; c.e=c.nw-S.nw0.v; c.wv=WORLD_VER; delete c.id; return c; }
 async function rkPush(){ if(!S.rkOn||!S.nick) return false; try{ const r=await fetch(RK_URL+"/"+S.pid+".json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(rkCard())}); return r.ok; }catch(e){ return false; } }
 async function rkLoad(){ if(rkLoading) return; rkLoading=true; rkLast=Date.now(); try{ const r=await fetch(RK_URL+".json"); if(!r.ok) throw 0; const o=await r.json()||{}; rkList=Object.keys(o).map(k=>Object.assign({id:k},o[k])).filter(d=>d&&typeof d.nw==="number"&&isFinite(d.nw)&&d.n).sort((x,y)=>y.nw-x.nw).slice(0,100); rkErr=false; }catch(e){ rkErr=true; } rkLoading=false; renderFriends(true); }
-function rkAll(nw){ const o=rkList.filter(f=>f.id!==S.pid).map(f=>({ic:"🌐",n:f.n,w:f.nw,sub:(f.j||"")+(f.rb?" · 환생 "+f.rb:"")+" · 오늘 "+((f.e||0)>=0?"+":"-")+fmt(Math.abs(f.e||0)),on:true}));
+function rkAll(nw){ const o=rkList.filter(f=>f.id!==S.pid).map(f=>({ic:"🌐",n:f.n,w:f.nw,sub:(f.j||"")+(f.rb?" · 환생 "+f.rb:"")+" · 오늘 "+((f.e||0)>=0?"+":"-")+fmt(Math.abs(f.e||0))+(f.wv!==WORLD_VER?" · ⚠️ 다른 버전 (시세가 달라요)":""),on:true}));
   return NPC.map(n=>({ic:n[0],n:n[1],w:n[2]})).concat(o).concat([{ic:"😎",n:S.rkOn&&S.nick?S.nick+" (나)":"나",w:nw,me:true}]).sort((x,y)=>y.w-x.w); }
 function renderFriends(fromLoad){ if(!$("frErr")) return; if(!fromLoad&&Date.now()-rkLast>15000) rkLoad();
   $("frErr").innerHTML=rkErr?'<div style="color:#ffb3b3;font-size:.82rem;margin-bottom:6px">📡 인터넷이 안 되거나 랭킹 서버에 연결할 수 없어요. 게임은 그대로 할 수 있어요!</div>':'';
@@ -3581,7 +3581,7 @@ const QUIZ=[
 ];
 function econ(){ const T=gTick(), rl=regLevel(T), M=S.mkt, L=S.life;
   return {gdp:2.1+rl*14, unemp:Math.max(2,3.4-rl*9), cpi:L&&L.cpiH&&L.cpiH.length>12?(L.cpi/L.cpiH[L.cpiH.length-13]-1)*100:2.4+rl*4, br:M.br, usd:fxP("usd"), oil:fxP("oil"), gold:fxP("gold"), idx:idxNow(), idxCh:(idxNow()/M.idxO-1)*100}; }
-function renderPaper(){ const D=W_DAY(gTick()), e=econ(), today=S.news.filter(n=>n.t>=Date.now()-DAYTICKS*TICKMS*1.2);
+function renderPaper(){ const D=W_DAY(gTick()), e=econ(), today=S.news.filter(n=>n.t>=nowMs()-DAYTICKS*TICKMS*1.2);
   const big=today.filter(n=>n.big).slice(0,5), rest=today.filter(n=>!n.big).slice(0,10);
   const mv=actStk().filter(k=>!k.etf&&k.id!=="sMy").map(k=>[k,(S.stkP[k.id]/S.stkO[k.id]-1)*100]).sort((a,b)=>b[1]-a[1]);
   const q=QUIZ[D%QUIZ.length], done=S.quizD===D, rw=Math.max(500,Math.floor(clickPay()*40));
@@ -3819,7 +3819,11 @@ setInterval(()=>{ if(curView==="vc"&&!ptrDown) renderVc(); if(curView==="stk"&&k
    ===================================================================== */
 const W_EPOCH=Date.UTC(2026,10,4,9,0,0);           // 2026-11-04 18:00 (한국 시간) = 1일차 시작
 const W_SEED=20261104;
-const gTick=()=>Math.floor((Date.now()-W_EPOCH)/TICKMS);
+// ⏱️ 모든 사람이 같은 시세를 보려면 "같은 시각"을 써야 해요 → 기기 시계 대신 서버 시간
+var TOFF=0, TSYNC=0;                       // TOFF: 서버 시간 − 기기 시간 (ms) · TSYNC: 0 기기 시계 / 1 서버 동기화됨
+const WORLD_VER="2026.11.05";              // 시장 규칙 버전 (종목·뉴스가 바뀌면 올려요)
+const nowMs=()=>Date.now()+TOFF;
+const gTick=()=>Math.floor((nowMs()-W_EPOCH)/TICKMS);
 const tickMs=t=>W_EPOCH+t*TICKMS;
 function strSeed(s){ let h=2166136261; for(const c of String(s)){ h^=c.charCodeAt(0); h=Math.imul(h,16777619); } return h|0; }
 function hh(a,b,c){ let h=(Math.imul(a|0,0x27d4eb2d)^Math.imul((b|0)+0x165667b1,0x85ebca6b)^Math.imul((c|0)+0x9e3779b1,0xc2b2ae35)^W_SEED); h^=h>>>15; h=Math.imul(h,0x2c1b3c6d); h^=h>>>12; h=Math.imul(h,0x297a2d39); h^=h>>>15; return (h>>>0)/4294967296; }
@@ -3986,7 +3990,7 @@ function wRebuild(T){ const D=W_DAY(T), t0=D*DAYTICKS, M=S.mkt; M.tick=T; M.day=
       if(t>T-400){ if(!cur||t%CANDLE===0){ if(cur) C.push(cur); cur={o:p,h:p,l:p,c:p,v:0}; } cur.h=Math.max(cur.h,p); cur.l=Math.min(cur.l,p); cur.c=p; cur.v+=v; }
       last=p; }
     S.stkP[id]=last; S.stkO[id]=op!=null?op:last; S.stkHi[id]=hi>-Infinity?hi:last; S.stkLo[id]=lo<Infinity?lo:last; S.dvol[id]=dv; S.stkH[id]=H; stkV[id]=V; S.cdl[id]=C.slice(-60); curC[id]=cur; limHit[id]=lim;
-    S.ath[id]=Math.max(S.ath[id]||0,hi>-Infinity?hi:last); S.atl[id]=Math.min(S.atl[id]||Infinity,lo<Infinity?lo:last);
+    if(!k.etf){ const [ah,al]=histHL(k,D); S.ath[id]=Math.max(ah,hi>-Infinity?hi:last); S.atl[id]=Math.min(al,lo<Infinity?lo:last); } else { S.ath[id]=Math.max(S.ath[id]||0,last); S.atl[id]=Math.min(S.atl[id]||Infinity,last); }
     if(!k.etf){ const th=themeAt(id,T); if(th) S.theme[id]=th; else delete S.theme[id]; S.eps[id]=stkRaw(k,t0)/((8+hh(strSeed(id),1,1)*30)*Math.exp(.3*vnoise(strSeed(id)+3,D/15))); let nd=D; for(let d=D;d<D+12;d++){ if(dayEvents(d).some(e=>e.earn&&e.tg===id&&(d>D||e.t>T))){ nd=d; break; } } S.earnDay[id]=nd+1; } });
   const L=STK.filter(k=>k.id!=="sMy"&&!k.etf); M.idxH=[]; for(let i=0;i<120;i++){ M.idxH.push(+(1000*L.reduce((a,k)=>a+S.stkH[k.id][i]/k.p,0)/L.length).toFixed(1)); } M.idxO=1000*L.reduce((a,k)=>a+S.stkO[k.id]/k.p,0)/L.length;
   wLast=T; }
@@ -4052,12 +4056,26 @@ function ipoDayEnd(){ ipoSettle(); }
 function ipoHoldTick(){ const H=S.ipo&&S.ipo.hold; if(!H) return; const T=gTick(), t0=(H.D+1)*DAYTICKS; H.p=ipoPxAt(H.D,T); H.h=[]; for(let t=Math.max(t0,T-80);t<=T;t+=2) H.h.push(ipoPxAt(H.D,t)); if(H.h.length<2) H.h=[H.pp,H.p];
   if(T-t0>400){ toast("⏰ 공모주 상장 후 10분이 지나 자동으로 팔았어요"); ipoSell(); } else if(curView==="stk"&&kSeg==="ipo"&&!ptrDown) renderIpo(); }
 /* ---- 시작할 때 맞추기 ---- */
+async function syncTime(){
+  const tries=[
+    async()=>{ const r=await fetch(RK_URL.replace(/\/rank$/,"")+"/time.json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({".sv":"timestamp"})}); const j=await r.json(); return typeof j==="number"?j:null; },
+    async()=>{ const r=await fetch(RK_URL+"/_time.json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({".sv":"timestamp"})}); const j=await r.json(); return typeof j==="number"?j:null; },
+    async()=>{ const r=await fetch("https://worldtimeapi.org/api/timezone/Etc/UTC"); const j=await r.json(); const t=Date.parse(j.utc_datetime||j.datetime); return isFinite(t)?t:null; },
+    async()=>{ const r=await fetch("https://timeapi.io/api/Time/current/zone?timeZone=UTC"); const j=await r.json(); const t=Date.parse((j.dateTime||"")+"Z"); return isFinite(t)?t:null; },
+  ];
+  for(const f of tries){ try{ const t0=Date.now(), sv=await f(), t1=Date.now(); if(sv==null||t1-t0>5000) continue;
+      const off=sv-(t0+t1)/2; const big=Math.abs(off-TOFF)>1500; TOFF=off; TSYNC=1; if(big) worldInit(); updSync(); return true; }catch(e){} }
+  updSync(); return false; }
+function updSync(){ const e=$("mSync"); if(!e) return; e.innerHTML=TSYNC?'⏱️ 서버 시간 ✅'+(Math.abs(TOFF)>3000?' <small>(기기 시계 '+(TOFF>0?'늦음':'빠름')+' '+Math.round(Math.abs(TOFF)/1000)+'초 보정)</small>':''):'⚠️ 기기 시계 사용 중 <small>(인터넷 연결 시 자동 맞춤)</small>'; e.title="시장 규칙 버전 "+WORLD_VER+" · 같은 버전 파일을 쓰는 사람끼리 시세가 똑같아요"; }
+setInterval(syncTime,10*60*1000);
+// 🏔️ 역대 최고·최저가도 모두 같게: 각자 본 기록 대신 최근 60일 시세에서 계산
+function histHL(k,D){ let hi=-Infinity, lo=Infinity; for(let d=D-60;d<D;d++){ for(const f of [0,.5]){ const p=stkPx(k,d*DAYTICKS+Math.floor(f*DAYTICKS)).p; if(p>hi) hi=p; if(p<lo) lo=p; } } return [hi,lo]; }
 function worldInit(){ for(const id in stkImp) delete stkImp[id]; wLast=null; mTick(); if(S.fx){ S.fx._b=0; fxTick(); } if(S.re){ S.re._b=0; reTick(); } if(S.cry){ S.cry._b=0; cryTick(); } if(S.lux){ S.lux._b=0; luxTick(); } ipoSettle(); }
 
 load(); setCoins(coins); renderStatus();
 if (coins<1) $("msg").textContent="코인이 없어요! 💼 돈 벌기에서 일해서 벌어요 💪";
 for(let i=0;i<26;i++){ const e=document.createElement("div"); e.className="sp"; e.textContent="✦"; e.style.left=Math.random()*100+"vw"; e.style.top=Math.random()*100+"vh"; e.style.fontSize=(10+Math.random()*18)+"px"; e.style.animationDelay=(Math.random()*2.6)+"s"; e.style.animationDuration=(1.8+Math.random()*2)+"s"; document.body.appendChild(e); }
-initMarket(); for(const id in S.theme){ const t=S.theme[id]; if(Math.abs(t.s)>.005) t.s=t.s>0?.0012:-.0016; } initFx(); initRe(); initLux(); initIpo(); initCry(); initFriends(); worldInit(); fixCity(); updVipTag(); initLife();
+initMarket(); for(const id in S.theme){ const t=S.theme[id]; if(Math.abs(t.s)>.005) t.s=t.s>0?.0012:-.0016; } initFx(); initRe(); initLux(); initIpo(); initCry(); initFriends(); worldInit(); fixCity(); updVipTag(); initLife(); updSync(); setTimeout(syncTime,800);
 applySkin(); applyFx(); renderWork(); setCoins(coins); updMini(); updAchBadge(); renderHist(); updPool(); updBadges();
 (function addX(){ document.querySelectorAll(".overlay").forEach(ov=>{ const box=ov.querySelector(".paybox"); if(!box||box.querySelector(".xBtn")) return; const w=document.createElement("div"); w.className="xWrap"; const b=document.createElement("button"); b.className="xBtn"; b.type="button"; b.setAttribute("aria-label","닫기"); b.textContent="✕";
   b.onclick=()=>{ if(ov.id==="ceoModal"&&getComputedStyle($("ceoOk")).display==="none"){ closeModal("ceoModal"); ceoOpen=false; if(curView==="co") renderCo(); return; } const cb=[...box.querySelectorAll(".closeBtn")].find(x=>getComputedStyle(x).display!=="none"); if(cb) cb.click(); else closeModal(ov.id); };
