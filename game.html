@@ -1110,10 +1110,17 @@
 <div id="toasts"></div>
 
 <script>
-const SYM = ["🍒","🍋","🔔","⭐","💎","7️⃣"];
-const W   = [26,24,20,14,9,7];
-const MULT= [5,8,15,30,60,200];
-const PAIR= [0.5,0.5,1,1.5,2,3];
+const SYM = ["🍒","🍋","🔔","⭐","💎","7️⃣","🍉","🍇","💰"];   // 새 그림은 뒤에 붙여서 옛 기록(도감) 번호가 안 바뀌어요
+const W   = [14,14,12,9,5,6,14,14,7];
+const MULT= [8,10,20,40,100,300,12,15,60];                 // 3개 일치 배수 (예전: 5·8·15·30·60·200)
+const PAIR= [1.5,1.5,2,2.5,4,6,1.5,1.5,3];                // 2개 일치: 이제 전부 베팅보다 많이 돌려줘요 (예전 0.5배 → 1.5배)
+const RARE=[2,3,4,5,8], FRUIT=[0,1,6,7], LUCKY3=[3,4,5];  // 희귀 그림(행운 효과 받음) · 과일 · 럭키 콤보 그림
+const ORDER=[5,4,8,3,2,7,6,1,0];                           // 배당표 순서 (비싼 것부터)
+const COMBO={lucky:30,fruit:1.5,seven:1};                  // 🌟 럭키 콤보 ⭐💎7️⃣ ×30 · 🧺 과일 바구니 ×1.5 · 7️⃣ 하나 = 본전
+// 특별 조합 (2·3개 일치가 아닐 때): 무엇이 나왔는지 → [배수, 이름]
+function slotCombo(r){ if(LUCKY3.every(x=>r.includes(x))) return [COMBO.lucky,"🌟 럭키 콤보 ⭐💎7️⃣"]; if(r.every(x=>FRUIT.includes(x))) return [COMBO.fruit,"🧺 과일 바구니 (과일 3종)"]; if(r.includes(5)) return [COMBO.seven,"7️⃣ 하나! 본전"]; return null; }
+// 🎰 테이블 한도: 진짜 카지노처럼 한 번에 걸 수 있는 돈에 한도가 있어요 (월급·VIP 등급에 따라 커져요)
+function betLimit(){ return Math.floor(Math.max(1000,clickPay()*30)*(1+0.5*(S.vip||0))); }
 const START = 100, BOX_PRICE = 250, REROLL = 30, MAXLV = 10;
 const $ = id => document.getElementById(id);
 const UNITS=[[1e20,"해"],[1e16,"경"],[1e12,"조"],[1e8,"억"]];
@@ -1124,7 +1131,7 @@ const S = { charm:0, amp:0, potion:0, ins:0, free:0, jb:0, dbl:0, glove:0, batt:
   sluck:0, mag:0, sins:0, cbUntil:0, abUntil:0, pairL:0, triL:0, jpL:0, refL:0, aspL:0, critL:0, toolL:0, autod:0, offL:0, rbL:0,
   stat:{spins:0,tri:0,jp:0,mega:0,top:0,buys:0,maxLc:0,maxLa:0,bet:0,won:0,wins:0,golden:0,wheel:0,poolTop:0,playSec:0,race:0,raceWin:0,slothWin:0,gigs:0,paydays:0,maxRank:0,stkProfit:0,div:0,limUp:0,trades:0,interest:0,robo:0,coProfit:0,themeHit:0,seized:0,reProfit:0,bondGain:0,defaults:0,fxTrades:0,fxProfit:0,ceo:0,jeonse:0}, ach:{},
   pool:1000, dq:{date:"",spins:0,clicks:0,gigs:0,wins:0,tri:0,wager:0,earn:0,claimed:{}}, att:{last:"",streak:0}, wheelAt:0,
-  hist:[], curve:[], col:{tri:[0,0,0,0,0,0],pair:[0,0,0,0,0,0]}, set:{bgm:false,lowfx:false,noshake:false}, seen:false,
+  hist:[], curve:[], col:{tri:[0,0,0,0,0,0,0,0,0],pair:[0,0,0,0,0,0,0,0,0]}, set:{bgm:false,lowfx:false,noshake:false}, seen:false,
   bc:{}, pets:{}, eq:[], petSlots:3, ecnt:{}, coll:{}, vip:0, don:0,
   city:{lots:8,tiles:[]}, bcnt:{}, stk:{}, stkP:{}, stkA:{}, stkO:{}, stkH:{}, stkHi:{}, stkLo:{}, watch:{}, news:[], mkt:{day:1,tick:0,reg:0,idxO:1000,idxH:[],br:3.5},
   car:{job:0,rank:0,exp:0,texp:0,edu:{},study:null,gig:null,acc:0,payIn:30,mig:false}, acl:0, abuy:{un:false,click:true,auto:true,city:true}, acla:{un:false,on:true}, bank:{dep:0,cap:1,rate:0},
@@ -1160,7 +1167,7 @@ function load(){
 
 /* ---------- 확률 / 배당 (업그레이드 반영) ---------- */
 function luck(){ return 0.06*S.charm + (itemsOn&&S.potion>0 ? 0.5 : 0) + (itemsOn&&S.sluck>0 ? 1.5 : 0) + 0.03*S.perk.slot + bonusLuck(); }
-function effW(){ const ew=W.map((w,i)=> i>=2 ? w*(1+luck()) : w); if(itemsOn&&S.jb>0) ew[5]*=2; return ew; }
+function effW(){ const ew=W.map((w,i)=> RARE.includes(i) ? w*(1+luck()) : w); if(itemsOn&&S.jb>0) ew[5]*=2; return ew; }
 function payBonus(){ return (1 + 0.03*S.amp)*(1+bonusSlot()); }
 function pick(ew){ const tot=ew.reduce((a,b)=>a+b); let r=Math.random()*tot; for(let i=0;i<ew.length;i++){ if((r-=ew[i])<0) return i; } return 0; }
 
@@ -1234,7 +1241,7 @@ function renderStatus(){
   if(S.sins)  c.push("🛡️ 슈퍼보험 "+S.sins+"장");
   if(Date.now()<S.cbUntil) c.push("⚡ 급여 ×2 ("+Math.ceil((S.cbUntil-Date.now())/1000)+"초)");
   if(Date.now()<S.abUntil) c.push("🌙 자동 ×3 ("+Math.ceil((S.abUntil-Date.now())/1000)+"초)");
-  if($("capNote")) $("capNote").textContent="🛡️ 슬롯 아이템(물약·보험·자석·더블 등)은 베팅 "+fmt(itemCap())+" 이하일 때만 효과가 있어요";
+  if($("capNote")) $("capNote").textContent="🎰 테이블 한도 "+fmt(betLimit())+" · 🛡️ 슬롯 아이템(물약·보험·자석·더블 등)은 베팅 "+fmt(itemCap())+" 이하일 때만 효과가 있어요";
   if(typeof cityRate==="function" && cityRate()>0) c.unshift("🏙️ +"+fmt(cityRate())+"/초");
   $("status").innerHTML = c.length ? c.map(t=>'<span class="chip">'+t+'</span>').join("") : '<span class="chip" style="opacity:.6">상점에서 아이템을 사봐요!</span>';
 }
@@ -1267,6 +1274,7 @@ function spin(fromLever){
   if (busy) return false;
   let b = Math.floor(Number($("betInput").value));
   if (!(b >= 1)){ $("msg").textContent = "베팅 금액을 1 이상으로 입력해요!"; return false; }
+  if (b > betLimit()){ b = betLimit(); toast("🎰 테이블 한도는 "+fmt(b)+"코인이에요 (월급·VIP가 오르면 커져요)"); }
   const useFree = S.free>0;
   if (useFree) b = Math.max(1,Math.min(b, itemCap()));
   else if (b > coins){ $("msg").textContent = "코인이 부족해요! 가진 코인: "+fmt(coins); return false; }
@@ -1301,12 +1309,15 @@ function result(r){
   if (tri){
     win = Math.round(bet*MULT[r[0]]*pb*(r[0]===5?1+0.1*S.jpL:1+0.08*S.triL));
     if (r[0]===5){ text="🎉 잭팟!!! +"+fmt(win)+" 코인 🎉"; reels.forEach(x=>x.classList.add("jp")); tier=3; }
-    else { text="🔥 대박! "+SYM[r[0]].repeat(3)+" ×"+MULT[r[0]]+" → +"+fmt(win)+" 코인"; reels.forEach(x=>x.classList.add("win")); tier = r[0]>=3 ? 2 : 1; if(tier===1) bigWinFX(SYM[r[0]], win); }
+    else { text="🔥 대박! "+SYM[r[0]].repeat(3)+" ×"+MULT[r[0]]+" → +"+fmt(win)+" 코인"; reels.forEach(x=>x.classList.add("win")); tier = [3,4,8].includes(r[0]) ? 2 : 1; if(tier===1) bigWinFX(SYM[r[0]], win); }
   } else if (r[0]===r[1] || r[1]===r[2] || r[0]===r[2]){
     const m = r[0]===r[1]?[0,1]:(r[1]===r[2]?[1,2]:[0,2]);
     const ps = r[m[0]];
     win = Math.round(bet*PAIR[ps]*pb*(1+0.1*S.pairL)); text="2개 일치! "+SYM[ps]+SYM[ps]+" ×"+PAIR[ps]+" → +"+fmt(win)+" 코인"; melody([784,988],110,"triangle",0.06,0.12); coinCascade(4);
     m.forEach(i=>reels[i].classList.add("win")); setTimeout(()=>m.forEach(i=>reels[i].classList.remove("win")),1200);
+  } else if (slotCombo(r)){
+    const [cm,cn]=slotCombo(r); win=Math.round(bet*cm*pb); text=cn+" ×"+cm+" → +"+fmt(win)+" 코인";
+    if(cm>=10){ reels.forEach(x=>x.classList.add("win")); tier=1; bigWinFX("🌟",win); S.stat.lucky=(S.stat.lucky||0)+1; } else { melody([659,880],100,"triangle",0.05,0.12); coinCascade(2); }
   } else if (itemsOn && S.sins>0){
     S.sins--; renderStatus(); win=Math.round(bet*0.8); text="꽝... 하지만 🛡️ 슈퍼 보험 발동! 80% 환불 +"+fmt(win)+" 코인"; melody([523,784],120,"triangle",0.06,0.15);
   } else if (itemsOn && S.ins>0){
@@ -1664,6 +1675,7 @@ $("shopModal").onclick = e => { if(e.target.id==="shopModal") $("shopModal").cla
 
 /* ---------- 업적 ---------- */
 const ACH=[
+  {id:"x3",icon:"🌟",name:"럭키 콤보",desc:"⭐💎7️⃣ 럭키 콤보 1번",goal:1,val:()=>S.stat.lucky||0,reward:3000},
   {id:"x1",icon:"🧑‍🚀",name:"꿈의 직업",desc:"우주비행사 되기 (꿈의 직업이지만 월급은 공무원 수준이에요!)",goal:1,val:()=>JOBS[S.car.job]&&JOBS[S.car.job].n==="우주비행사"?1:0,reward:5e6},
   {id:"x2",icon:"🎓",name:"자격증 부자",desc:"자격증·학위 10개 따기",goal:10,val:()=>Object.keys(S.car.edu||{}).length,reward:50000},
   {id:"lf1",icon:"🏢",name:"독립 만세!",desc:"부모님 집에서 나와 원룸 이상으로 이사",goal:2,val:()=>S.life?S.life.home:0,reward:3000},
@@ -1767,28 +1779,27 @@ setInterval(()=>{
 
 /* ---------- 배당표 ---------- */
 function buildPay(){
-  const ew=effW(), tot=ew.reduce((a,b)=>a+b), pb=payBonus();
-  const mm=x=>+x.toFixed(2);
-  let rtp=0, rows="<tr><th>결과</th><th>배당</th><th>확률</th><th>대략</th></tr>";
-  const order=[5,4,3,2,1,0];
-  order.forEach(i=>{
-    const p=Math.pow(ew[i]/tot,3), m=MULT[i]*pb*(i===5?1+0.1*S.jpL:1+0.08*S.triL); rtp+=p*m;
-    rows += "<tr"+(i===5?' class="jprow"':'')+"><td>"+SYM[i].repeat(3)+(i===5?" 잭팟":"")+"</td><td>×"+mm(m)+"</td><td>"+(p*100).toFixed(3)+"%</td><td>"+fmt(1/p)+"번에 1번</td></tr>";
-  });
-  let two=0;
-  order.forEach(i=>{
-    const p=ew[i]/tot, pp=3*p*p*(1-p), m=PAIR[i]*pb*(1+0.1*S.pairL); two+=pp; rtp+=pp*m;
-    rows += "<tr><td>"+SYM[i]+SYM[i]+" + 다른 그림</td><td>×"+mm(m)+"</td><td>"+(pp*100).toFixed(2)+"%</td><td>"+(1/pp).toFixed(1)+"번에 1번</td></tr>";
-  });
-  const triple=ew.reduce((a,w)=>a+Math.pow(w/tot,3),0), none=1-two-triple;
-  rows += "<tr><td>전부 다름 (꽝)</td><td>×0</td><td>"+(none*100).toFixed(2)+"%</td><td>"+(1/none).toFixed(1)+"번에 1번</td></tr>";
+  const ew=effW(), tot=ew.reduce((a,b)=>a+b), pb=payBonus(), P=ew.map(w=>w/tot), n=SYM.length;
+  const mm=x=>+x.toFixed(2), tm=i=>MULT[i]*pb*(i===5?1+0.1*S.jpL:1+0.08*S.triL), pm=i=>PAIR[i]*pb*(1+0.1*S.pairL);
+  const pr={lucky:0,fruit:0,seven:0}; let none=0, rtp=0;
+  for(let a=0;a<n;a++)for(let b=0;b<n;b++)for(let c=0;c<n;c++){ if(a===b||b===c||a===c) continue; const q=P[a]*P[b]*P[c], r=[a,b,c];
+    if(LUCKY3.every(x=>r.includes(x))) pr.lucky+=q; else if(r.every(x=>FRUIT.includes(x))) pr.fruit+=q; else if(r.includes(5)) pr.seven+=q; else none+=q; }
+  let rows="<tr><th>결과</th><th>배당</th><th>확률</th><th>대략</th></tr>", triple=0, two=0;
+  const row=(cls,name,m,p)=>"<tr"+cls+"><td>"+name+"</td><td>×"+mm(m)+"</td><td>"+(p*100).toFixed(p<.001?4:2)+"%</td><td>"+(p>0?(1/p>=100?fmt(1/p):(1/p).toFixed(1)):"-")+"번에 1번</td></tr>";
+  ORDER.forEach(i=>{ const p=Math.pow(P[i],3); triple+=p; rtp+=p*tm(i); rows+=row(i===5?' class="jprow"':'',SYM[i].repeat(3)+(i===5?" 잭팟":""),tm(i),p); });
+  rows+=row('',"🌟 ⭐💎7️⃣ 럭키 콤보 (순서 상관없음)",COMBO.lucky*pb,pr.lucky); rtp+=pr.lucky*COMBO.lucky*pb;
+  ORDER.forEach(i=>{ const p=P[i], pp=3*p*p*(1-p); two+=pp; rtp+=pp*pm(i); rows+=row('',SYM[i]+SYM[i]+" + 다른 그림",pm(i),pp); });
+  rows+=row('',"🧺 과일 바구니 (🍒🍋🍉🍇 중 서로 다른 3개)",COMBO.fruit*pb,pr.fruit); rtp+=pr.fruit*COMBO.fruit*pb;
+  rows+=row('',"7️⃣ 하나만 나와도 본전",COMBO.seven*pb,pr.seven); rtp+=pr.seven*COMBO.seven*pb;
+  rows+=row('',"그 밖에 전부 다름 (꽝)",0,none);
   $("payTable").innerHTML=rows;
   const lk=Math.round(luck()*100), ab=Math.round((pb-1)*100);
-  $("payNote").innerHTML = "• 한 칸에서 나올 확률: "+SYM.map((s,i)=>s+" "+(ew[i]/tot*100).toFixed(1)+"%").join(" · ")+"<br>"+
+  $("payNote").innerHTML = "• 한 칸에서 나올 확률: "+SYM.map((s,i)=>s+" "+(P[i]*100).toFixed(1)+"%").join(" · ")+"<br>"+
     "• 지금 적용 중: 희귀 그림 확률 <b>+"+lk+"%</b> · 당첨금 <b>+"+ab+"%</b> (상점 아이템)<br>"+
-    "• 3개 일치 전체: "+(triple*100).toFixed(2)+"% / 2개 이상 일치: "+((two+triple)*100).toFixed(1)+"%<br>"+
+    "• 무언가 당첨될 확률: <b>"+((1-none)*100).toFixed(1)+"%</b> · 3개 일치: "+(triple*100).toFixed(2)+"%<br>"+
     "• 평균 돌려받는 비율(기대값): 베팅의 약 <b>"+(rtp*100).toFixed(1)+"%</b><br>"+
-    "• 배당은 <b>베팅 금액 × 배수</b>예요. 드문 그림일수록 배수가 커요.";
+    "• 🎰 테이블 한도: 한 번에 최대 <b>"+fmt(betLimit())+"</b>코인 (월급의 30초치 · VIP 등급마다 +50%)<br>"+
+    "• 배당은 <b>베팅 금액 × 배수</b>예요. 2개만 맞아도 이제 베팅보다 더 받아요!";
 }
 $("payBtn").onclick = () => { buildPay(); $("payModal").classList.add("show"); };
 $("payClose").onclick = () => $("payModal").classList.remove("show");
@@ -2266,14 +2277,14 @@ function renderHist(){ const h=$("histBar"); if(!h) return; h.innerHTML=S.hist.s
 function recordSpin(r,win,tier,tri){
   const st=S.stat; st.spins++; st.bet+=bet; st.won+=win; if(tri) st.tri++; if(tier===3) st.jp++; if(tier===2) st.mega++; st.top=Math.max(st.top,win); if(win>bet) st.wins++;
   const pair=!tri&&(r[0]===r[1]||r[1]===r[2]||r[0]===r[2]);
-  if(tri) S.col.tri[r[0]]++; else if(pair){ const sy=r[0]===r[1]?r[0]:(r[1]===r[2]?r[1]:r[0]); S.col.pair[sy]++; }
-  S.hist.push({k:tri?(tier===3?"jp":"tri"):(pair?"pair":"lose"),w:win,b:bet,s:r.map(i=>SYM[i]).join("")}); if(S.hist.length>40) S.hist.shift();
+  if(tri) S.col.tri[r[0]]=(S.col.tri[r[0]]||0)+1; else if(pair){ const sy=r[0]===r[1]?r[0]:(r[1]===r[2]?r[1]:r[0]); S.col.pair[sy]=(S.col.pair[sy]||0)+1; }
+  S.hist.push({k:tri?(tier===3?"jp":"tri"):(pair||win>0?"pair":"lose"),w:win,b:bet,s:r.map(i=>SYM[i]).join("")}); if(S.hist.length>40) S.hist.shift();
   S.curve.push(Math.round(coins)); if(S.curve.length>80) S.curve.shift();
   const q=dq(); q.spins++; q.wager+=bet; if(tri||pair) q.wins++; if(tri) q.tri++;
   renderHist(); updBadges();
 }
 document.querySelectorAll(".betq button").forEach(b=>b.addEventListener("click",()=>{
-  const inp=$("betInput"); let v=Math.floor(Number(inp.value))||10; const k=b.dataset.b, cap=Math.max(1,Math.floor(coins));
+  const inp=$("betInput"); let v=Math.floor(Number(inp.value))||10; const k=b.dataset.b, cap=Math.max(1,Math.min(Math.floor(coins),betLimit()));
   if(k==="min") v=Math.min(10,cap); else if(k==="half") v=Math.max(1,Math.floor(v/2)); else if(k==="dbl") v=v*2; else v=cap;
   inp.value=Math.min(v,cap); beep(800,.04,"square",.07);
 }));
@@ -2385,7 +2396,7 @@ function renderStats(){
   const cv=S.curve; if(cv.length>1){ const mx=Math.max(...cv), mn=Math.min(...cv), W=300, H=80; const pts=cv.map((v,i)=>(i/(cv.length-1)*W).toFixed(1)+","+(H-4-((v-mn)/Math.max(1,mx-mn))*(H-8)).toFixed(1)).join(" ");
     $("curveBox").innerHTML='<svg viewBox="0 0 300 80" style="width:100%;background:#0006;border-radius:12px"><polyline points="'+pts+'" fill="none" stroke="#ffd23f" stroke-width="2.5" stroke-linejoin="round"/></svg><div class="note" style="text-align:center">최근 '+cv.length+'번 스핀 후 코인 (최고 '+fmt(mx)+' · 최저 '+fmt(mn)+')</div>'; }
   else $("curveBox").innerHTML='<div class="note">슬롯을 돌리면 그래프가 그려져요!</div>';
-  $("colGrid").className="colGrid"; $("colGrid").innerHTML=SYM.map((sy,i)=>{ const t=S.col.tri[i], p=S.col.pair[i]; const ic=sy==="7️⃣"?'<span class="seven" style="font-size:2.8rem;-webkit-text-stroke:4px #7a0b0b">7</span>':'<span style="font-size:2.6rem;line-height:1.3;display:block">'+sy+'</span>'; return '<div class="colCard '+(t?"got":"lock")+'"><div class="colIc">'+ic+'</div><div><b>'+(t?MULT[i]+"배":"???")+'</b></div><div>3개 '+t+'회 · 2개 '+p+'회</div></div>'; }).join("");
+  $("colGrid").className="colGrid"; $("colGrid").innerHTML=SYM.map((sy,i)=>{ const t=S.col.tri[i]||0, p=S.col.pair[i]||0; const ic=sy==="7️⃣"?'<span class="seven" style="font-size:2.8rem;-webkit-text-stroke:4px #7a0b0b">7</span>':'<span style="font-size:2.6rem;line-height:1.3;display:block">'+sy+'</span>'; return '<div class="colCard '+(t?"got":"lock")+'"><div class="colIc">'+ic+'</div><div><b>'+(t?MULT[i]+"배":"???")+'</b></div><div>3개 '+t+'회 · 2개 '+p+'회</div></div>'; }).join("");
 }
 $("statBtn").onclick=()=>{ renderStats(); openModal("statModal"); };
 
